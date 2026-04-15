@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Grupo ATM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#F4F4F4;color:#0A0A0A;font-size:14px}
+a{color:inherit;text-decoration:none}
+.header{background:#0A0A0A;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logos{display:flex;align-items:center;gap:24px}
+.logos img{height:28px;filter:brightness(0) invert(1)}
+.logo-text{color:#fff;font-size:12px;font-weight:600;letter-spacing:.08em;opacity:.7}
+.header-title{color:#fff;font-size:13px;font-weight:400;opacity:.5}
+.nav{background:#fff;border-bottom:1px solid #E8E8E8;padding:0 32px;display:flex;gap:0;overflow-x:auto}
+.nav button{background:none;border:none;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#666;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s}
+.nav button:hover{color:#0A0A0A}
+.nav button.active{color:#0A0A0A;border-bottom-color:#0A0A0A}
+.main{padding:32px;max-width:1400px;margin:0 auto}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:#fff;border-radius:10px;padding:20px;border:1px solid #EBEBEB}
+.section-title{font-size:18px;font-weight:700;margin-bottom:20px}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#999;margin-bottom:6px}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:#E6F4EC;color:#1A7A3F}
+.bb{background:#E6F1FB;color:#185FA5}
+.by{background:#FAEEDA;color:#854F0B}
+.br{background:#FDEAEA;color:#C0392B}
+.bgr{background:#F0F0F0;color:#666}
+.bp{background:#EEEDFE;color:#3C3489}
+.pw{background:#F0F0F0;height:6px;border-radius:99px;margin-top:8px}
+.pb{height:6px;border-radius:99px;background:#0A0A0A;transition:width .3s}
+.pb.g{background:#1A7A3F}.pb.y{background:#E6A817}.pb.r{background:#C0392B}
+.sm{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px}
+.sg{background:#1A7A3F}.sy{background:#E6A817}.sr{background:#C0392B}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#999;padding:10px 12px;border-bottom:1px solid #F0F0F0}
+td{padding:9px 12px;border-bottom:1px solid #F4F4F4;font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAFA}
+.kpib{text-align:center;padding:22px 16px}
+.kpinum{font-size:34px;font-weight:700;line-height:1}
+.kpilbl{font-size:12px;color:#999;margin-top:4px}
+.kpisub{font-size:12px;color:#555;margin-top:5px}
+/* FILTERS */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.fb{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid #DDD;background:#fff;cursor:pointer;transition:all .15s}
+.fb.active,.fb:hover{background:#0A0A0A;color:#fff;border-color:#0A0A0A}
+.filter-section{background:#fff;border-radius:10px;border:1px solid #EBEBEB;padding:14px 16px;margin-bottom:16px}
+.filter-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#999}
+.filter-group select{padding:6px 10px;border:1px solid #DDD;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;background:#fff}
+/* ALERT BANNER */
+.alert-banner{background:#fff;border:1px solid #EBEBEB;border-radius:10px;padding:14px 20px;margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.alert-item{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.alert-item:hover{opacity:.8}
+.al-red{background:#FDEAEA;color:#C0392B}
+.al-yellow{background:#FAEEDA;color:#854F0B}
+/* PROJECTS */
+.proj-item{background:#fff;border-radius:10px;border:1px solid #EBEBEB;margin-bottom:12px;overflow:hidden}
+.proj-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.proj-header:hover{background:#FAFAFA}
+.proj-body{padding:0 20px 16px;display:none}
+.proj-body.open{display:block}
+.proj-kpis{padding:10px 12px;background:#F8F8F8;border-radius:8px;margin-bottom:12px;font-size:12px;color:#666}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid #F4F4F4}
+.task-row:last-child{border-bottom:none}
+.task-name{flex:1;font-size:13px;line-height:1.4}
+.task-resp{font-size:11px;color:#999;min-width:90px}
+.task-prazo{font-size:11px;color:#999;min-width:36px}
+.meta-tag{font-size:10px;color:#999;padding:1px 6px;background:#F0F0F0;border-radius:10px;white-space:nowrap}
+.add-form{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #F0F0F0}
+.add-form input,.add-form select{padding:6px 10px;border:1px solid #DDD;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px}
+.add-form input.lg{flex:1;min-width:140px}
+.add-form input.sm2{max-width:100px}
+.add-form input.md{max-width:140px}
+/* FUNNEL */
+.funnel-stage{background:#fff;border-radius:10px;border:1px solid #EBEBEB;margin-bottom:10px;overflow:hidden}
+.fh{padding:13px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.fh:hover{background:#FAFAFA}
+.fb2{padding:0 20px 14px;display:none}
+.fb2.open{display:block}
+.frow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F4F4F4}
+.frow:last-child{border-bottom:none}
+/* CHANNELS */
+.ch-card{background:#fff;border-radius:10px;padding:18px;border:1px solid #EBEBEB}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #F8F8F8}
+.mrow:last-child{border-bottom:none}
+/* TEAM */
+.tc{border-radius:10px;padding:18px;border:1px solid #EBEBEB;background:#fff}
+.tav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;margin-bottom:12px}
+/* FORM */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em}
+.fg input,.fg select,.fg textarea{width:100%;padding:9px 12px;border:1px solid #DDD;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px}
+.fg textarea{min-height:110px;resize:vertical}
+.btn{padding:9px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btnp{background:#0A0A0A;color:#fff}
+.btnp:hover{background:#333}
+.btno{background:#fff;color:#0A0A0A;border:1px solid #DDD}
+.btno:hover{background:#F4F4F4}
+.btns{padding:6px 13px;font-size:12px}
+/* HERRERA / BLEND */
+.ext-header{background:#0A0A0A;color:#fff;padding:22px;border-radius:10px;margin-bottom:18px}
+.ext-title{font-size:20px;font-weight:700}
+.ext-sub{font-size:13px;opacity:.6;margin-top:3px}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;padding:20px}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center}
+.modal-box{background:#fff;width:100%;max-width:780px;max-height:90vh;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;margin-top:40px}
+.modal-head{padding:20px 24px;border-bottom:1px solid #F0F0F0;display:flex;justify-content:space-between;align-items:center;background:#fff;position:sticky;top:0}
+.modal-body{padding:20px 24px;overflow-y:auto}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#999;padding:4px 8px;border-radius:6px}
+.modal-close:hover{background:#F0F0F0;color:#0A0A0A}
+/* EDITABLE */
+.ev{border-radius:4px;padding:1px 4px;cursor:text;transition:background .1s}
+.ev:hover{background:#F0F0F0}
+.ev:focus{background:#F0F0F0;outline:none}
+/* CHEVRON */
+.chv{font-size:14px;transition:transform .2s;color:#999}
+.chv.open{transform:rotate(180deg)}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#0A0A0A;color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+/* RESPONSIVE */
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}.main{padding:16px}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}.header{padding:12px 16px}.nav{padding:0 12px}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logos">
+    <img src="/mnt/user-data/uploads/logo-Prancheta_2_3x.png" alt="Formô" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logo-text" style="display:none">FORMÔ BRASIL PR</span>
+    <img src="/mnt/user-data/uploads/logo-Prancheta_3_3x.png" alt="Revelô" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logo-text" style="display:none">REVELÔ</span>
+    <img src="/mnt/user-data/uploads/logo-Prancheta_4_3x.png" alt="Atmosfera" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logo-text" style="display:none">ATMOSFERA</span>
+  </div>
+  <span class="header-title">Dashboard Marketing · 2026</span>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showTab('visao',this)">Visão Geral</button>
+  <button onclick="showTab('metas',this)">Metas 2026</button>
+  <button onclick="showTab('projetos',this)">Projetos</button>
+  <button onclick="showTab('funil',this)">Funil Comercial</button>
+  <button onclick="showTab('canais',this)">Canais & Presença</button>
+  <button onclick="showTab('equipe',this)">Equipe</button>
+  <button onclick="showTab('comunicacao',this)">Comunicação</button>
+  <button onclick="showTab('blend',this)">Blend</button>
+  <button onclick="showTab('herrera',this)">Herrera Gastronomia</button>
+</nav>
+
+<div class="main">
+
+<!-- VISÃO GERAL -->
+<div id="tab-visao" class="tab-content active">
+  <div class="section-title">Visão Geral · Abril 2026</div>
+  <div class="grid g4" style="margin-bottom:18px">
+    <div class="card kpib">
+      <div class="kpinum">R$ 39,2M</div>
+      <div class="kpilbl">Pipeline Total Ativo</div>
+      <div class="kpisub" style="color:#666">46 turmas em negociação</div>
+      <div class="pw"><div class="pb g" style="width:100%"></div></div>
+    </div>
+    <div class="card kpib">
+      <div class="kpinum ev" contenteditable id="kpi-fechados" data-key="kpi_fechados">R$ 8,77M</div>
+      <div class="kpilbl">Contratos Fechados</div>
+      <div class="kpisub">Meta: R$ 35M <span class="badge br" style="font-size:10px">25%</span></div>
+      <div class="pw"><div class="pb y" style="width:25%"></div></div>
+    </div>
+    <div class="card kpib">
+      <div class="kpinum">4,6 ★</div>
+      <div class="kpilbl">Google · Formô PR</div>
+      <div class="kpisub">220 aval. · Meta: 4,7 / 500</div>
+      <div class="pw"><div class="pb y" style="width:44%"></div></div>
+    </div>
+    <div class="card kpib">
+      <div id="kpi-tasks-num" class="kpinum">—</div>
+      <div class="kpilbl">Tarefas Concluídas</div>
+      <div id="kpi-tasks-sub" class="kpisub">de 151 total</div>
+      <div class="pw"><div id="kpi-tasks-bar" class="pb" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="lbl" style="margin-bottom:12px">Funil por Etapa</div>
+      <div id="ov-funil"></div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="margin-bottom:12px">Canais · Status</div>
+      <div id="ov-canais"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lbl" style="margin-bottom:12px">Projetos · Progresso — <span style="font-size:11px;color:#185FA5;cursor:pointer;font-weight:600" onclick="showTab('projetos',document.querySelectorAll('.nav button')[2])">clique para ver tarefas →</span></div>
+    <div id="ov-projects"></div>
+  </div>
+</div>
+
+<!-- METAS 2026 -->
+<div id="tab-metas" class="tab-content">
+  <div class="section-title">Metas 2026</div>
+
+  <div style="margin-bottom:26px">
+    <div class="lbl" style="margin-bottom:12px">Metas da Organização</div>
+    <div class="grid g2" id="metas-org-grid"></div>
+  </div>
+
+  <div>
+    <div class="lbl" style="margin-bottom:12px">Metas de Marketing</div>
+    <div class="card">
+      <table id="metas-mkt-table">
+        <thead><tr><th>#</th><th>Meta</th><th>KPI</th><th>Liga a</th><th>Status</th><th>Projeto</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PROJETOS -->
+<div id="tab-projetos" class="tab-content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div class="section-title" style="margin-bottom:0">Projetos · 8 projetos · 151 tarefas</div>
+    <button class="btn btno btns" onclick="expandAll()">Expandir todos</button>
+  </div>
+
+  <div class="alert-banner" id="alert-banner"></div>
+
+  <div class="filter-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label>Status</label>
+        <select id="f-status" onchange="applyFilters()">
+          <option value="todos">Todos</option>
+          <option value="EM ANDAMENTO">Em andamento</option>
+          <option value="EM ATRASO">Em atraso</option>
+          <option value="NÃO INICIADO">Não iniciado</option>
+          <option value="STAND BY">Stand by</option>
+          <option value="CONCLUÍDO">Concluído</option>
+          <option value="FINALIZADO">Finalizado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Responsável</label>
+        <select id="f-resp" onchange="applyFilters()">
+          <option value="todos">Todos</option>
+          <option>Carol</option><option>Felipe</option><option>Ana</option>
+          <option>Paloma</option><option>Nana</option><option>Abner</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Mês</label>
+        <select id="f-mes" onchange="applyFilters()">
+          <option value="todos">Todos</option>
+          <option value="Jan">Janeiro</option><option value="Fev">Fevereiro</option>
+          <option value="Mar">Março</option><option value="Abr">Abril</option>
+          <option value="Mai">Maio</option><option value="Jun">Junho</option>
+          <option value="Jul">Julho</option><option value="Dez">Dezembro</option>
+        </select>
+      </div>
+      <div style="margin-top:18px">
+        <button class="btn btno btns" onclick="clearFilters()">Limpar filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="projetos-list"></div>
+</div>
+
+<!-- FUNIL COMERCIAL -->
+<div id="tab-funil" class="tab-content">
+  <div class="section-title">Funil Comercial</div>
+
+  <div class="grid g4" style="margin-bottom:20px">
+    <div class="card kpib">
+      <div class="kpinum">R$ 39,2M</div>
+      <div class="kpilbl">Pipeline Total Ativo</div>
+      <div class="kpisub">Todas as etapas · 46 turmas</div>
+    </div>
+    <div class="card kpib" style="border:2px solid #0A0A0A">
+      <div class="kpinum ev" contenteditable id="contratos-val" data-key="contratos_fechados">R$ 8,77M</div>
+      <div class="kpilbl">Contratos Fechados</div>
+      <div class="kpisub" style="color:#666">Assinatura + Pós Venda · editável</div>
+      <div class="pw"><div class="pb y" style="width:25%"></div></div>
+      <div style="font-size:11px;color:#999;margin-top:6px">Meta: R$ 35M</div>
+    </div>
+    <div class="card kpib">
+      <div class="kpinum">R$ 35M</div>
+      <div class="kpilbl">Meta 2026</div>
+      <div class="kpisub">Contratos assinados</div>
+    </div>
+    <div class="card kpib">
+      <div class="kpinum">6</div>
+      <div class="kpilbl">Vendedores</div>
+      <div class="kpisub">Vinicius · Maycon · Eduardo · Carlos · Thales · Vitor</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:#854F0B;background:#FAEEDA;padding:10px 16px;border-radius:8px;margin-bottom:18px">
+    ⚠ O campo <strong>Contratos Fechados</strong> é editável manualmente enquanto a integração automática com ClickUp não está ativa. Clique no valor para atualizar.
+  </div>
+  <div id="funil-stages"></div>
+</div>
+
+<!-- CANAIS -->
+<div id="tab-canais" class="tab-content">
+  <div class="section-title">Canais & Presença Digital</div>
+  <div class="grid g3" id="canais-grid"></div>
+</div>
+
+<!-- EQUIPE -->
+<div id="tab-equipe" class="tab-content">
+  <div class="section-title">Equipe de Marketing</div>
+  <div class="grid g3" id="equipe-grid"></div>
+</div>
+
+<!-- COMUNICAÇÃO -->
+<div id="tab-comunicacao" class="tab-content">
+  <div class="section-title">Comunicação</div>
+  <div class="grid g2">
+    <div class="card">
+      <div class="lbl" style="margin-bottom:14px">Novo Disparo</div>
+      <div class="fg"><label>Canal</label>
+        <select id="canal-select" onchange="toggleFields()">
+          <option value="">Selecione</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="email">E-mail</option>
+          <option value="push">Push Notificação</option>
+        </select>
+      </div>
+      <div class="fg"><label>Destinatário</label><input type="text" id="destinatario" placeholder="Nome, número, grupo ou lista"></div>
+      <div class="fg" id="assunto-g" style="display:none"><label>Assunto</label><input type="text" id="assunto" placeholder="Assunto do e-mail"></div>
+      <div class="fg"><label>Mensagem</label><textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea></div>
+      <div class="fg"><label>Agendar para (opcional)</label><input type="datetime-local" id="agendamento"></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btnp" onclick="enviarAgora()">Enviar agora</button>
+        <button class="btn btno" onclick="agendar()">Agendar</button>
+      </div>
+      <!--
+        INTEGRAÇÃO — COMENTÁRIOS PARA O PROGRAMADOR:
+        WhatsApp: Evolution API ou Twilio → POST /message/sendText → { number, text }
+        E-mail: Resend ou SendGrid → POST /emails → { from, to, subject, html }
+        Push: Firebase Cloud Messaging → POST /fcm/send → { to, notification: { title, body } }
+        NUNCA expor tokens no frontend. Usar endpoint backend intermediário (ex: /api/send).
+      -->
+    </div>
+    <div class="card">
+      <div class="lbl" style="margin-bottom:14px">Histórico de Disparos</div>
+      <div id="historico-list"><div style="text-align:center;padding:40px 0;color:#999;font-size:13px">Nenhum disparo ainda</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BLEND -->
+<div id="tab-blend" class="tab-content">
+  <div class="ext-header">
+    <div class="ext-title">Blend — Criação de Marca</div>
+    <div class="ext-sub">Coquetelaria · Nova marca do Grupo ATM · Responsáveis: Felipe, Abner</div>
+  </div>
+  <div class="grid g3" style="margin-bottom:18px">
+    <div class="card kpib"><div class="kpinum">6</div><div class="kpilbl">Tarefas do projeto</div><div class="kpisub">1 stand by · 5 não iniciadas</div></div>
+    <div class="card kpib"><div class="kpinum">Jun/26</div><div class="kpilbl">Prazo identidade visual</div><div class="kpisub">Marca + identidade prontas</div></div>
+    <div class="card kpib"><div class="kpinum">Dez/26</div><div class="kpilbl">Primeiros eventos</div><div class="kpisub">Meta: 3 eventos realizados</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="lbl" style="margin-bottom:10px">KPIs do Projeto</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <span class="badge bb">Marca posicionada até Jun/26</span>
+      <span class="badge bb">Identidade visual pronta até Jun/26</span>
+      <span class="badge bgr">3 eventos realizados até Dez/26</span>
+      <span class="badge by">Blend ainda não existe — criação do zero</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl" style="margin-bottom:12px">Tarefas</div>
+    <table>
+      <thead><tr><th>Tarefa</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>ClickUp</th></tr></thead>
+      <tbody>
+        <tr><td>Estudo de referências Blend</td><td>Felipe</td><td><span class="badge by">STAND BY</span></td><td>Jan</td><td><a href="https://app.clickup.com/t/868gy2q5r" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
+        <tr><td>Blend pesquisa + identidade visual</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868hufuqv" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
+        <tr><td>Instagram ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Mar</td><td>—</td></tr>
+        <tr><td>Materiais ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td>—</td></tr>
+        <tr><td>Tráfego pago ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Mai</td><td>—</td></tr>
+        <tr><td>Apresentação final ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Mai</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HERRERA -->
+<div id="tab-herrera" class="tab-content">
+  <div class="ext-header">
+    <div class="ext-title">Herrera Gastronomia</div>
+    <div class="ext-sub">Projeto externo · Parceria estratégica · Responsável: Ana</div>
+  </div>
+  <div class="grid g3" style="margin-bottom:18px">
+    <div class="card kpib"><div class="kpinum">4</div><div class="kpilbl">Vídeos da série</div><div class="kpisub">2 entregues · 2 em produção</div></div>
+    <div class="card kpib"><div class="kpinum">Ana</div><div class="kpilbl">Responsável</div><div class="kpisub">Produtora de Conteúdo</div></div>
+    <div class="card kpib"><div class="kpinum">Abr/26</div><div class="kpilbl">Prazo ativo</div><div class="kpisub">Vídeos 3 e 4 em andamento</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="lbl" style="margin-bottom:10px">KPIs</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <span class="badge bg">4 vídeos série entregues</span>
+      <span class="badge bb">Marca lançada</span>
+      <span class="badge bb">Instagram ativo com calendário mensal</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl" style="margin-bottom:12px">Tarefas</div>
+    <table>
+      <thead><tr><th>Tarefa</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>ClickUp</th></tr></thead>
+      <tbody>
+        <tr><td>Edição vídeo 1 Gabriel</td><td>Ana</td><td><span class="badge bg">CONCLUÍDO</span></td><td>Mar</td><td><a href="https://app.clickup.com/t/868hxamfz" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
+        <tr><td>Edição vídeo 2 Arquiteta</td><td>Ana</td><td><span class="badge bg">CONCLUÍDO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868j2xmx2" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
+        <tr><td>Edição vídeo 3 Mãos à obra</td><td>Ana</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868j2xnp2" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
+        <tr><td>Edição vídeo 4 Marca</td><td>Ana</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td>—</td></tr>
+        <tr><td>Plano de mídia Gabriel Herrera</td><td>Ana</td><td><span class="badge bg">CONCLUÍDO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868hxju57" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div id="modal-title" style="font-size:16px;font-weight:700"></div>
+        <div id="modal-sub" style="font-size:12px;color:#999;margin-top:2px"></div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const PROJECTS = [
+  {id:1,nome:"Autoridade de Marca Formô",resp:"Felipe, Abner, Carol",
+   kpis:"Site no ar com SEO · Top 3 Google · Identidade verbal publicada · Reclame Aqui ≥ 8,0",
+   metaTag:"Meta 3 · Nota 4,7 Google",linkedMeta:"org-3",
+   tarefas:[
+    {nome:"Site formobrasilpr.com.br",resp:"Felipe",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868gzrxu0"},
+    {nome:"SEO e mudança de site formôbrasil.com.br",resp:"Felipe",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868gztem2"},
+    {nome:"Ideias para avaliações Google e Meta",resp:"Felipe",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868j012gu"},
+    {nome:"Conteúdo - concorrência - gravação",resp:"Carol",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hdcw8m"},
+    {nome:"Assinaturas de email",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hvz169"},
+    {nome:"Uniforme Marines",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hyab7y"},
+    {nome:"Blend - pesquisa + direcionamento",resp:"Felipe",status:"EM ANDAMENTO",prazo:"Abr",link:""},
+    {nome:"Mudança de textos Instagram",resp:"Felipe",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868h2dwuc"},
+    {nome:"Respostas Reclame Aqui",resp:"Felipe",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868heg6eh"},
+    {nome:"TVs Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hnama1"},
+    {nome:"Linktree YZ",resp:"Ana",status:"CONCLUÍDO",prazo:"Mar",link:""},
+    {nome:"Formato e campanha WhatsApp",resp:"Felipe",status:"CONCLUÍDO",prazo:"Mar",link:""},
+    {nome:"Personalidade e identidade verbal",resp:"Felipe",status:"STAND BY",prazo:"Jan",link:"https://app.clickup.com/t/868gxzc3x"},
+    {nome:"Conceito refresh id visual grupo",resp:"Abner",status:"STAND BY",prazo:"Jan",link:"https://app.clickup.com/t/868gxzhmv"},
+    {nome:"Execução refresh id visual grupo",resp:"Abner",status:"STAND BY",prazo:"Fev",link:""},
+    {nome:"Comunicação e canais grupo",resp:"Felipe",status:"STAND BY",prazo:"Fev",link:""},
+    {nome:"Materiais grupo",resp:"Abner",status:"STAND BY",prazo:"Fev",link:""},
+    {nome:"Google meu negócio grupo",resp:"Felipe",status:"STAND BY",prazo:"Mar",link:""},
+    {nome:"Site grupo",resp:"Felipe",status:"STAND BY",prazo:"Mar",link:""},
+    {nome:"Apresentação final grupo",resp:"Felipe",status:"STAND BY",prazo:"Mar",link:""},
+    {nome:"Google reclamação",resp:"Felipe",status:"STAND BY",prazo:"Mar",link:""},
+    {nome:"Parcerias hotéis NH",resp:"Felipe",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868gb0zjz"},
+    {nome:"Parcerias hotéis Accor",resp:"Felipe",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868gb0zjz"},
+    {nome:"Posicionamento ATM Co",resp:"Felipe",status:"STAND BY",prazo:"Fev",link:""},
+    {nome:"Personalidade e identidade verbal ATM Co",resp:"Felipe",status:"STAND BY",prazo:"Mar",link:""},
+    {nome:"Conceito refresh id visual ATM Co",resp:"Abner",status:"NÃO INICIADO",prazo:"Fev",link:""},
+    {nome:"Execução refresh id visual ATM Co",resp:"Abner",status:"NÃO INICIADO",prazo:"Fev",link:""},
+    {nome:"Comunicação e canais ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Mar",link:""}
+  ]},
+  {id:2,nome:"Presença & Conteúdo Digital",resp:"Paloma, Ana, Nana",
+   kpis:"4 posts/semana Instagram · 2 vídeos/semana TikTok · 100% turmas com briefing 15 dias antes · Engajamento ≥ 5%",
+   metaTag:"Metas 1,4 · Leads e Engajamento",linkedMeta:"mkt-1",
+   tarefas:[
+    {nome:"Calendário semana 13 a 17",resp:"Paloma",status:"EM ANDAMENTO",prazo:"Abr",link:""},
+    {nome:"Analise de quadros virais",resp:"Ana",status:"EM ATRASO",prazo:"Abr",link:"https://app.clickup.com/t/868j0b00r"},
+    {nome:"Organizar captações de abril",resp:"Nana",status:"EM ATRASO",prazo:"Abr",link:"https://app.clickup.com/t/868j0tc5a"},
+    {nome:"Briefing Meio Médico FAG 28",resp:"Nana",status:"NÃO INICIADO",prazo:"Abr",link:"https://app.clickup.com/t/868hv0yb4"},
+    {nome:"Briefing captação FPP 22",resp:"Ana e Paloma",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Planilha análise concorrentes",resp:"Ana",status:"EM ATRASO",prazo:"Abr",link:"https://app.clickup.com/t/868hybamt"},
+    {nome:"Briefing de conteúdos pré-evento e formaturas",resp:"Paloma",status:"FINALIZADO",prazo:"Dez",link:""},
+    {nome:"Telas de colação e baile",resp:"Matheus",status:"FINALIZADO",prazo:"Dez",link:""},
+    {nome:"Briefing cont 144 Direito Unicuritiba",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868gz5x4k"},
+    {nome:"Briefing cont Med UP 18",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:""},
+    {nome:"Briefing cont Med Fempar 67",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h84wn8"},
+    {nome:"Feedback cont Med UP 18",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h84y5g"},
+    {nome:"Feedback cont Med Fempar 67",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:""},
+    {nome:"Briefing cont Direito PUC 140",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h84x1j"},
+    {nome:"Feedback cont Direito PUC 140",resp:"Paloma",status:"CONCLUÍDO",prazo:"Jan",link:""},
+    {nome:"Briefing cont Med PUCPR 84",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868haufjw"},
+    {nome:"Feedback cont Med PUCPR 84",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:""},
+    {nome:"Conteúdos semana 12 a 16",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h0pvru"},
+    {nome:"Conteúdos semana 19 a 23",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h3uzv4"},
+    {nome:"Conteúdos semana 26 a 30",resp:"Paloma",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h7v74e"},
+    {nome:"Conteúdos semana 2 a 6",resp:"Paloma",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868haue3n"},
+    {nome:"Conteúdos semana 9 a 13",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868hauea6"},
+    {nome:"Conteúdos semana 16 a 20",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868hdwfma"},
+    {nome:"Briefings pré-evento Direito PUC e FAG 26",resp:"Paloma",status:"FINALIZADO",prazo:"Fev",link:"https://app.clickup.com/t/868hg8c75"},
+    {nome:"Briefing evento Jaragua",resp:"Paloma",status:"FINALIZADO",prazo:"Fev",link:"https://app.clickup.com/t/868hg8c75"},
+    {nome:"Conteúdos semana 23 a 27",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868hdwfxb"},
+    {nome:"Calendário semana 2 a 6 Fev",resp:"Paloma",status:"FINALIZADO",prazo:"Fev",link:"https://app.clickup.com/t/868hkp1az"},
+    {nome:"Análise de mídia out nov",resp:"Paloma",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Subir depoimentos e destaques Jan",resp:"Paloma",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868h850c8"},
+    {nome:"Subir depoimentos e destaques Fev",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868heg4dy"},
+    {nome:"Calendário semana 15 a 21",resp:"Ana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hv28g4"},
+    {nome:"Calendário semana 22 a 28",resp:"Ana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hv292j"},
+    {nome:"Calendário semana 30 a 3",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868j04nwd"},
+    {nome:"Calendário semana 6 a 10",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:""},
+    {nome:"Plano de mídia Gabriel Herrera",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hxju57"},
+    {nome:"Briefing 1/6 FAPI",resp:"Nana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hv0v2e"},
+    {nome:"Briefing pré-clínico UFPR",resp:"Nana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hv0npr"},
+    {nome:"Briefing Papa Calouro",resp:"Nana",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868huwtyc"},
+    {nome:"Conseguir fichas técnicas eventos",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""}
+  ]},
+  {id:3,nome:"Viralização & Parcerias",resp:"Felipe, Carol, Nana",
+   kpis:"Mín. 1 influenciador por turma medicina · 5 novas parcerias até Jun/26 · Formo Day 2 com 30% mais público",
+   metaTag:"Meta 5 · Viralização",linkedMeta:"mkt-5",
+   tarefas:[
+    {nome:"Formo Day 2 lançamento",resp:"Carol",status:"EM ANDAMENTO",prazo:"Abr",link:""},
+    {nome:"Entender viabilidade projeto Corrida 73",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hm6jdg"},
+    {nome:"Enviar eventos do mês ao Digo",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Influenciadores 2026 Med UP",resp:"Felipe",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868gbu3mt"},
+    {nome:"Influenciadores 2026 Direito PUCPR",resp:"Felipe",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868h847md"},
+    {nome:"Influenciadores 2026 Med PUC 84",resp:"Felipe",status:"CONCLUÍDO",prazo:"Fev",link:""},
+    {nome:"Feedback influenciadores UP",resp:"Felipe",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hdxevd"},
+    {nome:"Feedback influenciadores Direito PUCPR",resp:"Felipe",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hdxevd"},
+    {nome:"Feedback influenciadores Med PUC 84",resp:"Felipe",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hdxevd"},
+    {nome:"Divulgação Dunna 14.03",resp:"Felipe",status:"FINALIZADO",prazo:"Mar",link:"https://app.clickup.com/t/868hue6qk"},
+    {nome:"Divulgação Dunna 28.03",resp:"Felipe",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hue6qk"},
+    {nome:"Divulgação Dunna 28.02",resp:"Felipe",status:"FINALIZADO",prazo:"Fev",link:"https://app.clickup.com/t/868hmm50w"},
+    {nome:"SPA Torriton",resp:"Felipe",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868hnarn5"},
+    {nome:"Formo Day 2 id visual",resp:"Carol",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hxjvm7"},
+    {nome:"Fechar captação Corrida 73",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Fechar brinde Corrida 73",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Distribuição de água Corrida 73",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""}
+  ]},
+  {id:4,nome:"Blend — Criação de Marca (Coquetelaria)",resp:"Felipe, Abner",
+   kpis:"Marca posicionada + identidade pronta até Jun/26 · Primeiros 3 eventos realizados até Dez/26",
+   metaTag:"Meta 7 · Lançamento Blend",linkedMeta:"mkt-7",
+   tarefas:[
+    {nome:"Estudo de referências Blend",resp:"Felipe",status:"STAND BY",prazo:"Jan",link:"https://app.clickup.com/t/868gy2q5r"},
+    {nome:"Blend pesquisa + identidade visual",resp:"Felipe",status:"NÃO INICIADO",prazo:"Abr",link:"https://app.clickup.com/t/868hufuqv"},
+    {nome:"Instagram ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Mar",link:""},
+    {nome:"Materiais ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Tráfego pago ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Mai",link:""},
+    {nome:"Apresentação final ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Mai",link:""}
+  ]},
+  {id:5,nome:"Entregas de Eventos",resp:"Nana",
+   kpis:"NPS 4,5 nas entregas · 95% eventos com avaliação aplicada · 100% materiais entregues no prazo",
+   metaTag:"Metas 6,8 · NPS Produtos e Entregas",linkedMeta:"org-6",
+   tarefas:[
+    {nome:"Odontologia Unicesumar 25.2 18.04",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hyrq42"},
+    {nome:"Medicina Unicesumar 27.06",resp:"Nana",status:"NÃO INICIADO",prazo:"Jun",link:""},
+    {nome:"Medicina FPP 13 04.07",resp:"Nana",status:"NÃO INICIADO",prazo:"Jul",link:""},
+    {nome:"144 Direito Unicuritiba 15.01",resp:"Nana",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868gr74qn"},
+    {nome:"Med UP 18 24.01",resp:"Nana",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868gzrwu9"},
+    {nome:"Med Fempar 67 31.01",resp:"Nana",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868gz5bkt"},
+    {nome:"Direito PUC 140 31.01",resp:"Nana",status:"FINALIZADO",prazo:"Jan",link:"https://app.clickup.com/t/868h7vmb6"},
+    {nome:"Med PUCPR 84 07.02",resp:"Nana",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868g9qrra"},
+    {nome:"Direito UFPR 25.02",resp:"Nana",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868gzrq4x"},
+    {nome:"Check list de materiais entrega",resp:"Nana",status:"CONCLUÍDO",prazo:"Jan",link:""},
+    {nome:"Med FPP 12 21.02",resp:"Nana",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868gzrq4x"},
+    {nome:"Arq e Urb PUCPR 28.02",resp:"Nana",status:"FINALIZADO",prazo:"Fev",link:"https://app.clickup.com/t/868hkfy3e"},
+    {nome:"Junção FPP 148 07.03",resp:"Nana",status:"FINALIZADO",prazo:"Mar",link:"https://app.clickup.com/t/868hkggq6"},
+    {nome:"Odonto Unibrasil 146 06.03",resp:"Nana",status:"FINALIZADO",prazo:"Mar",link:"https://app.clickup.com/t/868hkggn8"},
+    {nome:"Psico PUCPR 07.03",resp:"Nana",status:"FINALIZADO",prazo:"Mar",link:"https://app.clickup.com/t/868hm12vy"}
+  ]},
+  {id:6,nome:"Herrera Gastronomia",resp:"Ana",
+   kpis:"4 vídeos série entregues · Marca lançada · Canal Instagram ativo",
+   metaTag:"Projeto Externo",linkedMeta:"",
+   tarefas:[
+    {nome:"Edição vídeo 1 Gabriel",resp:"Ana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hxamfz"},
+    {nome:"Edição vídeo 2 Arquiteta",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868j2xmx2"},
+    {nome:"Edição vídeo 3 Mãos à obra",resp:"Ana",status:"NÃO INICIADO",prazo:"Abr",link:"https://app.clickup.com/t/868j2xnp2"},
+    {nome:"Edição vídeo 4 Marca",resp:"Ana",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Plano de mídia Gabriel Herrera",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hxju57"}
+  ]},
+  {id:7,nome:"Eventos Institucionais",resp:"Carol",
+   kpis:"NPS interno ≥ 8 · 100% kits entregues · Registro de todos os eventos",
+   metaTag:"NPS Interno",linkedMeta:"",
+   tarefas:[
+    {nome:"Conteúdo Torriton",resp:"Paloma",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Vídeo retrospectiva do ano",resp:"Paloma",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"QRCode ingresso Torriton",resp:"Alisson",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Aprovar comidas e bebidas Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Precificação drinks Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Backdrop nomes Torriton",resp:"Miguel",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Cardápio de bebidas Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Backdrop patrocinadores Torriton",resp:"Miguel",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Fotos por IA e pontos de ativação",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Carreta furacão Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"LED show de talentos e sorteio",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Fechar equipe foto e vídeo Torriton",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"LED e máquina de fumaça Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Robô e pistola de gás Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Cheque de valor Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Nomes Formô Torriton",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Reunião lideranças fim de ano",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Fechar planilha evento fim de ano",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Kit para fornecedores",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Kit turmas",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Kit colaboradores fim de ano",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Kit colaboradores início de ano",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Ver quem vai na entrega Joinville",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""}
+  ]},
+  {id:8,nome:"Cultura & Eficiência Interna",resp:"Carol, Nana",
+   kpis:"NPS interno ≥ 8 · 100% time com onboarding até Mai/26 · Reunião semanal com comercial",
+   metaTag:"Meta 7 NPS Atendimento",linkedMeta:"org-7",
+   tarefas:[
+    {nome:"Projeto onboarding time",resp:"Nana",status:"EM ATRASO",prazo:"Mar",link:"https://app.clickup.com/t/868cd1yy3"},
+    {nome:"Reuniões recorrentes com comercial",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:""},
+    {nome:"Camisetas da Copa",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hytk29"},
+    {nome:"Nova contratação designer júnior",resp:"Assertiva",status:"FINALIZADO",prazo:"Dez",link:""},
+    {nome:"Bonés para início de ano",resp:"Carol",status:"CONCLUÍDO",prazo:"Jan",link:"https://app.clickup.com/t/868gy21zu"},
+    {nome:"Organizar escala de entregas",resp:"Carol",status:"CONCLUÍDO",prazo:"Jan",link:""},
+    {nome:"Nova aplicação de pesquisa de clima",resp:"Carol",status:"CONCLUÍDO",prazo:"Jan",link:""},
+    {nome:"Endorfinados",resp:"Felipe",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hydzmu"},
+    {nome:"Briefings pré-evento Direito PUC e FAG 26",resp:"Paloma",status:"FINALIZADO",prazo:"Fev",link:"https://app.clickup.com/t/868hg8c75"},
+    {nome:"Finalizar doc 4 e 5",resp:"Paloma",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868hf05t9"},
+    {nome:"Analise de quadros virais",resp:"Ana",status:"EM ATRASO",prazo:"Abr",link:"https://app.clickup.com/t/868j0b00r"},
+    {nome:"Fotos por IA e pontos de ativação",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"LED show de talentos e sorteio",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Ativações caixa de fotos",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Quem libera ingressos na entrada",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Subir necessidade de motions",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""},
+    {nome:"Ver músicas DJ Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Pensar brincadeira fim de ano",resp:"Carol",status:"FINALIZADO",prazo:"—",link:""}
+  ]}
+];
+
+const FUNNEL_STAGES = [
+  {nome:"Prospectar",cor:"#666",total:"R$ 8.350.000",count:13,turmas:[
+    {nome:"MEDICINA UNIVEL 2030.2 T1",valor:"R$ 1.000.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hr5rbr"},
+    {nome:"MEDICINA UNICENTRO 2031.2 T8",valor:"R$ 800.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hufwur"},
+    {nome:"MEDICINA UNICENTRO 2030.2 T7",valor:"R$ 800.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hufvdp"},
+    {nome:"MEDICINA UNIPAR 2031.2 T9",valor:"R$ 700.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hufy8a"},
+    {nome:"MEDICINA UNIPAR 2030.2 T8",valor:"R$ 700.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hudgn6"},
+    {nome:"MEDICINA UNIDEP 2031.2 T17",valor:"R$ 700.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hudg4g"},
+    {nome:"MEDICINA UNIDEP 2031.1 T16",valor:"R$ 700.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hudfvc"},
+    {nome:"MEDICINA UNIDEP 2030.2 T15",valor:"R$ 700.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hr5urt"},
+    {nome:"MEDICINA UNIOESTE 2031.2 T30",valor:"R$ 600.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hufu6m"},
+    {nome:"MEDICINA UNIOESTE 2030.2 T29",valor:"R$ 600.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hufa10"},
+    {nome:"PSICOLOGIA FPP 2028.2",valor:"R$ 350.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzz6qn"},
+    {nome:"ENFERMAGEM FPP 2028.2",valor:"R$ 350.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzz5x4"},
+    {nome:"BIO MEDICINA FPP 2028.2",valor:"R$ 350.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzyxnn"}
+  ]},
+  {nome:"Em Atendimento",cor:"#185FA5",total:"R$ 18.581.000",count:19,turmas:[
+    {nome:"MEDICINA UP 2030.2 T23",valor:"R$ 4.000.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868fdv7x2"},
+    {nome:"MEDICINA FAG 30",valor:"R$ 2.500.000",resp:"Thales Ioris",link:"https://app.clickup.com/t/868h28z3t"},
+    {nome:"MEDICINA PUCPR 2030.2 T94",valor:"R$ 2.000.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868ev8648"},
+    {nome:"MEDICINA UFPR 2031.1 T172",valor:"R$ 1.500.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868fdvfjz"},
+    {nome:"MEDICINA UFPR 2030.2 T171",valor:"R$ 1.500.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868fdvfbr"},
+    {nome:"MEDICINA MACKENZIE 2031.1 T78",valor:"R$ 1.300.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868gyu0ut"},
+    {nome:"MEDICINA IDOMED 2030.2 T13",valor:"R$ 1.000.000",resp:"Eduardo Vasconcelos",link:"https://app.clickup.com/t/868gzamf2"},
+    {nome:"MEDICINA FPP 2031.2 T23",valor:"R$ 1.000.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868gdp645"},
+    {nome:"MEDICINA FPP 2030.2 T22",valor:"R$ 1.000.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868f4ycra"},
+    {nome:"PSICOLOGIA FAE SJP 2029.1",valor:"R$ 380.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gm1904"},
+    {nome:"DIREITO UP 2029.2",valor:"R$ 500.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzyfaq"},
+    {nome:"MEDICINA VETERINARIA PUC 2029.2",valor:"R$ 500.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzyc0v"},
+    {nome:"DIREITO UNICURITIBA 2029.2",valor:"R$ 500.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzydba"},
+    {nome:"MEDICINA UNC 2030.2 T16",valor:"R$ 500.000",resp:"Eduardo Vasconcelos",link:"https://app.clickup.com/t/868fja3tr"},
+    {nome:"ODONTOLOGIA UFPR 2030.2 T171",valor:"R$ 400.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gzyx6b"},
+    {nome:"DIREITO UTP 2030.2",valor:"—",resp:"Maycon Correa",link:"https://app.clickup.com/t/868hyct61"},
+    {nome:"PUBLICIDADE E PROPAGANDA PUC 28.2",valor:"—",resp:"—",link:"https://app.clickup.com/t/868hnn3fv"},
+    {nome:"DIREITO UNIDOMBOSCO 2029.2",valor:"—",resp:"Maycon Correa",link:"https://app.clickup.com/t/868hg1v57"},
+    {nome:"ARQ E URB UFPR 2026.2",valor:"—",resp:"Eduardo Vasconcelos",link:"https://app.clickup.com/t/868hpy62j"}
+  ]},
+  {nome:"Elaboração de Projeto",cor:"#854F0B",total:"R$ 2.800.000",count:4,turmas:[
+    {nome:"DIREITO UFPR 2029.2 T113",valor:"R$ 1.500.000",resp:"Vinicius Luiz",link:"https://app.clickup.com/t/868fc29jk"},
+    {nome:"DIREITO UP 28.2",valor:"R$ 500.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868fw4xf8"},
+    {nome:"MEDICINA UNIOESTE-FB 2030.1 T13",valor:"R$ 500.000",resp:"Eduardo Vasconcelos",link:"https://app.clickup.com/t/868ewyc5h"},
+    {nome:"MED VET IFC 2028.2",valor:"R$ 300.000",resp:"Eduardo Vasconcelos",link:"https://app.clickup.com/t/868hpy1jh"}
+  ]},
+  {nome:"Assembleia",cor:"#993556",total:"R$ 700.000",count:1,turmas:[
+    {nome:"DIREITO FAE 2028.2",valor:"R$ 700.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868gpuyda"}
+  ]},
+  {nome:"Assinatura / Fechamento",cor:"#3B6D11",total:"R$ 6.300.000",count:5,turmas:[
+    {nome:"DIREITO PUCPR 2029.2 T30",valor:"R$ 5.000.000",resp:"Carlos Perotti",link:"https://app.clickup.com/t/868gyu79n"},
+    {nome:"MEDICINA UNIDEP T13 2029.2",valor:"R$ 800.000",resp:"Thales Ioris",link:"https://app.clickup.com/t/868f5840p"},
+    {nome:"ODONTOLOGIA UFPR 2029.2 T170",valor:"R$ 500.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868fbezcj"},
+    {nome:"PP PUC 2028.2 MULTCOM",valor:"—",resp:"Maycon Correa",link:"https://app.clickup.com/t/868hw76gq"},
+    {nome:"ARQUITETURA URB ENG CIVIL UP 29.2",valor:"—",resp:"Maycon Correa",link:"https://app.clickup.com/t/868hmudge"}
+  ]},
+  {nome:"Pós Venda",cor:"#3C3489",total:"R$ 2.470.000",count:4,turmas:[
+    {nome:"PSICOLOGIA PUC 2028.2 T80",valor:"R$ 1.000.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868etg83b"},
+    {nome:"MEDICINA UNIDEP T14 2030.1",valor:"R$ 600.000",resp:"Thales Ioris",link:"https://app.clickup.com/t/868f584yg"},
+    {nome:"ODONTOLOGIA UFPR 2029.1 T169",valor:"R$ 500.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868fbe5xy"},
+    {nome:"MARKETING PUC 2027.2",valor:"R$ 370.000",resp:"Maycon Correa",link:"https://app.clickup.com/t/868fw6ymu"}
+  ]}
+];
+
+const CANAIS = [
+  {id:"ig-formo",nome:"Instagram Formô PR",handle:"@formobrasilpr",marca:"Formô Brasil PR",status:"yellow",diag:"Abaixo da média do setor (5,2%). Engajamento subindo — expandir frequência.",
+   metricas:[{l:"Seguidores",v:"18.200",k:"ig_formo_seg"},{l:"Variação",v:"+3,2%",k:"ig_formo_var"},{l:"Alcance médio",v:"4.100",k:"ig_formo_alc"},{l:"Engajamento",v:"4,8%",k:"ig_formo_eng"},{l:"Posts/mês",v:"12",k:"ig_formo_posts"},{l:"Média setor",v:"5,2%",k:"ig_formo_media"}]},
+  {id:"tk-formo",nome:"TikTok Formô PR",handle:"@formobrasilpr",marca:"Formô Brasil PR",status:"green",diag:"Acima da média do setor (4,5%). Canal em crescimento acelerado.",
+   metricas:[{l:"Seguidores",v:"9.800",k:"tk_formo_seg"},{l:"Variação",v:"+6,1%",k:"tk_formo_var"},{l:"Views médias",v:"11.400",k:"tk_formo_views"},{l:"Engajamento",v:"7,2%",k:"tk_formo_eng"},{l:"Vídeos/mês",v:"8",k:"tk_formo_vids"},{l:"Média setor",v:"4,5%",k:"tk_formo_media"}]},
+  {id:"ig-revelo",nome:"Instagram Revelô",handle:"@reveloproducoes",marca:"Revelô",status:"red",diag:"Engajamento estável mas abaixo do setor. Aumentar frequência e diversificar formatos.",
+   metricas:[{l:"Seguidores",v:"5.200",k:"ig_rev_seg"},{l:"Variação",v:"+1,8%",k:"ig_rev_var"},{l:"Alcance médio",v:"1.800",k:"ig_rev_alc"},{l:"Engajamento",v:"3,4%",k:"ig_rev_eng"},{l:"Posts/mês",v:"6",k:"ig_rev_posts"},{l:"Média setor",v:"5,2%",k:"ig_rev_media"}]},
+  {id:"ig-atm",nome:"Instagram Atmosfera",handle:"@grupoatmosfera",marca:"Atmosfera",status:"red",diag:"Queda de seguidores e engajamento. Revisar estratégia de conteúdo institucional.",
+   metricas:[{l:"Seguidores",v:"3.100",k:"ig_atm_seg"},{l:"Variação",v:"-0,3%",k:"ig_atm_var"},{l:"Alcance médio",v:"820",k:"ig_atm_alc"},{l:"Engajamento",v:"2,1%",k:"ig_atm_eng"},{l:"Posts/mês",v:"4",k:"ig_atm_posts"},{l:"Média setor",v:"5,2%",k:"ig_atm_media"}]},
+  {id:"ig-yz",nome:"Instagram YZ Formaturas",handle:"@yzformaturas",marca:"YZ (em transição)",status:"yellow",diag:"Crescimento consistente. Engajamento abaixo da meta mas em alta.",
+   metricas:[{l:"Seguidores",v:"4.600",k:"ig_yz_seg"},{l:"Variação",v:"+2,5%",k:"ig_yz_var"},{l:"Alcance médio",v:"1.400",k:"ig_yz_alc"},{l:"Engajamento",v:"3,9%",k:"ig_yz_eng"},{l:"Posts/mês",v:"7",k:"ig_yz_posts"},{l:"Média setor",v:"5,2%",k:"ig_yz_media"}]},
+  {id:"gmb",nome:"Google Meu Negócio",handle:"Formô Brasil PR",marca:"Formô Brasil PR",status:"yellow",diag:"Faltam 280 avaliações para meta. Ativar campanha de incentivo.",
+   metricas:[{l:"Buscas/mês",v:"1.240",k:"gmb_buscas"},{l:"Visualizações",v:"3.800",k:"gmb_views"},{l:"Cliques site",v:"187",k:"gmb_cliques"},{l:"Avaliação",v:"4,6 ★",k:"gmb_nota"},{l:"Total aval.",v:"220",k:"gmb_aval"},{l:"Meta aval.",v:"500",k:"gmb_meta"}]},
+  {id:"ra",nome:"Reclame Aqui",handle:"formo-brasil-pr",marca:"Formô Brasil PR",status:"green",diag:"Boa reputação. Manter tempo de resposta e qualidade nas réplicas.",
+   metricas:[{l:"Reclamações",v:"8",k:"ra_recl"},{l:"Respondidas",v:"7",k:"ra_resp"},{l:"Resolução",v:"87%",k:"ra_resolucao"},{l:"Nota geral",v:"8,2/10",k:"ra_nota"},{l:"Voltariam",v:"79%",k:"ra_volta"}]}
+];
+
+const EQUIPE=[
+  {nome:"Carol",cargo:"Diretora de Marketing",foco:"Estratégia, aprovações, novos projetos, ativações de marca",alerta:"Gargalo de aprovação — descentralizar decisões operacionais",bg:"#EEEDFE",cor:"#3C3489"},
+  {nome:"Felipe",cargo:"Estrategista Digital",foco:"Posicionamento, SEO, influenciadores, parcerias, branding",alerta:"Distribuído em 4 frentes simultâneas",bg:"#E1F5EE",cor:"#0F6E56"},
+  {nome:"Ana",cargo:"Produtora de Conteúdo",foco:"Calendários editoriais, análise de mídia, vídeos Formô e Herrera",alerta:"Capacidade disponível — ampliar análise de dados",bg:"#FAEEDA",cor:"#854F0B"},
+  {nome:"Paloma",cargo:"Social Media",foco:"Calendários semanais, briefings de turma, Instagram diário",alerta:"Ritmo consistente — expandir para TikTok",bg:"#E6F1FB",cor:"#185FA5"},
+  {nome:"Nana",cargo:"Coord. de Operações",foco:"Entregas de evento, briefings, processos internos, comercial",alerta:"Over-executando — migrar para coordenação",bg:"#FBEAF0",cor:"#993556"},
+  {nome:"Abner",cargo:"Head de Design",foco:"Identidade visual, refresh de marca, materiais gráficos",alerta:"Projetos em stand by — aguarda decisão estratégica",bg:"#EAF3DE",cor:"#3B6D11"}
+];
+
+const METAS_ORG=[
+  {id:"org-1",titulo:"R$ 35M em contratos assinados",sub:"KPI: Contratos formalmente assinados",meta:"35M",atual:"8,77M",pct:25,status:"yellow",ligaA:"Funil Comercial",linkedProjId:null,linkedTab:"funil"},
+  {id:"org-2",titulo:"R$ 6M em álbuns e fotografia",sub:"R$ 2M coletivo + R$ 4M individual",meta:"6M",atual:"—",pct:20,status:"yellow",ligaA:"Projeto Entregas",linkedProjId:5,linkedTab:"projetos"},
+  {id:"org-3",titulo:"Nota 4,7 Google · 500 avaliações",sub:"Atual: 4,6★ · 220 avaliações",meta:"4,7",atual:"4,6",pct:44,status:"yellow",ligaA:"Autoridade de Marca",linkedProjId:1,linkedTab:"projetos"},
+  {id:"org-4",titulo:"Margem bruta 15% eventos / 5% pré",sub:"Receita real menos custos diretos",meta:"15%",atual:"—",pct:50,status:"gray",ligaA:"Financeiro",linkedProjId:null,linkedTab:null},
+  {id:"org-5",titulo:"Excedente máximo 5% do budget",sub:"Budget aprovado vs custo final executado",meta:"5%",atual:"—",pct:60,status:"gray",ligaA:"Financeiro",linkedProjId:null,linkedTab:null},
+  {id:"org-6",titulo:"NPS 4,5 · Produtos e Family Days",sub:"75% participação em álbuns entregues",meta:"4,5",atual:"—",pct:55,status:"yellow",ligaA:"Entregas",linkedProjId:5,linkedTab:"projetos"},
+  {id:"org-7",titulo:"NPS 4,5 · Atendimento",sub:"2 avaliações semestrais · 90% participação",meta:"4,5",atual:"—",pct:40,status:"yellow",ligaA:"Cultura Interna",linkedProjId:8,linkedTab:"projetos"},
+  {id:"org-8",titulo:"NPS 4,5 · Entregas",sub:"Avaliação após cada entrega · 95% participação",meta:"4,5",atual:"—",pct:65,status:"yellow",ligaA:"Entregas",linkedProjId:5,linkedTab:"projetos"}
+];
+
+const METAS_MKT=[
+  {n:1,titulo:"Leads qualificados via digital",kpi:"Cliques Linktree → WhatsApp/mês",liga:"Meta R$ 35M",status:"blue",linkedProjId:2},
+  {n:2,titulo:"Reputação digital consolidada",kpi:"Google ≥ 4,7 · 500 aval. · Reclame Aqui ≥ 8,0",liga:"Google + conversão",status:"yellow",linkedProjId:1},
+  {n:3,titulo:"Autoridade de marca Formô PR",kpi:"Site indexado · Top 3 Google · Identidade verbal",liga:"Diferenciação",status:"blue",linkedProjId:1},
+  {n:4,titulo:"Engajamento e crescimento social",kpi:"Instagram ≥ 5% · TikTok ≥ 7%",liga:"Leads orgânicos",status:"yellow",linkedProjId:2},
+  {n:5,titulo:"Viralização por turma",kpi:"Mín. 1 influenciador por turma medicina 2026",liga:"Awareness",status:"blue",linkedProjId:3},
+  {n:6,titulo:"Análise de concorrência ativa",kpi:"Relatório mensal de concorrentes",liga:"Posicionamento",status:"red",linkedProjId:2},
+  {n:7,titulo:"Lançamento Blend Coquetelaria",kpi:"Marca + identidade pronta até Jun/26",liga:"Nova receita",status:"yellow",linkedProjId:4}
+];
+
+// ===== EDITABLE SYSTEM =====
+const ED_KEY='atm_editable';
+function loadED(){return JSON.parse(localStorage.getItem(ED_KEY)||'{}')}
+function saveED(k,v){const d=loadED();d[k]=v;localStorage.setItem(ED_KEY,JSON.stringify(d))}
+function restoreED(){
+  const d=loadED();
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    if(d[el.dataset.key]) el.textContent=d[el.dataset.key];
+    el.addEventListener('blur',()=>saveED(el.dataset.key,el.textContent.trim()));
+  });
+}
+
+// ===== EXTRA TASKS (localStorage) =====
+function loadExtraTasks(){
+  const s=localStorage.getItem('atm_tasks');if(!s)return;
+  const d=JSON.parse(s);
+  PROJECTS.forEach(p=>{if(d[p.id])p.tarefas=[...p.tarefas,...d[p.id]]});
+}
+function saveExtraTask(pid,t){
+  const d=JSON.parse(localStorage.getItem('atm_tasks')||'{}');
+  if(!d[pid])d[pid]=[];d[pid].push(t);
+  localStorage.setItem('atm_tasks',JSON.stringify(d));
+}
+
+// ===== HELPERS =====
+function statusBadge(s){
+  const m={"EM ANDAMENTO":"bb","EM ATRASO":"br","NÃO INICIADO":"bgr","STAND BY":"by","CONCLUÍDO":"bg","FINALIZADO":"bg"};
+  return `<span class="badge ${m[s]||'bgr'}">${s}</span>`;
+}
+function semCls(s){return{green:"sg",yellow:"sy",red:"sr"}[s]||"sgr"}
+
+// ===== FILTERS =====
+let filters={status:"todos",resp:"todos",mes:"todos"};
+function applyFilters(){
+  filters.status=document.getElementById('f-status').value;
+  filters.resp=document.getElementById('f-resp').value;
+  filters.mes=document.getElementById('f-mes').value;
+  renderProjects();
+}
+function clearFilters(){
+  filters={status:"todos",resp:"todos",mes:"todos"};
+  document.getElementById('f-status').value="todos";
+  document.getElementById('f-resp').value="todos";
+  document.getElementById('f-mes').value="todos";
+  renderProjects();
+}
+function taskVisible(t){
+  if(filters.status!=="todos"&&t.status!==filters.status)return false;
+  if(filters.resp!=="todos"&&!t.resp.includes(filters.resp))return false;
+  if(filters.mes!=="todos"&&t.prazo!==filters.mes)return false;
+  return true;
+}
+
+// ===== ALERT BANNER =====
+function renderAlertBanner(){
+  const all=PROJECTS.flatMap(p=>p.tarefas);
+  const atrasadas=all.filter(t=>t.status==="EM ATRASO");
+  const mesAtual=all.filter(t=>t.prazo==="Abr"&&t.status!=="CONCLUÍDO"&&t.status!=="FINALIZADO");
+  const el=document.getElementById('alert-banner');
+  if(!atrasadas.length&&!mesAtual.length){el.style.display='none';return;}
+  el.style.display='flex';
+  el.innerHTML=`<span style="font-size:12px;font-weight:600;color:#666">Alertas:</span>
+    ${atrasadas.length?`<span class="alert-item al-red" onclick="setFilter('EM ATRASO')">🔴 ${atrasadas.length} tarefa${atrasadas.length>1?'s':''} em atraso — clique para filtrar</span>`:''}
+    ${mesAtual.length?`<span class="alert-item al-yellow" onclick="setFilter('mes-abr')">🟡 ${mesAtual.length} tarefa${mesAtual.length>1?'s':''} com prazo em Abril — clique para filtrar</span>`:''}`;
+}
+function setFilter(v){
+  if(v==="mes-abr"){
+    filters.mes="Abr";filters.status="todos";
+    document.getElementById('f-mes').value="Abr";
+    document.getElementById('f-status').value="todos";
+  } else {
+    filters.status=v;filters.mes="todos";
+    document.getElementById('f-status').value=v;
+    document.getElementById('f-mes').value="todos";
+  }
+  filters.resp="todos";document.getElementById('f-resp').value="todos";
+  renderProjects();
+}
+
+// ===== RENDER PROJECTS =====
+function renderProjects(){
+  const container=document.getElementById('projetos-list');
+  container.innerHTML='';
+  PROJECTS.forEach(p=>{
+    const tot=p.tarefas.length;
+    const done=p.tarefas.filter(t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO").length;
+    const atr=p.tarefas.filter(t=>t.status==="EM ATRASO").length;
+    const pct=Math.round(done/tot*100);
+    const filtered=p.tarefas.filter(taskVisible);
+    let rows='';
+    filtered.forEach(t=>{
+      const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:6px;text-decoration:none">↗</a>`:'';
+      rows+=`<div class="task-row"><span class="task-name">${t.nome}${lnk}</span><span class="task-resp">${t.resp}</span><span class="task-prazo">${t.prazo}</span>${statusBadge(t.status)}<span class="meta-tag">${p.metaTag}</span></div>`;
+    });
+    const noRes=filtered.length===0?`<div style="padding:16px 0;color:#999;font-size:13px;text-align:center">Nenhuma tarefa com os filtros ativos</div>`:'';
+    container.insertAdjacentHTML('beforeend',`
+      <div class="proj-item">
+        <div class="proj-header" onclick="toggleProj(${p.id})">
+          <div>
+            <div style="font-size:14px;font-weight:700">${p.nome}</div>
+            <div style="font-size:12px;color:#999;margin-top:2px">${p.resp} · ${tot} tarefas</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span class="badge bg" style="font-size:10px">${done} concluídas</span>
+            ${atr?`<span class="badge br" style="font-size:10px">${atr} atrasadas</span>`:''}
+            <div style="text-align:right;min-width:72px">
+              <div style="font-size:12px;font-weight:700">${pct}%</div>
+              <div class="pw" style="width:72px"><div class="pb ${pct>=70?'g':pct>=40?'y':''}" style="width:${pct}%"></div></div>
+            </div>
+            <span class="chv" id="chv-${p.id}">▾</span>
+          </div>
+        </div>
+        <div class="proj-body" id="pb-${p.id}">
+          <div class="proj-kpis"><strong>KPIs:</strong> ${p.kpis}</div>
+          <div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0">
+            <span style="flex:1">Tarefa</span><span style="min-width:90px">Responsável</span><span style="min-width:36px">Prazo</span><span style="min-width:100px">Status</span><span style="min-width:100px">Meta</span>
+          </div>
+          ${rows}${noRes}
+          <div class="add-form">
+            <input class="lg" type="text" placeholder="Nova tarefa..." id="nt-nome-${p.id}">
+            <input class="sm2" type="text" placeholder="Responsável" id="nt-resp-${p.id}">
+            <input style="max-width:70px" type="text" placeholder="Prazo" id="nt-prazo-${p.id}">
+            <select id="nt-status-${p.id}" style="max-width:140px">
+              <option value="NÃO INICIADO">Não iniciado</option>
+              <option value="EM ANDAMENTO">Em andamento</option>
+              <option value="CONCLUÍDO">Concluído</option>
+            </select>
+            <input class="md" type="text" placeholder="Link ClickUp (opcional)" id="nt-link-${p.id}">
+            <button class="btn btnp btns" onclick="addTask(${p.id})">+ Adicionar</button>
+          </div>
+        </div>
+      </div>`);
+  });
+}
+
+function toggleProj(id){
+  const b=document.getElementById(`pb-${id}`);
+  const c=document.getElementById(`chv-${id}`);
+  b.classList.toggle('open');c.classList.toggle('open');
+}
+
+function expandAll(){
+  PROJECTS.forEach(p=>{
+    document.getElementById(`pb-${p.id}`).classList.add('open');
+    document.getElementById(`chv-${p.id}`).classList.add('open');
+  });
+}
+
+function addTask(pid){
+  const nome=document.getElementById(`nt-nome-${pid}`).value.trim();
+  if(!nome){toast('Digite o nome da tarefa');return;}
+  const resp=document.getElementById(`nt-resp-${pid}`).value||'—';
+  const prazo=document.getElementById(`nt-prazo-${pid}`).value||'—';
+  const status=document.getElementById(`nt-status-${pid}`).value;
+  const link=document.getElementById(`nt-link-${pid}`).value.trim();
+  const t={nome,resp,status,prazo,link};
+  PROJECTS.find(p=>p.id===pid).tarefas.push(t);
+  saveExtraTask(pid,t);
+  renderProjects();
+  renderAlertBanner();
+  document.getElementById(`pb-${pid}`).classList.add('open');
+  document.getElementById(`chv-${pid}`).classList.add('open');
+  toast('Tarefa adicionada!');
+}
+
+// ===== MODAL (overview project click) =====
+function openProjModal(id){
+  const p=PROJECTS.find(x=>x.id===id);
+  document.getElementById('modal-title').textContent=p.nome;
+  document.getElementById('modal-sub').textContent=`${p.resp} · ${p.tarefas.length} tarefas · ${p.metaTag}`;
+  let rows=p.tarefas.map(t=>{
+    const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:6px">↗</a>`:'';
+    return `<div class="task-row"><span class="task-name">${t.nome}${lnk}</span><span class="task-resp">${t.resp}</span><span class="task-prazo">${t.prazo}</span>${statusBadge(t.status)}</div>`;
+  }).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="proj-kpis" style="margin-bottom:14px"><strong>KPIs:</strong> ${p.kpis}</div>
+    <div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0">
+      <span style="flex:1">Tarefa</span><span style="min-width:90px">Responsável</span><span style="min-width:36px">Prazo</span><span style="min-width:100px">Status</span>
+    </div>${rows}`;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(e){if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');}
+
+// ===== FUNIL =====
+function renderFunil(){
+  const c=document.getElementById('funil-stages');
+  c.innerHTML='';
+  FUNNEL_STAGES.forEach((s,i)=>{
+    const rows=s.turmas.map(t=>`
+      <div class="frow">
+        <div><div style="font-size:13px;font-weight:500">${t.nome}</div><div style="font-size:11px;color:#999">${t.resp}</div></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="ev" contenteditable data-key="funil_${i}_${t.nome.replace(/\s/g,'_')}" style="font-weight:700;font-size:13px">${t.valor}</span>
+          <a href="${t.link}" target="_blank" style="color:#185FA5;font-size:12px">↗</a>
+        </div>
+      </div>`).join('');
+    c.insertAdjacentHTML('beforeend',`
+      <div class="funnel-stage">
+        <div class="fh" onclick="toggleFunil(${i})">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:4px;height:18px;border-radius:2px;background:${s.cor}"></div>
+            <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:${s.cor}">${s.nome}</span>
+          </div>
+          <div style="display:flex;gap:14px;align-items:center">
+            <span style="font-size:12px;color:#999">${s.count} turmas</span>
+            <span style="font-weight:700;font-size:13px">${s.total}</span>
+            <span class="chv" id="fchv-${i}">▾</span>
+          </div>
+        </div>
+        <div class="fb2" id="fb-${i}">${rows}</div>
+      </div>`);
+  });
+  restoreED();
+}
+function toggleFunil(i){
+  document.getElementById(`fb-${i}`).classList.toggle('open');
+  document.getElementById(`fchv-${i}`).classList.toggle('open');
+}
+
+// ===== CANAIS =====
+function renderCanais(){
+  const g=document.getElementById('canais-grid');
+  g.innerHTML='';
+  CANAIS.forEach(c=>{
+    const mrows=c.metricas.map(m=>`
+      <div class="mrow">
+        <span style="font-size:12px;color:#666">${m.l}</span>
+        <span class="ev" contenteditable data-key="${m.k}" style="font-size:13px;font-weight:600">${m.v}</span>
+      </div>`).join('');
+    g.insertAdjacentHTML('beforeend',`
+      <div class="ch-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:2px">${c.nome}</div>
+            <div style="font-size:12px;color:#999">${c.handle} · ${c.marca}</div>
+          </div>
+          <span class="sm ${semCls(c.status)}" style="width:12px;height:12px;margin-top:4px"></span>
+        </div>
+        ${mrows}
+        <div style="margin-top:12px;padding:9px 12px;background:#F8F8F8;border-radius:8px;font-size:12px;color:#666">${c.diag}</div>
+      </div>`);
+  });
+  restoreED();
+}
+
+// ===== EQUIPE =====
+function renderEquipe(){
+  const g=document.getElementById('equipe-grid');
+  g.innerHTML='';
+  EQUIPE.forEach(m=>{
+    const tasks=PROJECTS.flatMap(p=>p.tarefas).filter(t=>t.resp.includes(m.nome));
+    const and=tasks.filter(t=>t.status==="EM ANDAMENTO"||t.status==="EM ATRASO").length;
+    const don=tasks.filter(t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO").length;
+    const pr=PROJECTS.filter(p=>p.resp.includes(m.nome)).length;
+    g.insertAdjacentHTML('beforeend',`
+      <div class="tc">
+        <div class="tav" style="background:${m.bg};color:${m.cor}">${m.nome[0]}</div>
+        <div style="font-size:15px;font-weight:700">${m.nome}</div>
+        <div style="font-size:12px;color:#999;margin-bottom:10px">${m.cargo}</div>
+        <div style="font-size:12px;color:#555;line-height:1.5;margin-bottom:12px">${m.foco}</div>
+        <div style="font-size:12px;padding:8px 12px;border-radius:8px;background:#FFF8E6;color:#854F0B;border-left:3px solid #E6A817;margin-bottom:14px">${m.alerta}</div>
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;text-align:center;padding:9px;background:#F8F8F8;border-radius:8px"><div style="font-size:18px;font-weight:700">${and}</div><div style="font-size:11px;color:#999">ativos</div></div>
+          <div style="flex:1;text-align:center;padding:9px;background:#F8F8F8;border-radius:8px"><div style="font-size:18px;font-weight:700">${don}</div><div style="font-size:11px;color:#999">concluídos</div></div>
+          <div style="flex:1;text-align:center;padding:9px;background:#F8F8F8;border-radius:8px"><div style="font-size:18px;font-weight:700">${pr}</div><div style="font-size:11px;color:#999">projetos</div></div>
+        </div>
+      </div>`);
+  });
+}
+
+// ===== METAS ORG =====
+function renderMetasOrg(){
+  const g=document.getElementById('metas-org-grid');
+  g.innerHTML='';
+  const saved=loadED();
+  METAS_ORG.forEach(m=>{
+    const pctKey=`meta_pct_${m.id}`;
+    const pct=saved[pctKey]?parseInt(saved[pctKey]):m.pct;
+    const atualKey=`meta_atual_${m.id}`;
+    const atual=saved[atualKey]||m.atual;
+    const linkBtn=m.linkedTab?`<button class="btn btno btns" style="font-size:11px;padding:4px 10px" onclick="${m.linkedTab==='projetos'?`gotoProj(${m.linkedProjId})`:`showTab('${m.linkedTab}',document.querySelectorAll('.nav button')[${m.linkedTab==='funil'?3:0}])`}">Ver projeto →</button>`:'';
+    g.insertAdjacentHTML('beforeend',`
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;margin-bottom:3px">${m.titulo}</div>
+            <div style="font-size:12px;color:#999">${m.sub}</div>
+          </div>
+          <div style="margin-left:10px">${linkBtn}</div>
+        </div>
+        <div style="font-size:12px;color:#666;margin-bottom:8px">Meta: <strong>${m.meta}</strong> · Atual: <span class="ev" contenteditable data-key="${atualKey}">${atual}</span></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pw" style="flex:1"><div class="pb ${m.status==='green'?'g':m.status==='yellow'?'y':m.status==='red'?'r':''}" id="mpb-${m.id}" style="width:${pct}%"></div></div>
+          <input type="number" min="0" max="100" value="${pct}" style="width:52px;padding:3px 6px;border:1px solid #DDD;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif" onchange="updateMetaPct('${m.id}','${pctKey}',this.value)">
+          <span style="font-size:12px;color:#999">%</span>
+        </div>
+      </div>`);
+  });
+  restoreED();
+}
+function updateMetaPct(mid,key,val){
+  saveED(key,val);
+  const bar=document.getElementById(`mpb-${mid}`);
+  if(bar)bar.style.width=val+'%';
+}
+
+// ===== METAS MKT =====
+function renderMetasMkt(){
+  const tb=document.querySelector('#metas-mkt-table tbody');
+  tb.innerHTML='';
+  const sc={blue:"bb",yellow:"by",red:"br",green:"bg"};
+  METAS_MKT.forEach(m=>{
+    const proj=PROJECTS.find(p=>p.id===m.linkedProjId);
+    const link=proj?`<button class="btn btno btns" style="font-size:11px;padding:4px 10px" onclick="gotoProj(${proj.id})">${proj.nome.substring(0,22)}… →</button>`:'—';
+    tb.insertAdjacentHTML('beforeend',`
+      <tr>
+        <td style="color:#999;font-size:12px">0${m.n}</td>
+        <td><strong>${m.titulo}</strong></td>
+        <td style="font-size:12px;color:#666">${m.kpi}</td>
+        <td style="font-size:12px;color:#666">${m.liga}</td>
+        <td>${statusBadge(m.status==="blue"?"EM ANDAMENTO":m.status==="yellow"?"STAND BY":m.status==="red"?"EM ATRASO":"CONCLUÍDO")}</td>
+        <td>${link}</td>
+      </tr>`);
+  });
+}
+
+function gotoProj(id){
+  showTab('projetos',document.querySelectorAll('.nav button')[2]);
+  clearFilters();
+  setTimeout(()=>{
+    const pb=document.getElementById(`pb-${id}`);
+    const chv=document.getElementById(`chv-${id}`);
+    if(pb){pb.classList.add('open');chv.classList.add('open');pb.scrollIntoView({behavior:'smooth',block:'start'});}
+  },100);
+}
+
+// ===== OVERVIEW =====
+function renderOverview(){
+  // Funil
+  const fDiv=document.getElementById('ov-funil');
+  fDiv.innerHTML=FUNNEL_STAGES.map(s=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F8F8F8">
+      <span style="font-size:13px">${s.nome}</span>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span style="font-size:12px;color:#999">${s.count} turmas</span>
+        <span style="font-weight:700;font-size:13px">${s.total}</span>
+      </div>
+    </div>`).join('');
+  // Canais
+  const cDiv=document.getElementById('ov-canais');
+  cDiv.innerHTML=CANAIS.map(c=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F8F8F8">
+      <div><span class="sm ${semCls(c.status)}"></span><span style="font-size:13px;font-weight:500">${c.nome}</span></div>
+      <span style="font-size:11px;color:#999">${c.metricas.find(m=>m.l==="Engajamento"||m.l==="Avaliação"||m.l==="Nota geral")?.v||''}</span>
+    </div>`).join('');
+  // Projects
+  const pDiv=document.getElementById('ov-projects');
+  pDiv.innerHTML=PROJECTS.map(p=>{
+    const tot=p.tarefas.length;
+    const done=p.tarefas.filter(t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO").length;
+    const atr=p.tarefas.filter(t=>t.status==="EM ATRASO").length;
+    const pct=Math.round(done/tot*100);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #F8F8F8;cursor:pointer" onclick="openProjModal(${p.id})">
+      <div style="min-width:200px;font-size:13px;font-weight:500;color:#185FA5">${p.nome}</div>
+      <div style="flex:1"><div class="pw"><div class="pb ${pct>=70?'g':pct>=40?'y':''}" style="width:${pct}%"></div></div></div>
+      <div style="min-width:36px;text-align:right;font-size:13px;font-weight:700">${pct}%</div>
+      <div style="min-width:90px;font-size:12px;color:#999">${done}/${tot} tarefas</div>
+      ${atr?`<span class="badge br" style="font-size:10px">${atr} atr.</span>`:`<span style="min-width:60px"></span>`}
+    </div>`;
+  }).join('');
+  // KPI tasks
+  const allT=PROJECTS.flatMap(p=>p.tarefas);
+  const doneT=allT.filter(t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO").length;
+  const pctT=Math.round(doneT/allT.length*100);
+  document.getElementById('kpi-tasks-num').textContent=doneT;
+  document.getElementById('kpi-tasks-sub').textContent=`de ${allT.length} total`;
+  document.getElementById('kpi-tasks-bar').style.width=pctT+'%';
+}
+
+// ===== COMUNICAÇÃO =====
+function toggleFields(){
+  document.getElementById('assunto-g').style.display=
+    document.getElementById('canal-select').value==='email'?'block':'none';
+}
+let historico=JSON.parse(localStorage.getItem('atm_hist')||'[]');
+function renderHistorico(){
+  const el=document.getElementById('historico-list');
+  if(!historico.length){el.innerHTML='<div style="text-align:center;padding:40px 0;color:#999;font-size:13px">Nenhum disparo ainda</div>';return;}
+  el.innerHTML=historico.slice().reverse().map(h=>`
+    <div style="padding:10px 0;border-bottom:1px solid #F4F4F4">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span class="badge ${h.canal==='whatsapp'?'bg':h.canal==='email'?'bb':'bp'}">${h.canal.toUpperCase()}</span>
+        <span style="font-size:11px;color:#999">${h.data}</span>
+      </div>
+      <div style="font-size:13px;font-weight:500">${h.dest}</div>
+      <div style="font-size:12px;color:#666;margin-top:2px">${h.msg.substring(0,80)}${h.msg.length>80?'...':''}</div>
+      ${h.ag?`<div style="font-size:11px;color:#854F0B;margin-top:3px">⏰ ${h.ag}</div>`:''}
+    </div>`).join('');
+}
+function enviarAgora(){
+  const canal=document.getElementById('canal-select').value;
+  const dest=document.getElementById('destinatario').value.trim();
+  const msg=document.getElementById('mensagem').value.trim();
+  if(!canal||!dest||!msg){toast('Preencha canal, destinatário e mensagem');return;}
+  historico.push({canal,dest,msg,data:new Date().toLocaleString('pt-BR'),ag:null});
+  localStorage.setItem('atm_hist',JSON.stringify(historico));
+  renderHistorico();
+  toast('Registrado! Integre com Evolution API / Resend / FCM.');
+  document.getElementById('mensagem').value='';document.getElementById('destinatario').value='';
+}
+function agendar(){
+  const canal=document.getElementById('canal-select').value;
+  const dest=document.getElementById('destinatario').value.trim();
+  const msg=document.getElementById('mensagem').value.trim();
+  const ag=document.getElementById('agendamento').value;
+  if(!canal||!dest||!msg||!ag){toast('Preencha todos os campos para agendar');return;}
+  const dt=new Date(ag).toLocaleString('pt-BR');
+  historico.push({canal,dest,msg,data:new Date().toLocaleString('pt-BR'),ag:dt});
+  localStorage.setItem('atm_hist',JSON.stringify(historico));
+  renderHistorico();
+  toast(`Agendado para ${dt}`);
+}
+
+// ===== TAB NAVIGATION =====
+function showTab(id,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+
+// ===== TOAST =====
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// ===== INIT =====
+loadExtraTasks();
+renderOverview();
+renderProjects();
+renderAlertBanner();
+renderFunil();
+renderCanais();
+renderEquipe();
+renderMetasOrg();
+renderMetasMkt();
+renderHistorico();
+restoreED();
+</script>
+</body>
+</html>
