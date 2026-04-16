@@ -369,6 +369,10 @@ tr:hover td{background:#FAFAFA}
             <option value="Jul">Julho</option><option value="Dez">Dezembro</option>
           </select>
         </div>
+        <div class="filter-group">
+          <label>Buscar tarefa</label>
+          <input type="text" id="f-query" placeholder="Nome da tarefa..." oninput="applyFilters()" style="padding:6px 10px;border:1px solid #DDD;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;min-width:180px">
+        </div>
         <div style="margin-top:18px"><button class="btn btno btns" onclick="clearFilters()">Limpar filtros</button></div>
       </div>
       <div class="filter-group" style="width:100%">
@@ -920,7 +924,7 @@ const METAS_ORG=[
   {id:"org-4",titulo:"Margem bruta 15% eventos / 5% pré",sub:"Receita real menos custos diretos",meta:"15%",atual:"—",pct:50,status:"gray",ligaA:"Financeiro",linkedProjId:null,linkedTab:null},
   {id:"org-5",titulo:"Excedente máximo 5% do budget",sub:"Budget aprovado vs custo final executado",meta:"5%",atual:"—",pct:60,status:"gray",ligaA:"Financeiro",linkedProjId:null,linkedTab:null},
   {id:"org-6",titulo:"NPS 4,5 · Produtos e Family Days",sub:"75% participação em álbuns entregues",meta:"4,5",atual:"—",pct:55,status:"yellow",ligaA:"Entregas",linkedProjId:5,linkedTab:"projetos"},
-  {id:"org-7",titulo:"NPS 4,5 · Atendimento",sub:"2 avaliações semestrais · 90% participação",meta:"4,5",atual:"—",pct:40,status:"yellow",ligaA:"Cultura Interna",linkedProjId:8,linkedTab:"projetos"},
+  {id:"org-7",titulo:"NPS 4,5 · Atendimento",sub:"2 avaliações semestrais · 90% participação",meta:"4,5",atual:"—",pct:40,status:"yellow",ligaA:"Funil Comercial",linkedProjId:null,linkedTab:"funil"},
   {id:"org-8",titulo:"NPS 4,5 · Entregas",sub:"Avaliação após cada entrega · 95% participação",meta:"4,5",atual:"—",pct:65,status:"yellow",ligaA:"Entregas",linkedProjId:5,linkedTab:"projetos"}
 ];
 
@@ -1054,34 +1058,38 @@ function statusBadge(s){
 function semCls(s){return{green:"sg",yellow:"sy",red:"sr"}[s]||"sgr"}
 
 // ===== FILTERS =====
-let filters={status:[],resp:"todos",mes:"todos"};
+let filters={status:[],resp:"todos",mes:"todos",query:""};
 let viewMode='projeto';
 function applyFilters(){
   filters.status=Array.from(document.querySelectorAll('#f-status-checks input:checked')).map(i=>i.value);
-  // update visual state of checkboxes
   document.querySelectorAll('#f-status-checks .sch').forEach(lbl=>{
     const inp=lbl.querySelector('input');
-    const cls=lbl.dataset.cls;
-    lbl.classList.toggle(cls, inp.checked);
+    lbl.classList.toggle(lbl.dataset.cls, inp.checked);
   });
   filters.resp=document.getElementById('f-resp').value;
   filters.mes=document.getElementById('f-mes').value;
+  filters.query=(document.getElementById('f-query')?.value||'').toLowerCase().trim();
   renderProjects();
 }
 function clearFilters(){
-  filters={status:[],resp:"todos",mes:"todos"};
+  filters={status:[],resp:"todos",mes:"todos",query:""};
   document.querySelectorAll('#f-status-checks input').forEach(i=>{i.checked=false});
-  document.querySelectorAll('#f-status-checks .sch').forEach(lbl=>{
-    lbl.classList.remove(lbl.dataset.cls);
-  });
+  document.querySelectorAll('#f-status-checks .sch').forEach(lbl=>lbl.classList.remove(lbl.dataset.cls));
   document.getElementById('f-resp').value="todos";
   document.getElementById('f-mes').value="todos";
+  const qi=document.getElementById('f-query');if(qi)qi.value='';
   renderProjects();
 }
-function taskVisible(t){
+function taskVisible(t,p){
   if(filters.status.length>0&&!filters.status.includes(t.status))return false;
   if(filters.resp!=="todos"&&!t.resp.includes(filters.resp))return false;
   if(filters.mes!=="todos"&&t.prazo!==filters.mes)return false;
+  if(filters.query){
+    const q=filters.query;
+    const inTask=t.nome.toLowerCase().includes(q);
+    const inProj=p?p.nome.toLowerCase().includes(q):false;
+    if(!inTask&&!inProj)return false;
+  }
   return true;
 }
 function setView(mode,btn){
@@ -1129,13 +1137,13 @@ function taskRowHTML(p,t,tIdx){
   const isDone=t.status==="CONCLUÍDO"||t.status==="FINALIZADO";
   const nameStyle=isDone?'text-decoration:line-through;color:#999':'';
   return `<div class="task-row" id="trow-${p.id}-${tIdx}">
-    <input type="checkbox" class="task-cb" ${isDone?'checked':''} onchange="checkTask(${p.id},${tIdx},this.checked)" title="Marcar como concluída">
+    <input type="checkbox" class="task-cb" ${isDone?'checked':''} onchange="checkTask(${p.id},${tIdx},this.checked)" title="Marcar como concluída" style="flex-shrink:0;width:16px">
     <span class="task-name" style="${nameStyle}">${t.nome}${lnk}</span>
-    <span class="task-resp">${t.resp}</span>
-    <span class="task-prazo">${t.prazo}</span>
-    ${statusBadge(t.status)}
-    <span class="meta-tag">${p.metaTag}</span>
-    <div style="display:flex;gap:3px;margin-left:auto;padding-left:6px">
+    <span class="task-resp" style="width:100px;flex-shrink:0">${t.resp}</span>
+    <span class="task-prazo" style="width:44px;flex-shrink:0">${t.prazo}</span>
+    <span style="width:120px;flex-shrink:0">${statusBadge(t.status)}</span>
+    <span class="meta-tag" style="width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.metaTag}</span>
+    <div style="display:flex;gap:3px;width:52px;flex-shrink:0;justify-content:flex-end">
       <button class="bico bico-edit" onclick="editTask(${p.id},${tIdx})" title="Editar">✎</button>
       <button class="bico bico-del" onclick="deleteTask(${p.id},${tIdx})" title="Excluir">✕</button>
     </div>
@@ -1162,11 +1170,13 @@ function renderProjects(){
     const pct=Math.round(done/tot*100);
     // Split: active vs done/standby
     const isArchived=t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO"||t.status==="STAND BY";
-    const activeFiltered=p.tarefas.filter(t=>!isArchived(t)&&taskVisible(t));
-    const archiveFiltered=p.tarefas.filter(t=>isArchived(t)&&taskVisible(t));
+    const activeFiltered=p.tarefas.filter(t=>!isArchived(t)&&taskVisible(t,p));
+    const archiveFiltered=p.tarefas.filter(t=>isArchived(t)&&taskVisible(t,p));
     // If status filter includes archived statuses, show them in active section too
     const hasArchivedFilter=filters.status.some(s=>["CONCLUÍDO","FINALIZADO","STAND BY"].includes(s));
-    const allFiltered=p.tarefas.filter(taskVisible);
+    const allFiltered=p.tarefas.filter(t=>taskVisible(t,p));
+    // Se busca ativa e nenhuma tarefa bate, ocultar projeto inteiro
+    if(filters.query&&activeFiltered.length===0&&archiveFiltered.length===0)return;
     const showActive=hasArchivedFilter?allFiltered:activeFiltered;
     const showArchived=hasArchivedFilter?[]:archiveFiltered;
     let rows='';
@@ -1210,7 +1220,7 @@ function renderProjects(){
             </div>
           </div>
           <div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0">
-            <span style="width:20px"></span><span style="flex:1">Tarefa</span><span style="min-width:90px">Responsável</span><span style="min-width:36px">Prazo</span><span style="min-width:100px">Status</span><span style="min-width:100px">Meta</span>
+            <span style="width:16px;flex-shrink:0"></span><span style="flex:1">Tarefa</span><span style="width:100px;flex-shrink:0">Responsável</span><span style="width:44px;flex-shrink:0">Prazo</span><span style="width:120px;flex-shrink:0">Status</span><span style="width:120px;flex-shrink:0">Meta</span><span style="width:52px;flex-shrink:0"></span>
           </div>
           ${rows}${noRes}${archSection}
           <div class="add-form">
@@ -1232,7 +1242,7 @@ function renderProjects(){
 function renderProjectsFlat(){
   const container=document.getElementById('projetos-list');
   container.innerHTML='';
-  const all=PROJECTS.flatMap(p=>p.tarefas.filter(taskVisible).map(t=>({t,p,tIdx:p.tarefas.indexOf(t)})));
+  const all=PROJECTS.flatMap(p=>p.tarefas.filter(t=>taskVisible(t,p)).map(t=>({t,p,tIdx:p.tarefas.indexOf(t)})));
   if(!all.length){container.innerHTML='<div style="text-align:center;padding:40px;color:#999">Nenhuma tarefa com os filtros ativos</div>';return;}
   let rows=all.map(({t,p,tIdx})=>{
     const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:5px">↗</a>`:'';
@@ -1393,22 +1403,51 @@ function renderMetasOrg(){
   const g=document.getElementById('metas-org-grid');
   g.innerHTML='';
   const saved=loadED();
+  const projOpts=`<option value="">— sem projeto —</option>`+PROJECTS.map(p=>`<option value="proj:${p.id}">${p.nome}</option>`).join('')+`<option value="tab:funil">Funil Comercial</option>`;
   METAS_ORG.forEach(m=>{
     const pctKey=`meta_pct_${m.id}`;
     const pct=saved[pctKey]?parseInt(saved[pctKey]):m.pct;
     const atualKey=`meta_atual_${m.id}`;
     const atual=saved[atualKey]||m.atual;
-    const linkBtn=m.linkedTab?`<button class="btn btno btns" style="font-size:11px;padding:4px 10px" onclick="${m.linkedTab==='projetos'?`gotoProj(${m.linkedProjId})`:`showTab('${m.linkedTab}',document.querySelectorAll('.nav button')[${m.linkedTab==='funil'?3:0}])`}">Ver projeto →</button>`:'';
+    const tituloKey=`meta_titulo_${m.id}`;
+    const subKey=`meta_sub_${m.id}`;
+    const ligaKey=`meta_liga_${m.id}`;
+    const linkKey=`meta_link_${m.id}`;
+    const titulo=saved[tituloKey]||m.titulo;
+    const sub=saved[subKey]||m.sub;
+    const liga=saved[ligaKey]||m.ligaA;
+    const savedLink=saved[linkKey]||'';
+    // Resolve link atual (savedLink tem precedência)
+    let curLinkVal='';
+    if(savedLink){curLinkVal=savedLink;}
+    else if(m.linkedTab==='projetos'&&m.linkedProjId){curLinkVal=`proj:${m.linkedProjId}`;}
+    else if(m.linkedTab==='funil'){curLinkVal='tab:funil';}
+    const linkOnclick=curLinkVal?(curLinkVal.startsWith('proj:')?`gotoProj(${curLinkVal.slice(5)})`:`showTab('funil',document.querySelectorAll('.nav button')[3])`):'';
+    const linkBtn=curLinkVal?`<button class="btn btno btns" style="font-size:11px;padding:3px 8px" onclick="${linkOnclick}">Ver →</button>`:'';
     g.insertAdjacentHTML('beforeend',`
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
           <div style="flex:1">
-            <div style="font-size:14px;font-weight:700;margin-bottom:3px">${m.titulo}</div>
-            <div style="font-size:12px;color:#999">${m.sub}</div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:2px">
+              <span class="ev" contenteditable data-key="${tituloKey}" onblur="saveED(this.dataset.key,this.textContent)" style="outline:none">${titulo}</span>
+            </div>
+            <div style="font-size:12px;color:#999">
+              <span class="ev" contenteditable data-key="${subKey}" onblur="saveED(this.dataset.key,this.textContent)" style="outline:none">${sub}</span>
+            </div>
           </div>
-          <div style="margin-left:10px">${linkBtn}</div>
+          <div style="margin-left:8px;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            ${linkBtn}
+          </div>
         </div>
-        <div style="font-size:12px;color:#666;margin-bottom:8px">Meta: <strong>${m.meta}</strong> · Atual: <span class="ev" contenteditable data-key="${atualKey}">${atual}</span></div>
+        <div style="font-size:11px;color:#999;margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span>Liga a:</span>
+          <span class="ev" contenteditable data-key="${ligaKey}" onblur="saveED(this.dataset.key,this.textContent)" style="outline:none;color:#666;font-weight:600">${liga}</span>
+          <span style="color:#ccc">·</span>
+          <select data-meta="${m.id}" onchange="saveMetaLink('${m.id}',this.value)" style="padding:2px 6px;border:1px solid #DDD;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif">
+            ${projOpts.replace(`value="${curLinkVal}"`,`value="${curLinkVal}" selected`)}
+          </select>
+        </div>
+        <div style="font-size:12px;color:#666;margin-bottom:8px">Meta: <strong>${m.meta}</strong> · Atual: <span class="ev" contenteditable data-key="${atualKey}" onblur="saveED(this.dataset.key,this.textContent)" style="outline:none">${atual}</span></div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="pw" style="flex:1"><div class="pb ${m.status==='green'?'g':m.status==='yellow'?'y':m.status==='red'?'r':''}" id="mpb-${m.id}" style="width:${pct}%"></div></div>
           <input type="number" min="0" max="100" value="${pct}" style="width:52px;padding:3px 6px;border:1px solid #DDD;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif" onchange="updateMetaPct('${m.id}','${pctKey}',this.value)">
@@ -1416,7 +1455,10 @@ function renderMetasOrg(){
         </div>
       </div>`);
   });
-  restoreED();
+}
+function saveMetaLink(mid,val){
+  saveED(`meta_link_${mid}`,val);
+  renderMetasOrg();
 }
 function updateMetaPct(mid,key,val){
   saveED(key,val);
@@ -1428,18 +1470,33 @@ function updateMetaPct(mid,key,val){
 function renderMetasMkt(){
   const tb=document.querySelector('#metas-mkt-table tbody');
   tb.innerHTML='';
-  const sc={blue:"bb",yellow:"by",red:"br",green:"bg"};
+  const saved=loadED();
+  const projOpts=`<option value="">—</option>`+PROJECTS.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  const statusOpts=['EM ANDAMENTO','STAND BY','EM ATRASO','CONCLUÍDO'].map(s=>`<option value="${s}">${s}</option>`).join('');
   METAS_MKT.forEach(m=>{
-    const proj=PROJECTS.find(p=>p.id===m.linkedProjId);
-    const link=proj?`<button class="btn btno btns" style="font-size:11px;padding:4px 10px" onclick="gotoProj(${proj.id})">${proj.nome.substring(0,22)}… →</button>`:'—';
+    const tituloKey=`mkt_titulo_${m.n}`;
+    const kpiKey=`mkt_kpi_${m.n}`;
+    const ligaKey=`mkt_liga_${m.n}`;
+    const statusKey=`mkt_status_${m.n}`;
+    const projKey=`mkt_proj_${m.n}`;
+    const titulo=saved[tituloKey]||m.titulo;
+    const kpi=saved[kpiKey]||m.kpi;
+    const liga=saved[ligaKey]||m.liga;
+    const curStatus=saved[statusKey]||(m.status==="blue"?"EM ANDAMENTO":m.status==="yellow"?"STAND BY":m.status==="red"?"EM ATRASO":"CONCLUÍDO");
+    const curProjId=saved[projKey]!==undefined?parseInt(saved[projKey]):m.linkedProjId;
+    const proj=PROJECTS.find(p=>p.id===curProjId);
+    const linkBtn=proj?`<button class="btn btno btns" style="font-size:11px;padding:3px 8px" onclick="gotoProj(${proj.id})">Ver →</button>`:'';
     tb.insertAdjacentHTML('beforeend',`
       <tr>
         <td style="color:#999;font-size:12px">0${m.n}</td>
-        <td><strong>${m.titulo}</strong></td>
-        <td style="font-size:12px;color:#666">${m.kpi}</td>
-        <td style="font-size:12px;color:#666">${m.liga}</td>
-        <td>${statusBadge(m.status==="blue"?"EM ANDAMENTO":m.status==="yellow"?"STAND BY":m.status==="red"?"EM ATRASO":"CONCLUÍDO")}</td>
-        <td>${link}</td>
+        <td><span contenteditable data-key="${tituloKey}" onblur="saveED(this.dataset.key,this.textContent);renderMetasMkt()" style="font-weight:600;outline:none;cursor:text">${titulo}</span></td>
+        <td style="font-size:12px;color:#666"><span contenteditable data-key="${kpiKey}" onblur="saveED(this.dataset.key,this.textContent)" style="outline:none;cursor:text">${kpi}</span></td>
+        <td style="font-size:12px;color:#666"><span contenteditable data-key="${ligaKey}" onblur="saveED(this.dataset.key,this.textContent)" style="outline:none;cursor:text">${liga}</span></td>
+        <td><select onchange="saveED('${statusKey}',this.value);renderMetasMkt()" style="padding:3px 6px;border:1px solid #DDD;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif">${statusOpts.replace(`value="${curStatus}"`,`value="${curStatus}" selected`)}</select></td>
+        <td>
+          <select onchange="saveED('${projKey}',this.value);renderMetasMkt()" style="padding:3px 6px;border:1px solid #DDD;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;max-width:140px">${projOpts.replace(`value="${curProjId}"`,`value="${curProjId}" selected`)}</select>
+          ${linkBtn}
+        </td>
       </tr>`);
   });
 }
