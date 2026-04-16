@@ -227,9 +227,9 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   <!-- LINHA 1: comercial -->
   <div class="grid g4" style="margin-bottom:14px">
     <div class="card kpib">
-      <div class="kpinum">R$ 39,2M</div>
+      <div class="kpinum" id="kpi-pipeline-ov">R$ 39,2M</div>
       <div class="kpilbl">Pipeline Total Ativo</div>
-      <div class="kpisub" style="color:#666">46 turmas em negociação</div>
+      <div class="kpisub" style="color:#666" id="kpi-turmas-ov">46 turmas em negociação</div>
       <div class="pw"><div class="pb g" style="width:100%"></div></div>
     </div>
     <div class="card kpib">
@@ -455,9 +455,9 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 
   <div class="grid g4" style="margin-bottom:20px">
     <div class="card kpib">
-      <div class="kpinum">R$ 39,2M</div>
+      <div class="kpinum" id="kpi-pipeline-funil">R$ 39,2M</div>
       <div class="kpilbl">Pipeline Total Ativo</div>
-      <div class="kpisub">Todas as etapas · 46 turmas</div>
+      <div class="kpisub" id="kpi-turmas-funil">Todas as etapas · 46 turmas</div>
     </div>
     <div class="card kpib" style="border:2px solid #0A0A0A">
       <div class="kpinum ev" contenteditable id="contratos-val" data-key="contratos_fechados">R$ 8,77M</div>
@@ -1196,7 +1196,7 @@ const PROJECTS = [
   ]}
 ];
 
-const FUNNEL_STAGES = [
+let FUNNEL_STAGES = [
   {nome:"Prospectar",cor:"#666",total:"R$ 8.350.000",count:13,turmas:[
     {nome:"MEDICINA UNIVEL 2030.2 T1",valor:"R$ 1.000.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hr5rbr"},
     {nome:"MEDICINA UNICENTRO 2031.2 T8",valor:"R$ 800.000",resp:"Vitor Pacifico",link:"https://app.clickup.com/t/868hufwur"},
@@ -1864,6 +1864,30 @@ function openProjModal(id){
 function closeModal(e){if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');}
 
 // ===== FUNIL =====
+function loadFunilFromDB(){
+  const raw = dbStore.getItem('atm_funil_data');
+  if (!raw) return;
+  try {
+    const f = JSON.parse(raw);
+    if (f.stages && f.stages.length) FUNNEL_STAGES = f.stages;
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    if (f.pipeline) {
+      setEl('kpi-pipeline-ov',    f.pipeline);
+      setEl('kpi-pipeline-funil', f.pipeline);
+    }
+    if (f.turmasAtivas) {
+      setEl('kpi-turmas-ov',    `${f.turmasAtivas} turmas em negociação`);
+      setEl('kpi-turmas-funil', `Todas as etapas · ${f.turmasAtivas} turmas`);
+    }
+    if (f.contratos) {
+      const c1 = document.getElementById('kpi-fechados');
+      const c2 = document.getElementById('contratos-val');
+      if (c1) c1.textContent = f.contratos;
+      if (c2) c2.textContent = f.contratos;
+    }
+  } catch(e) { console.warn('loadFunilFromDB:', e); }
+}
+
 function renderFunil(){
   const c=document.getElementById('funil-stages');
   c.innerHTML='';
@@ -3039,6 +3063,7 @@ async function initApp(){
   loadProjFases();
   loadProjPct();
   syncHerreraDefaults();
+  loadFunilFromDB();
 
   // 4. Renderizar tudo
   renderOverview();

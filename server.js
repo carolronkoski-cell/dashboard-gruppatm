@@ -25,6 +25,30 @@ const PORT          = process.env.PORT || 3333;
 const DB_PATH       = process.env.DB_PATH || path.join(__dirname, 'atm_dashboard.db');
 const CLICKUP_TOKEN = process.env.CLICKUP_TOKEN;
 
+// IDs das listas de turmas no ClickUp
+const TURMAS_LISTS = ['901103166181', '901103299950']; // Formô + YZ
+const VALOR_PROJETO_FIELD = 'f232bcb7-7e91-42b8-9a45-b12c7dccc61b';
+
+// Mapeamento status ClickUp → etapa do funil
+const FUNIL_STAGE_MAP = {
+  'prospectar':            { nome: 'Prospectar',              cor: '#666666' },
+  'prospectado':           { nome: 'Prospectar',              cor: '#666666' },
+  'em atendimento':        { nome: 'Em Atendimento',          cor: '#185FA5' },
+  'elaboração de projeto': { nome: 'Elaboração de Projeto',   cor: '#854F0B' },
+  'elaboracao de projeto': { nome: 'Elaboração de Projeto',   cor: '#854F0B' },
+  'assembleia':            { nome: 'Assembleia',              cor: '#993556' },
+  'assinatura/fechamento': { nome: 'Assinatura / Fechamento', cor: '#3B6D11' },
+  'pós venda':             { nome: 'Pós Venda',               cor: '#3C3489' },
+  'pos venda':             { nome: 'Pós Venda',               cor: '#3C3489' },
+  'formô':                 { nome: 'Formô',                   cor: '#0F6E56' },
+  'formo':                 { nome: 'Formô',                   cor: '#0F6E56' },
+};
+
+const STAGE_ORDER = [
+  'Prospectar','Em Atendimento','Elaboração de Projeto',
+  'Assembleia','Assinatura / Fechamento','Pós Venda','Formô'
+];
+
 // ── DB setup ──────────────────────────────────────────────────────────────────
 const db = new Database(DB_PATH);
 
@@ -147,6 +171,129 @@ function parseProjectsFromHTML() {
   }
 }
 
+function formatBRLFull(num) {
+  if (!num) return '—';
+  return 'R$ ' + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function formatBRLM(num) {
+  if (!num) return '—';
+  if (num >= 1000000) return `R$ ${(num / 1000000).toFixed(1).replace('.', ',')}M`;
+  return formatBRLFull(num);
+}
+
+async function fetchAllListTasks(listId) {
+  const tasks = [];
+  let page = 0;
+  while (true) {
+    const result = await new Promise((resolve) => {
+      const req = https.get({
+        hostname: 'api.clickup.com',
+        path: `/api/v2/list/${listId}/task?archived=false&page=${page}`,
+        headers: { 'Authorization': CLICKUP_TOKEN },
+        timeout: 20000
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => data += chunk);
+        res.on('end', () => { try { resolve(JSON.parse(data)); } catch { resolve(null); } });
+      });
+      req.on('error', () => resolve(null));
+      req.on('timeout', () => { req.destroy(); resolve(null); });
+    });
+    if (!result || !result.tasks) break;
+    tasks.push(...result.tasks);
+    if (result.tasks.length < 100) break;
+    page++;
+    await new Promise(r => setTimeout(r, 300));
+  }
+  return tasks;
+}
+
+async function syncFunil() {
+  if (!CLICKUP_TOKEN) return;
+  console.log('  Sincronizando funil comercial...');
+
+  const allTasks = [];
+  for (const listId of TURMAS_LISTS) {
+    const tasks = await fetchAllListTasks(listId);
+    allTasks.push(...tasks);
+    await new Promise(r => setTimeout(r, 300));
+  }
+  console.log(`  ${allTasks.length} turmas carregadas`);
+
+  // Inicializar etapas
+  const stageData = {};
+  for (const nome of STAGE_ORDER) {
+    const cor = Object.values(FUNIL_STAGE_MAP).find(s => s.nome === nome)?.cor || '#666';
+    stageData[nome] = { nome, cor, turmas: [], totalNum: 0 };
+  }
+
+  let pipeline = 0, contratos = 0, turmasAtivas = 0;
+
+  for (const t of allTasks) {
+    const statusRaw = normalizeStr(t.status?.status || '');
+    const stageInfo = FUNIL_STAGE_MAP[statusRaw];
+    if (!stageInfo) continue; // pula "perdidas" e desconhecidos
+
+    const stageName = stageInfo.nome;
+
+    // Valor do projeto
+    let valor = 0;
+    for (const cf of (t.custom_fields || [])) {
+      if (cf.id === VALOR_PROJETO_FIELD && cf.value) {
+        valor = parseFloat(String(cf.value).replace(',', '.')) || 0;
+        break;
+      }
+    }
+
+    // Responsável (primeiro + sobrenome)
+    const assignees = t.assignees || [];
+    const resp = assignees.length > 0
+      ? assignees.map(a => {
+          const parts = (a.username || '').split(' ');
+          return parts.length >= 2 ? `${parts[0]} ${parts[1]}` : parts[0];
+        }).join(', ')
+      : '—';
+
+    if (stageData[stageName]) {
+      stageData[stageName].turmas.push({
+        nome: t.name,
+        valor: valor ? formatBRLFull(valor) : '—',
+        resp,
+        link: `https://app.clickup.com/t/${t.id}`
+      });
+      stageData[stageName].totalNum += valor;
+    }
+
+    pipeline += valor;
+    turmasAtivas++;
+    if (['Assinatura / Fechamento', 'Pós Venda', 'Formô'].includes(stageName)) {
+      contratos += valor;
+    }
+  }
+
+  const stages = STAGE_ORDER
+    .filter(nome => stageData[nome]?.turmas.length > 0)
+    .map(nome => ({
+      ...stageData[nome],
+      total: formatBRLFull(stageData[nome].totalNum),
+      count: stageData[nome].turmas.length
+    }));
+
+  const funil = {
+    pipelineNum: pipeline,
+    pipeline: formatBRLM(pipeline),
+    contratosNum: contratos,
+    contratos: formatBRLM(contratos),
+    turmasAtivas,
+    ultimoSync: new Date().toISOString(),
+    stages
+  };
+
+  stmtUpsert.run('atm_funil_data', JSON.stringify(funil));
+  console.log(`  Funil: ${turmasAtivas} turmas · pipeline ${funil.pipeline} · contratos ${funil.contratos}`);
+}
+
 let lastSync       = null;
 let syncInProgress = false;
 
@@ -222,8 +369,11 @@ async function syncClickUp() {
       if (i < ids.length - 1) await new Promise(r => setTimeout(r, 120));
     }
 
-    // 6. Salvar no DB se houve mudanças
+    // 6. Salvar tarefas no DB
     stmtUpsert.run('atm_all_tasks', JSON.stringify(allTasks));
+
+    // 7. Sincronizar funil comercial
+    await syncFunil();
 
     lastSync = new Date().toISOString();
     console.log(`  Sync concluído: ${updated} tarefa(s) atualizada(s)`);
