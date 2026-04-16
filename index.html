@@ -200,7 +200,9 @@ tr:hover td{background:#FAFAFA}
 <!-- VISÃO GERAL -->
 <div id="tab-visao" class="tab-content active">
   <div class="section-title">Visão Geral · Abril 2026</div>
-  <div class="grid g4" style="margin-bottom:18px">
+
+  <!-- LINHA 1: comercial -->
+  <div class="grid g4" style="margin-bottom:14px">
     <div class="card kpib">
       <div class="kpinum">R$ 39,2M</div>
       <div class="kpilbl">Pipeline Total Ativo</div>
@@ -216,8 +218,8 @@ tr:hover td{background:#FAFAFA}
     <div class="card kpib">
       <div class="kpinum">4,6 ★</div>
       <div class="kpilbl">Google · Formô PR</div>
-      <div class="kpisub">220 aval. · Meta: 4,7 / 500</div>
-      <div class="pw"><div class="pb y" style="width:44%"></div></div>
+      <div class="kpisub" id="ov-google-sub">220 aval. · Meta: 4,7 / 500</div>
+      <div class="pw"><div class="pb y" id="ov-google-bar" style="width:44%"></div></div>
     </div>
     <div class="card kpib">
       <div id="kpi-tasks-num" class="kpinum">—</div>
@@ -227,7 +229,41 @@ tr:hover td{background:#FAFAFA}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-bottom:18px">
+  <!-- LINHA 2: marketing -->
+  <div class="grid g4" style="margin-bottom:18px">
+    <div class="card kpib">
+      <div class="kpinum ev" contenteditable data-key="ov_leads_mes">—</div>
+      <div class="kpilbl">Leads do Mês</div>
+      <div class="kpisub">via digital · clique para editar</div>
+      <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:8px">
+        <span style="font-size:11px;color:#999">Meta:</span>
+        <span class="ev" contenteditable data-key="ov_leads_meta" style="font-size:11px;font-weight:600">—</span>
+      </div>
+    </div>
+    <div class="card kpib">
+      <div class="kpinum ev" contenteditable data-key="ov_conv">—%</div>
+      <div class="kpilbl">Taxa de Conversão</div>
+      <div class="kpisub">Leads → Contrato</div>
+      <div class="pw"><div class="pb y" id="ov-conv-bar" style="width:0%"></div></div>
+    </div>
+    <div class="card kpib">
+      <div id="ov-posts-num" class="kpinum">—</div>
+      <div class="kpilbl">Posts Publicados · Abr</div>
+      <div class="kpisub">Meta: 16/mês (4/semana)</div>
+      <div class="pw"><div id="ov-posts-bar" class="pb y" style="width:0%"></div></div>
+      <div style="font-size:11px;color:#999;margin-top:5px">
+        Atual: <span class="ev" contenteditable data-key="ov_posts_atual" onblur="updatePostsBar()">0</span> posts
+      </div>
+    </div>
+    <div class="card kpib">
+      <div id="ov-briefings-num" class="kpinum">—</div>
+      <div class="kpilbl">Briefings Ativos</div>
+      <div class="kpisub">turmas com conteúdo em produção</div>
+    </div>
+  </div>
+
+  <!-- LINHA 3: funil + canais -->
+  <div class="grid g2" style="margin-bottom:14px">
     <div class="card">
       <div class="lbl" style="margin-bottom:12px">Funil por Etapa</div>
       <div id="ov-funil"></div>
@@ -238,6 +274,39 @@ tr:hover td{background:#FAFAFA}
     </div>
   </div>
 
+  <!-- LINHA 4: entregas + NPS -->
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="lbl" style="margin-bottom:12px">Próximas Entregas</div>
+      <div id="ov-entregas"></div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="margin-bottom:12px">NPS Recente · clique nos valores para editar</div>
+      <div id="ov-nps"></div>
+    </div>
+  </div>
+
+  <!-- LINHA 5: google progress -->
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="lbl" style="margin-bottom:0">Progresso · Avaliações Google</div>
+      <span style="font-size:12px;color:#999">Meta: 500 avaliações · Nota 4,7</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:13px;color:#999;min-width:20px">0</span>
+      <div style="flex:1;background:#F0F0F0;border-radius:99px;height:12px;position:relative">
+        <div style="width:44%;background:#E6A817;border-radius:99px;height:12px;transition:width .4s"></div>
+        <div style="position:absolute;left:44%;top:-18px;transform:translateX(-50%);font-size:11px;font-weight:700;color:#854F0B">220 aval.</div>
+      </div>
+      <span style="font-size:13px;font-weight:700;min-width:60px">500 meta</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#666;flex-wrap:wrap;gap:8px">
+      <span>Avaliação atual: <strong>4,6 ★</strong> · Meta: <strong>4,7 ★</strong></span>
+      <span>Faltam <strong>280 avaliações</strong> · ~<strong class="ev" contenteditable data-key="ov_aval_mes">—</strong> novas/mês</span>
+    </div>
+  </div>
+
+  <!-- LINHA 6: projetos -->
   <div class="card">
     <div class="lbl" style="margin-bottom:12px">Projetos · Progresso — <span style="font-size:11px;color:#185FA5;cursor:pointer;font-weight:600" onclick="showTab('projetos',document.querySelectorAll('.nav button')[2])">clique para ver tarefas →</span></div>
     <div id="ov-projects"></div>
@@ -1395,6 +1464,74 @@ function renderOverview(){
   document.getElementById('kpi-tasks-num').textContent=doneT;
   document.getElementById('kpi-tasks-sub').textContent=`de ${allT.length} total`;
   document.getElementById('kpi-tasks-bar').style.width=pctT+'%';
+  // Briefings ativos
+  const briefCount=allT.filter(t=>t.nome.toLowerCase().includes('briefing')&&t.status==='EM ANDAMENTO').length;
+  const bEl=document.getElementById('ov-briefings-num');
+  if(bEl)bEl.textContent=briefCount||'0';
+  // Posts publicados
+  updatePostsBar();
+  // Próximas Entregas (Projeto id=5)
+  const projE=PROJECTS.find(p=>p.id===5);
+  const eDiv=document.getElementById('ov-entregas');
+  if(projE&&eDiv){
+    const upcoming=projE.tarefas.filter(t=>t.status!=='CONCLUÍDO'&&t.status!=='FINALIZADO').slice(0,5);
+    eDiv.innerHTML=upcoming.length?upcoming.map(t=>{
+      const cls=t.status==='EM ATRASO'?'br':t.status==='EM ANDAMENTO'?'bb':'bgr';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F8F8F8">
+        <span style="font-size:13px;flex:1">${t.nome}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${t.prazo?`<span style="font-size:11px;color:#999">${t.prazo}</span>`:''}
+          <span class="badge ${cls}" style="font-size:10px">${t.status}</span>
+        </div>
+      </div>`;
+    }).join(''):'<div style="color:#999;font-size:13px;padding:8px 0">Nenhuma entrega pendente.</div>';
+  }
+  // NPS Recente
+  const nDiv=document.getElementById('ov-nps');
+  if(nDiv){
+    const ed=loadED();
+    const npsItems=[
+      {k:'nps_entregas',label:'Entregas'},
+      {k:'nps_atendimento',label:'Atendimento'},
+      {k:'nps_produtos',label:'Produtos'}
+    ];
+    nDiv.innerHTML=npsItems.map(n=>{
+      const val=ed[n.k]||'—';
+      const num=parseFloat(String(val).replace(',','.'));
+      const pct=isNaN(num)?0:Math.min(100,Math.round(num/10*100));
+      const barCls=num>=8?'g':num>=6?'y':'r';
+      return `<div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:12px;color:#666">${n.label}</span>
+          <span class="ev" contenteditable data-key="${n.k}" onblur="updateNpsBar('${n.k}')"
+            style="font-size:22px;font-weight:700;min-width:30px;text-align:right;outline:none;cursor:text">${val}</span>
+        </div>
+        <div class="pw"><div id="nps-bar-${n.k}" class="pb ${barCls}" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  }
+}
+function updatePostsBar(){
+  const el=document.querySelector('[data-key="ov_posts_atual"]');
+  const raw=el?el.textContent.trim():(loadED()['ov_posts_atual']||'0');
+  const val=parseInt(raw)||0;
+  if(el)saveED('ov_posts_atual',String(val));
+  const pct=Math.min(100,Math.round(val/16*100));
+  const numEl=document.getElementById('ov-posts-num');
+  const barEl=document.getElementById('ov-posts-bar');
+  if(numEl)numEl.textContent=val;
+  if(barEl)barEl.style.width=pct+'%';
+}
+function updateNpsBar(key){
+  const el=document.querySelector(`[data-key="${key}"]`);
+  if(!el)return;
+  const val=el.textContent.trim();
+  saveED(key,val);
+  const num=parseFloat(val.replace(',','.'));
+  const pct=isNaN(num)?0:Math.min(100,Math.round(num/10*100));
+  const barCls=num>=8?'g':num>=6?'y':'r';
+  const barEl=document.getElementById('nps-bar-'+key);
+  if(barEl){barEl.style.width=pct+'%';barEl.className='pb '+barCls;}
 }
 
 // ===== COMUNICAÇÃO =====
