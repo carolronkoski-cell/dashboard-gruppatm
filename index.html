@@ -124,6 +124,11 @@ tr:hover td{background:#FAFAFA}
 .ev{border-radius:4px;padding:1px 4px;cursor:text;transition:background .1s}
 .ev:hover{background:#F0F0F0}
 .ev:focus{background:#F0F0F0;outline:none}
+/* ICON BUTTONS */
+.bico{background:none;border:1px solid #E8E8E8;border-radius:5px;padding:2px 6px;font-size:12px;cursor:pointer;color:#999;transition:all .15s;line-height:1.4}
+.bico:hover{background:#F0F0F0;color:#0A0A0A;border-color:#CCC}
+.bico-del:hover{background:#FDEAEA;color:#C0392B;border-color:#FACCCC}
+.bico-edit:hover{background:#E6F1FB;color:#185FA5;border-color:#C2D8F0}
 /* CHEVRON */
 .chv{font-size:14px;transition:transform .2s;color:#999}
 .chv.open{transform:rotate(180deg)}
@@ -764,16 +769,61 @@ function restoreED(){
   });
 }
 
-// ===== EXTRA TASKS (localStorage) =====
+// ===== TASKS PERSISTENCE =====
 function loadExtraTasks(){
-  const s=localStorage.getItem('atm_tasks');if(!s)return;
-  const d=JSON.parse(s);
-  PROJECTS.forEach(p=>{if(d[p.id])p.tarefas=[...p.tarefas,...d[p.id]]});
+  // Novo sistema: array completo por projeto
+  const all=JSON.parse(localStorage.getItem('atm_all_tasks')||'{}');
+  PROJECTS.forEach(p=>{
+    if(all[p.id]){p.tarefas=all[p.id];return;}
+    // Legado: só extras
+    const old=JSON.parse(localStorage.getItem('atm_tasks')||'{}');
+    if(old[p.id])p.tarefas=[...p.tarefas,...old[p.id]];
+  });
 }
-function saveExtraTask(pid,t){
-  const d=JSON.parse(localStorage.getItem('atm_tasks')||'{}');
-  if(!d[pid])d[pid]=[];d[pid].push(t);
-  localStorage.setItem('atm_tasks',JSON.stringify(d));
+function saveProjectTasks(pid){
+  const proj=PROJECTS.find(p=>p.id===pid);
+  const d=JSON.parse(localStorage.getItem('atm_all_tasks')||'{}');
+  d[pid]=proj.tarefas;
+  localStorage.setItem('atm_all_tasks',JSON.stringify(d));
+}
+function deleteTask(pid,tIdx){
+  if(!confirm('Excluir esta tarefa?'))return;
+  PROJECTS.find(p=>p.id===pid).tarefas.splice(tIdx,1);
+  saveProjectTasks(pid);
+  renderProjects();renderAlertBanner();renderOverview();
+  document.getElementById(`pb-${pid}`).classList.add('open');
+  document.getElementById(`chv-${pid}`).classList.add('open');
+  toast('Tarefa excluída!');
+}
+function editTask(pid,tIdx){
+  const t=PROJECTS.find(p=>p.id===pid).tarefas[tIdx];
+  const row=document.getElementById(`trow-${pid}-${tIdx}`);
+  if(!row)return;
+  const statOpts=['NÃO INICIADO','EM ANDAMENTO','EM ATRASO','STAND BY','CONCLUÍDO','FINALIZADO']
+    .map(s=>`<option value="${s}"${t.status===s?' selected':''}>${s}</option>`).join('');
+  row.outerHTML=`<div class="task-row" id="trow-${pid}-${tIdx}" style="flex-wrap:wrap;gap:6px;background:#F4F8FF;border-radius:8px;padding:10px;border:1px solid #C2D8F0">
+    <input value="${t.nome}" id="et-nome-${pid}-${tIdx}" style="flex:1;min-width:160px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+    <input value="${t.resp}" id="et-resp-${pid}-${tIdx}" placeholder="Responsável" style="width:110px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+    <input value="${t.prazo}" id="et-prazo-${pid}-${tIdx}" placeholder="Prazo" style="width:60px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+    <select id="et-status-${pid}-${tIdx}" style="padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">${statOpts}</select>
+    <input value="${t.link||''}" id="et-link-${pid}-${tIdx}" placeholder="Link ClickUp" style="width:150px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+    <button class="btn btnp btns" onclick="saveEditTask(${pid},${tIdx})">Salvar</button>
+    <button class="btn btno btns" onclick="renderProjects();document.getElementById('pb-${pid}').classList.add('open');document.getElementById('chv-${pid}').classList.add('open')">Cancelar</button>
+  </div>`;
+}
+function saveEditTask(pid,tIdx){
+  const proj=PROJECTS.find(p=>p.id===pid);
+  const t=proj.tarefas[tIdx];
+  t.nome=document.getElementById(`et-nome-${pid}-${tIdx}`).value.trim()||t.nome;
+  t.resp=document.getElementById(`et-resp-${pid}-${tIdx}`).value.trim()||t.resp;
+  t.prazo=document.getElementById(`et-prazo-${pid}-${tIdx}`).value.trim()||t.prazo;
+  t.status=document.getElementById(`et-status-${pid}-${tIdx}`).value;
+  t.link=document.getElementById(`et-link-${pid}-${tIdx}`).value.trim();
+  saveProjectTasks(pid);
+  renderProjects();renderAlertBanner();renderOverview();
+  document.getElementById(`pb-${pid}`).classList.add('open');
+  document.getElementById(`chv-${pid}`).classList.add('open');
+  toast('Tarefa atualizada!');
 }
 
 // ===== HELPERS =====
@@ -843,8 +893,9 @@ function renderProjects(){
     const filtered=p.tarefas.filter(taskVisible);
     let rows='';
     filtered.forEach(t=>{
+      const tIdx=p.tarefas.indexOf(t);
       const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:6px;text-decoration:none">↗</a>`:'';
-      rows+=`<div class="task-row"><span class="task-name">${t.nome}${lnk}</span><span class="task-resp">${t.resp}</span><span class="task-prazo">${t.prazo}</span>${statusBadge(t.status)}<span class="meta-tag">${p.metaTag}</span></div>`;
+      rows+=`<div class="task-row" id="trow-${p.id}-${tIdx}"><span class="task-name">${t.nome}${lnk}</span><span class="task-resp">${t.resp}</span><span class="task-prazo">${t.prazo}</span>${statusBadge(t.status)}<span class="meta-tag">${p.metaTag}</span><div style="display:flex;gap:3px;margin-left:auto;padding-left:6px"><button class="bico bico-edit" onclick="editTask(${p.id},${tIdx})" title="Editar">✎</button><button class="bico bico-del" onclick="deleteTask(${p.id},${tIdx})" title="Excluir">✕</button></div></div>`;
     });
     const noRes=filtered.length===0?`<div style="padding:16px 0;color:#999;font-size:13px;text-align:center">Nenhuma tarefa com os filtros ativos</div>`:'';
     container.insertAdjacentHTML('beforeend',`
@@ -852,7 +903,11 @@ function renderProjects(){
         <div class="proj-header" onclick="toggleProj(${p.id})">
           <div>
             <div style="font-size:14px;font-weight:700">${p.nome}</div>
-            <div style="font-size:12px;color:#999;margin-top:2px">${p.resp} · ${tot} tarefas</div>
+            <div style="font-size:12px;color:#999;margin-top:3px;display:flex;align-items:center;gap:6px">
+              <span style="background:#F0F0F0;color:#0A0A0A;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px">${p.resp.split(',')[0].trim()}</span>
+              ${p.resp.split(',').length>1?`<span>${p.resp.split(',').slice(1).join(',').trim()}</span>`:''}
+              <span>· ${tot} tarefas</span>
+            </div>
           </div>
           <div style="display:flex;align-items:center;gap:14px">
             <span class="badge bg" style="font-size:10px">${done} concluídas</span>
@@ -909,7 +964,7 @@ function addTask(pid){
   const link=document.getElementById(`nt-link-${pid}`).value.trim();
   const t={nome,resp,status,prazo,link};
   PROJECTS.find(p=>p.id===pid).tarefas.push(t);
-  saveExtraTask(pid,t);
+  saveProjectTasks(pid);
   renderProjects();
   renderAlertBanner();
   document.getElementById(`pb-${pid}`).classList.add('open');
