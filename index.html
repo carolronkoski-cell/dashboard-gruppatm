@@ -859,7 +859,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 
 <script>
 // ===== DB STORE (SQLite via Express, fallback a localStorage) =====
-const _DB_BASE = 'http://localhost:3333/api';
+const _DB_BASE = '/api';
 const dbStore = {
   _cache: null,   // null = não inicializado; {} = carregado do servidor
   _online: false,
