@@ -708,12 +708,15 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
         <div class="fg"><label>Link</label><input type="url" id="pm-link" placeholder="https://..."></div>
       </div>
       <div class="fg"><label>Observação</label><input type="text" id="pm-obs" placeholder="Qualquer nota adicional..."></div>
-      <div style="display:flex;gap:24px;margin-bottom:20px">
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="pm-aprovado" style="width:16px;height:16px;accent-color:#1A7A3F"> Aprovado
+      <div style="display:flex;gap:0;margin-bottom:20px;border:1px solid #E8E8E8;border-radius:8px;overflow:hidden">
+        <label id="lbl-aprovado" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:10px;border-right:1px solid #E8E8E8;transition:all .15s">
+          <input type="checkbox" id="pm-aprovado" style="display:none" onchange="syncAprovRep('aprovado')"> <span id="ico-aprovado">✓</span> Aprovado
         </label>
-        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
-          <input type="checkbox" id="pm-postado" style="width:16px;height:16px;accent-color:#1A7A3F"> Postado
+        <label id="lbl-reprovado" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:10px;border-right:1px solid #E8E8E8;transition:all .15s">
+          <input type="checkbox" id="pm-reprovado" style="display:none" onchange="syncAprovRep('reprovado')"> <span>✕</span> Reprovado
+        </label>
+        <label id="lbl-postado" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:10px;transition:all .15s">
+          <input type="checkbox" id="pm-postado" style="display:none" onchange="syncAprovRep('postado')"> <span>📤</span> Postado
         </label>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -2148,6 +2151,40 @@ function toast(msg){
 
 // ===== POSTS =====
 let POSTS=JSON.parse(localStorage.getItem('atm_posts')||'[]');
+const PLAT_ICONS={
+  Instagram:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
+  TikTok:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.17 8.17 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>`,
+  YouTube:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M23.5 6.19a3.02 3.02 0 00-2.12-2.12C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.57A3.02 3.02 0 00.5 6.19 31.53 31.53 0 000 12a31.53 31.53 0 00.5 5.81 3.02 3.02 0 002.12 2.12C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.57a3.02 3.02 0 002.12-2.12A31.53 31.53 0 0024 12a31.53 31.53 0 00-.5-5.81zM9.75 15.5v-7l6.25 3.5-6.25 3.5z"/></svg>`,
+  WhatsApp:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
+  LinkedIn:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>`,
+  Google:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>`
+};
+function postStatusStyle(p){
+  if(p.postado)return {bg:'#E6F4EC',c:'#1A7A3F',border:'1px solid #A8D5B5'};
+  if(p.reprovado)return {bg:'#FDEAEA',c:'#C0392B',border:'1px solid #F5AAAA'};
+  if(p.aprovado)return {bg:'#E6F1FB',c:'#185FA5',border:'1px solid #A8C8F0'};
+  const cl=PLAT_COLORS[p.plataforma]||{bg:'#F0F0F0',c:'#666'};
+  return {bg:cl.bg,c:cl.c,border:'none'};
+}
+function postStatusBadge(p){
+  if(p.postado)return `<span class="badge bg" style="font-size:10px">Postado</span>`;
+  if(p.reprovado)return `<span class="badge br" style="font-size:10px">Reprovado</span>`;
+  if(p.aprovado)return `<span class="badge bb" style="font-size:10px">Aprovado</span>`;
+  return `<span class="badge bgr" style="font-size:10px">Pendente</span>`;
+}
+function syncAprovRep(changed){
+  if(changed==='aprovado'&&document.getElementById('pm-aprovado').checked)document.getElementById('pm-reprovado').checked=false;
+  if(changed==='reprovado'&&document.getElementById('pm-reprovado').checked)document.getElementById('pm-aprovado').checked=false;
+  ['aprovado','reprovado','postado'].forEach(k=>{
+    const cb=document.getElementById(`pm-${k}`);
+    const lbl=document.getElementById(`lbl-${k}`);
+    if(!cb||!lbl)return;
+    if(cb.checked){
+      const s={aprovado:'background:#E6F1FB;color:#185FA5',reprovado:'background:#FDEAEA;color:#C0392B',postado:'background:#E6F4EC;color:#1A7A3F'}[k];
+      lbl.style.cssText=lbl.style.cssText+';'+s;
+    }else{lbl.style.background='';lbl.style.color='';}
+  });
+}
 let postsView='mes';
 let postMonth=new Date().getMonth();
 let postYear=new Date().getFullYear();
@@ -2195,7 +2232,7 @@ function renderPostsMes(posts,container){
     const dp=posts.filter(p=>p.data===ds);
     html+=`<div class="cal-day${isToday?' cal-today':''}">
       <div class="cal-day-num">${d}</div>
-      ${dp.map(p=>{const cl=PLAT_COLORS[p.plataforma]||{bg:'#F0F0F0',c:'#666'};return `<span class="post-chip" style="background:${cl.bg};color:${cl.c}" onclick="editPostById(${p.id})" title="${p.tema}">${p.plataforma}${p.aprovado?'✓':''}${p.postado?' 📤':''}</span>`;}).join('')}
+      ${dp.map(p=>{const st=postStatusStyle(p);const ico=PLAT_ICONS[p.plataforma]||'';return `<span class="post-chip" style="background:${st.bg};color:${st.c};border:${st.border}" onclick="editPostById(${p.id})" title="${p.tema}">${ico}${p.plataforma.substring(0,3)}</span>`;}).join('')}
       <button onclick="openPostModal('${ds}')" style="width:100%;background:none;border:1px dashed #DDD;border-radius:4px;color:#CCC;font-size:10px;padding:1px;cursor:pointer;margin-top:2px">+</button>
     </div>`;
   }
@@ -2213,7 +2250,7 @@ function renderPostsWeek(posts,container){
     const isToday=day.toDateString()===new Date().toDateString();
     html+=`<div class="cal-day${isToday?' cal-today':''}">
       <div class="cal-day-num">${day.getDate()}/${day.getMonth()+1}</div>
-      ${dp.map(p=>{const cl=PLAT_COLORS[p.plataforma]||{bg:'#F0F0F0',c:'#666'};return `<span class="post-chip" style="background:${cl.bg};color:${cl.c}" onclick="editPostById(${p.id})">${p.plataforma}</span>`;}).join('')}
+      ${dp.map(p=>{const st=postStatusStyle(p);const ico=PLAT_ICONS[p.plataforma]||'';return `<span class="post-chip" style="background:${st.bg};color:${st.c};border:${st.border}" onclick="editPostById(${p.id})" title="${p.tema}">${ico}${p.plataforma.substring(0,3)}</span>`;}).join('')}
       <button onclick="openPostModal('${ds}')" style="width:100%;background:none;border:1px dashed #DDD;border-radius:4px;color:#CCC;font-size:10px;padding:1px;cursor:pointer;margin-top:2px">+</button>
     </div>`;
   }
@@ -2223,18 +2260,18 @@ function renderPostsList(posts,container){
   if(!posts.length){container.innerHTML='<div style="text-align:center;padding:40px;color:#999">Nenhum post cadastrado.</div>';return;}
   const sorted=[...posts].sort((a,b)=>a.data.localeCompare(b.data));
   container.innerHTML=`<div class="card"><table>
-    <thead><tr><th>Data</th><th>Marca</th><th>Plataforma</th><th>Formato</th><th>Tema</th><th>Objetivo</th><th>Aprov.</th><th>Postado</th><th></th></tr></thead>
+    <thead><tr><th>Data</th><th>Marca</th><th>Plataforma</th><th>Formato</th><th>Tema</th><th>Objetivo</th><th>Status</th><th></th></tr></thead>
     <tbody>${sorted.map(p=>{
       const cl=PLAT_COLORS[p.plataforma]||{bg:'#F0F0F0',c:'#666'};
+      const ico=PLAT_ICONS[p.plataforma]||'';
       return `<tr>
         <td style="font-size:12px;white-space:nowrap">${fmtDate(p.data)}</td>
         <td style="font-size:11px">${p.marca}</td>
-        <td><span class="badge" style="background:${cl.bg};color:${cl.c};font-size:10px">${p.plataforma}</span></td>
+        <td><span class="badge" style="background:${cl.bg};color:${cl.c};font-size:10px;display:inline-flex;align-items:center">${ico}${p.plataforma}</span></td>
         <td style="font-size:12px">${p.formato}</td>
         <td style="font-size:13px;font-weight:500">${p.tema}</td>
         <td style="font-size:12px;color:#666">${p.objetivo}</td>
-        <td style="text-align:center">${p.aprovado?'<span style="color:#1A7A3F;font-weight:700">✓</span>':'—'}</td>
-        <td style="text-align:center">${p.postado?'<span style="color:#1A7A3F;font-weight:700">✓</span>':'—'}</td>
+        <td>${postStatusBadge(p)}</td>
         <td><button class="bico bico-edit" onclick="editPostById(${p.id})">✎</button> <button class="bico bico-del" onclick="deletePost(${p.id})">✕</button></td>
       </tr>`;
     }).join('')}</tbody>
@@ -2256,7 +2293,9 @@ function openPostModal(dateStr,marca){
   document.getElementById('pm-link').value='';
   document.getElementById('pm-obs').value='';
   document.getElementById('pm-aprovado').checked=false;
+  document.getElementById('pm-reprovado').checked=false;
   document.getElementById('pm-postado').checked=false;
+  ['aprovado','reprovado','postado'].forEach(k=>syncAprovRep(k));
   document.getElementById('post-modal').classList.add('open');
 }
 function editPostById(id){
@@ -2269,7 +2308,9 @@ function editPostById(id){
   });
   document.getElementById('pm-marca').value=p.marca||'';
   document.getElementById('pm-aprovado').checked=!!p.aprovado;
+  document.getElementById('pm-reprovado').checked=!!p.reprovado;
   document.getElementById('pm-postado').checked=!!p.postado;
+  ['aprovado','reprovado','postado'].forEach(k=>syncAprovRep(k));
   document.getElementById('post-modal').classList.add('open');
 }
 function savePost(){
@@ -2286,6 +2327,7 @@ function savePost(){
     link:document.getElementById('pm-link').value,
     obs:document.getElementById('pm-obs').value,
     aprovado:document.getElementById('pm-aprovado').checked,
+    reprovado:document.getElementById('pm-reprovado').checked,
     postado:document.getElementById('pm-postado').checked
   };
   if(editingPostId){const idx=POSTS.findIndex(p=>p.id===editingPostId);if(idx>-1)POSTS[idx]=data;}
@@ -2310,17 +2352,17 @@ function renderExtPosts(pid){
   const posts=POSTS.filter(p=>p.marca===marca).sort((a,b)=>a.data.localeCompare(b.data));
   if(!posts.length){container.innerHTML=`<div style="text-align:center;padding:20px;color:#999;font-size:13px">Nenhum post cadastrado para ${marca}.</div>`;return;}
   container.innerHTML=`<div style="overflow-x:auto"><table style="min-width:600px">
-    <thead><tr><th>Data</th><th>Plataforma</th><th>Formato</th><th>Tema</th><th>Objetivo</th><th>Aprov.</th><th>Post.</th><th></th></tr></thead>
+    <thead><tr><th>Data</th><th>Plataforma</th><th>Formato</th><th>Tema</th><th>Objetivo</th><th>Status</th><th></th></tr></thead>
     <tbody>${posts.map(p=>{
       const cl=PLAT_COLORS[p.plataforma]||{bg:'#F0F0F0',c:'#666'};
+      const ico=PLAT_ICONS[p.plataforma]||'';
       return `<tr>
         <td style="font-size:12px;white-space:nowrap">${fmtDate(p.data)}</td>
-        <td><span class="badge" style="background:${cl.bg};color:${cl.c};font-size:10px">${p.plataforma}</span></td>
+        <td><span class="badge" style="background:${cl.bg};color:${cl.c};font-size:10px;display:inline-flex;align-items:center">${ico}${p.plataforma}</span></td>
         <td style="font-size:12px">${p.formato}</td>
         <td style="font-size:13px">${p.tema}</td>
         <td style="font-size:12px;color:#666">${p.objetivo}</td>
-        <td style="text-align:center">${p.aprovado?'<span style="color:#1A7A3F;font-weight:700">✓</span>':'—'}</td>
-        <td style="text-align:center">${p.postado?'<span style="color:#1A7A3F;font-weight:700">✓</span>':'—'}</td>
+        <td>${postStatusBadge(p)}</td>
         <td><button class="bico bico-edit" onclick="editPostById(${p.id})">✎</button> <button class="bico bico-del" onclick="deletePost(${p.id})">✕</button></td>
       </tr>`;
     }).join('')}</tbody>
