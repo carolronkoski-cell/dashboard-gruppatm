@@ -1102,11 +1102,29 @@ function renderOverview(){
     </div>`).join('');
   // Canais
   const cDiv=document.getElementById('ov-canais');
-  cDiv.innerHTML=CANAIS.map(c=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F8F8F8">
-      <div><span class="sm ${semCls(c.status)}"></span><span style="font-size:13px;font-weight:500">${c.nome}</span></div>
-      <span style="font-size:11px;color:#999">${c.metricas.find(m=>m.l==="Engajamento"||m.l==="Avaliação"||m.l==="Nota geral")?.v||''}</span>
-    </div>`).join('');
+  cDiv.innerHTML=CANAIS.map(c=>{
+    const eng=c.metricas.find(m=>m.l==="Engajamento"||m.l==="Avaliação"||m.l==="Nota geral");
+    const seg=c.metricas.find(m=>m.l==="Seguidores"||m.l==="Buscas/mês"||m.l==="Reclamações");
+    const vari=c.metricas.find(m=>m.l==="Variação");
+    const variColor=vari?(vari.v.startsWith('-')?'#C0392B':vari.v.startsWith('+')?'#1A7A3F':'#999'):'#999';
+    return `<div style="padding:10px 0;border-bottom:1px solid #F8F8F8">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="sm ${semCls(c.status)}"></span>
+          <span style="font-size:13px;font-weight:600">${c.nome}</span>
+        </div>
+        <span style="font-size:12px;font-weight:700">${eng?eng.v:''}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-left:16px">
+        <span style="font-size:11px;color:#999">${c.handle}</span>
+        <div style="display:flex;gap:10px;align-items:center">
+          ${seg?`<span style="font-size:11px;color:#666">${seg.v}</span>`:''}
+          ${vari?`<span style="font-size:11px;font-weight:600;color:${variColor}">${vari.v}</span>`:''}
+        </div>
+      </div>
+      <div style="padding-left:16px;margin-top:3px;font-size:11px;color:#999;font-style:italic">${c.diag.split('.')[0]}.</div>
+    </div>`;
+  }).join('');
   // Projects
   const pDiv=document.getElementById('ov-projects');
   pDiv.innerHTML=PROJECTS.map(p=>{
