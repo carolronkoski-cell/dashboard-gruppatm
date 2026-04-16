@@ -553,7 +553,7 @@ tr:hover td{background:#FAFAFA}
     <div class="ext-sub">Coquetelaria · Nova marca do Grupo ATM · Responsáveis: Felipe, Abner</div>
   </div>
   <div class="grid g3" style="margin-bottom:18px">
-    <div class="card kpib"><div class="kpinum">6</div><div class="kpilbl">Tarefas do projeto</div><div class="kpisub">1 stand by · 5 não iniciadas</div></div>
+    <div class="card kpib" id="ext-kpi-4"></div>
     <div class="card kpib"><div class="kpinum">Jun/26</div><div class="kpilbl">Prazo identidade visual</div><div class="kpisub">Marca + identidade prontas</div></div>
     <div class="card kpib"><div class="kpinum">Dez/26</div><div class="kpilbl">Primeiros eventos</div><div class="kpisub">Meta: 3 eventos realizados</div></div>
   </div>
@@ -568,17 +568,7 @@ tr:hover td{background:#FAFAFA}
   </div>
   <div class="card">
     <div class="lbl" style="margin-bottom:12px">Tarefas</div>
-    <table>
-      <thead><tr><th>Tarefa</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>ClickUp</th></tr></thead>
-      <tbody>
-        <tr><td>Estudo de referências Blend</td><td>Felipe</td><td><span class="badge by">STAND BY</span></td><td>Jan</td><td><a href="https://app.clickup.com/t/868gy2q5r" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
-        <tr><td>Blend pesquisa + identidade visual</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868hufuqv" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
-        <tr><td>Instagram ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Mar</td><td>—</td></tr>
-        <tr><td>Materiais ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td>—</td></tr>
-        <tr><td>Tráfego pago ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Mai</td><td>—</td></tr>
-        <tr><td>Apresentação final ATM Co</td><td>Felipe</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Mai</td><td>—</td></tr>
-      </tbody>
-    </table>
+    <div id="ext-proj-4"></div>
   </div>
 </div>
 
@@ -589,7 +579,7 @@ tr:hover td{background:#FAFAFA}
     <div class="ext-sub">Projeto externo · Parceria estratégica · Responsável: Ana</div>
   </div>
   <div class="grid g3" style="margin-bottom:18px">
-    <div class="card kpib"><div class="kpinum">4</div><div class="kpilbl">Vídeos da série</div><div class="kpisub">2 entregues · 2 em produção</div></div>
+    <div class="card kpib" id="ext-kpi-6"></div>
     <div class="card kpib"><div class="kpinum">Ana</div><div class="kpilbl">Responsável</div><div class="kpisub">Produtora de Conteúdo</div></div>
     <div class="card kpib"><div class="kpinum">Abr/26</div><div class="kpilbl">Prazo ativo</div><div class="kpisub">Vídeos 3 e 4 em andamento</div></div>
   </div>
@@ -603,16 +593,7 @@ tr:hover td{background:#FAFAFA}
   </div>
   <div class="card">
     <div class="lbl" style="margin-bottom:12px">Tarefas</div>
-    <table>
-      <thead><tr><th>Tarefa</th><th>Responsável</th><th>Status</th><th>Prazo</th><th>ClickUp</th></tr></thead>
-      <tbody>
-        <tr><td>Edição vídeo 1 Gabriel</td><td>Ana</td><td><span class="badge bg">CONCLUÍDO</span></td><td>Mar</td><td><a href="https://app.clickup.com/t/868hxamfz" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
-        <tr><td>Edição vídeo 2 Arquiteta</td><td>Ana</td><td><span class="badge bg">CONCLUÍDO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868j2xmx2" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
-        <tr><td>Edição vídeo 3 Mãos à obra</td><td>Ana</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868j2xnp2" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
-        <tr><td>Edição vídeo 4 Marca</td><td>Ana</td><td><span class="badge bgr">NÃO INICIADO</span></td><td>Abr</td><td>—</td></tr>
-        <tr><td>Plano de mídia Gabriel Herrera</td><td>Ana</td><td><span class="badge bg">CONCLUÍDO</span></td><td>Abr</td><td><a href="https://app.clickup.com/t/868hxju57" target="_blank" style="color:#185FA5;font-size:12px">↗ ClickUp</a></td></tr>
-      </tbody>
-    </table>
+    <div id="ext-proj-6"></div>
   </div>
 </div>
 
@@ -1020,7 +1001,7 @@ function editTask(pid,tIdx){
     <select id="et-proj-${pid}-${tIdx}" title="Mover para projeto" style="padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;max-width:180px">${projOpts}</select>
     <input value="${t.link||''}" id="et-link-${pid}-${tIdx}" placeholder="Link ClickUp" style="width:150px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
     <button class="btn btnp btns" onclick="saveEditTask(${pid},${tIdx})">Salvar</button>
-    <button class="btn btno btns" onclick="renderProjects();document.getElementById('pb-${pid}').classList.add('open');document.getElementById('chv-${pid}').classList.add('open')">Cancelar</button>
+    <button class="btn btno btns" onclick="renderProjects();document.getElementById('pb-${pid}')?.classList.add('open');document.getElementById('chv-${pid}')?.classList.add('open')">Cancelar</button>
   </div>`;
 }
 function saveEditTask(pid,tIdx){
@@ -1160,7 +1141,7 @@ function checkTask(pid,tIdx,checked){
 
 // ===== RENDER PROJECTS =====
 function renderProjects(){
-  if(viewMode==='lista'){renderProjectsFlat();return;}
+  if(viewMode==='lista'){renderProjectsFlat();renderExtProj(4);renderExtProj(6);return;}
   const container=document.getElementById('projetos-list');
   container.innerHTML='';
   PROJECTS.forEach(p=>{
@@ -1238,6 +1219,9 @@ function renderProjects(){
         </div>
       </div>`);
   });
+  // Sincroniza abas externas Blend e Herrera
+  renderExtProj(4);
+  renderExtProj(6);
 }
 function renderProjectsFlat(){
   const container=document.getElementById('projetos-list');
@@ -1499,6 +1483,66 @@ function renderMetasMkt(){
         </td>
       </tr>`);
   });
+}
+
+// ===== EXT PROJ (Blend / Herrera) =====
+function renderExtProj(pid){
+  const p=PROJECTS.find(x=>x.id===pid);
+  if(!p)return;
+  // KPI card
+  const kpiEl=document.getElementById(`ext-kpi-${pid}`);
+  if(kpiEl){
+    const tot=p.tarefas.length;
+    const done=p.tarefas.filter(t=>t.status==='CONCLUÍDO').length;
+    const pct=Math.round(done/tot*100);
+    kpiEl.innerHTML=`<div class="kpinum">${tot}</div><div class="kpilbl">Tarefas do projeto</div>
+      <div class="kpisub">${done} concluídas · ${pct}%</div>
+      <div class="pw" style="margin-top:8px"><div class="pb ${pct>=70?'g':pct>=40?'y':''}" style="width:${pct}%"></div></div>`;
+  }
+  const container=document.getElementById(`ext-proj-${pid}`);
+  if(!container)return;
+  const statOpts=['NÃO INICIADO','EM ANDAMENTO','EM ATRASO','STAND BY','CONCLUÍDO']
+    .map(s=>`<option value="${s}">${s}</option>`).join('');
+  const isArchived=t=>t.status==='CONCLUÍDO'||t.status==='STAND BY';
+  const active=p.tarefas.filter(t=>!isArchived(t));
+  const archived=p.tarefas.filter(isArchived);
+  const header=`<div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0;align-items:center">
+    <span style="width:16px;flex-shrink:0"></span><span style="flex:1">Tarefa</span>
+    <span style="width:100px;flex-shrink:0">Responsável</span><span style="width:44px;flex-shrink:0">Prazo</span>
+    <span style="width:120px;flex-shrink:0">Status</span><span style="width:52px;flex-shrink:0"></span>
+  </div>`;
+  const rowsHTML=active.map(t=>taskRowHTML(p,t,p.tarefas.indexOf(t))).join('');
+  const archHTML=archived.length?`
+    <div class="done-toggle" style="margin-top:8px" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.chv').classList.toggle('open')">
+      <span class="chv">▾</span> Concluídas e Stand By (${archived.length})
+    </div>
+    <div style="display:none">${archived.map(t=>taskRowHTML(p,t,p.tarefas.indexOf(t))).join('')}</div>`:'';
+  const addForm=`<div class="add-form">
+    <input class="lg" type="text" placeholder="Nova tarefa..." id="ent-nome-${pid}">
+    <input class="sm2" type="text" placeholder="Responsável" id="ent-resp-${pid}">
+    <input style="max-width:70px" type="text" placeholder="Prazo" id="ent-prazo-${pid}">
+    <select id="ent-status-${pid}" style="max-width:140px">
+      <option value="NÃO INICIADO">Não iniciado</option>
+      <option value="EM ANDAMENTO">Em andamento</option>
+      <option value="CONCLUÍDO">Concluído</option>
+    </select>
+    <input class="md" type="text" placeholder="Link ClickUp (opcional)" id="ent-link-${pid}">
+    <button class="btn btnp btns" onclick="addExtTask(${pid})">+ Adicionar</button>
+  </div>`;
+  container.innerHTML=header+rowsHTML+archHTML+addForm;
+}
+function addExtTask(pid){
+  const nome=document.getElementById(`ent-nome-${pid}`).value.trim();
+  if(!nome)return;
+  const resp=document.getElementById(`ent-resp-${pid}`).value.trim()||'—';
+  const prazo=document.getElementById(`ent-prazo-${pid}`).value.trim()||'—';
+  const status=document.getElementById(`ent-status-${pid}`).value;
+  const link=document.getElementById(`ent-link-${pid}`).value.trim();
+  PROJECTS.find(p=>p.id===pid).tarefas.push({nome,resp,status,prazo,link});
+  saveProjectTasks(pid);
+  renderExtProj(pid);
+  renderProjects();renderAlertBanner();renderOverview();
+  toast('Tarefa adicionada!');
 }
 
 function gotoProj(id){
