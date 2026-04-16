@@ -108,7 +108,7 @@ function mapAssignees(assignees) {
 function formatDue(timestamp) {
   if (!timestamp) return null;
   const date = new Date(parseInt(timestamp));
-  return MONTHS_PT[date.getMonth()];
+  return `${date.getDate()} ${MONTHS_PT[date.getMonth()]}`;
 }
 
 function fetchClickUpTask(taskId) {
