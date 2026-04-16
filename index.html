@@ -338,7 +338,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   </div>
 
   <div>
-    <div class="lbl" style="margin-bottom:12px">Metas de Marketing</div>
+    <div class="lbl" style="margin-bottom:12px">Objetivos de Marketing</div>
     <div class="card">
       <table id="metas-mkt-table">
         <thead><tr><th>#</th><th>Meta</th><th>KPI</th><th>Liga a</th><th>Status</th><th>Projeto</th></tr></thead>
@@ -359,6 +359,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
         <button id="vtog-cal" onclick="setView('calendario',this)">Calendário</button>
       </div>
       <button class="btn btno btns" onclick="expandAll()" id="btn-expand-all">Expandir todos</button>
+      <button class="btn btnp btns" onclick="openNovoProjModal()">+ Novo Projeto</button>
     </div>
   </div>
 
@@ -674,6 +675,30 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 
 </div><!-- end .main -->
 
+<!-- NOVO PROJETO MODAL -->
+<div class="modal-overlay" id="novo-proj-modal" onclick="closeNovoProjModal(event)">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-head">
+      <div style="font-size:16px;font-weight:700">Novo Projeto</div>
+      <button class="modal-close" onclick="closeNovoProjModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label>Nome do Projeto</label><input type="text" id="np-nome" placeholder="Ex: Formo Day 2, Baile Medicina PUCPR..."></div>
+      <div class="fg"><label>Responsável Principal</label><input type="text" id="np-resp" list="team-list" placeholder="Ex: Carol"></div>
+      <div class="fg"><label>KPIs / Objetivo</label><input type="text" id="np-kpis" placeholder="Ex: Evento realizado, NPS ≥ 4,5"></div>
+      <div class="fg"><label>Meta Relacionada</label><input type="text" id="np-meta" placeholder="Ex: Meta 6 · Entregas"></div>
+      <div class="fg">
+        <label>Fases iniciais <span style="font-weight:400;color:#999">(separadas por vírgula)</span></label>
+        <input type="text" id="np-fases" placeholder="Ex: Planejamento, Produção, Execução, Pós-evento">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+        <button class="btn btno" onclick="closeNovoProjModal()">Cancelar</button>
+        <button class="btn btnp" onclick="saveNovoProj()">Criar Projeto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- POST MODAL -->
 <div class="modal-overlay" id="post-modal" onclick="closePostModal(event)">
   <div class="modal-box" style="max-width:680px">
@@ -747,7 +772,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 <script>
 // ===== DATA =====
 const PROJECTS = [
-  {id:1,nome:"Autoridade de Marca Formô",resp:"Felipe, Abner, Carol",
+  {id:1,nome:"Formô Brasil PR",resp:"Felipe, Abner, Carol",
    kpis:"Site no ar com SEO · Top 3 Google · Identidade verbal publicada · Reclame Aqui ≥ 8,0",
    metaTag:"Meta 3 · Nota 4,7 Google",linkedMeta:"org-3",
    tarefas:[
@@ -822,7 +847,8 @@ const PROJECTS = [
     {nome:"Briefing 1/6 FAPI",resp:"Nana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hv0v2e"},
     {nome:"Briefing pré-clínico UFPR",resp:"Nana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hv0npr"},
     {nome:"Briefing Papa Calouro",resp:"Nana",status:"CONCLUÍDO",prazo:"Fev",link:"https://app.clickup.com/t/868huwtyc"},
-    {nome:"Conseguir fichas técnicas eventos",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""}
+    {nome:"Conseguir fichas técnicas eventos",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Análise de concorrência mensal",resp:"Ana",status:"EM ATRASO",prazo:"",link:"https://app.clickup.com/t/868hybamt"}
   ]},
   {id:3,nome:"Viralização & Parcerias",resp:"Felipe, Carol, Nana",
    kpis:"Mín. 1 influenciador por turma medicina · 5 novas parcerias até Jun/26 · Formo Day 2 com 30% mais público",
@@ -857,6 +883,9 @@ const PROJECTS = [
     {nome:"Tráfego pago ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Mai",link:""},
     {nome:"Apresentação final ATM Co",resp:"Felipe",status:"NÃO INICIADO",prazo:"Mai",link:""}
   ]},
+  {id:9,nome:"Formô Clube",resp:"",
+ kpis:"A definir",metaTag:"Novo projeto",linkedMeta:"",
+ tarefas:[],fases:[]},
   {id:5,nome:"Entregas de Eventos",resp:"Nana",
    kpis:"NPS 4,5 nas entregas · 95% eventos com avaliação aplicada · 100% materiais entregues no prazo",
    metaTag:"Metas 6,8 · NPS Produtos e Entregas",linkedMeta:"org-6",
@@ -1044,8 +1073,7 @@ const METAS_MKT=[
   {n:3,titulo:"Autoridade de marca Formô PR",kpi:"Site indexado · Top 3 Google · Identidade verbal",liga:"Diferenciação",status:"blue",linkedProjId:1},
   {n:4,titulo:"Engajamento e crescimento social",kpi:"Instagram ≥ 5% · TikTok ≥ 7%",liga:"Leads orgânicos",status:"yellow",linkedProjId:2},
   {n:5,titulo:"Viralização por turma",kpi:"Mín. 1 influenciador por turma medicina 2026",liga:"Awareness",status:"blue",linkedProjId:3},
-  {n:6,titulo:"Análise de concorrência ativa",kpi:"Relatório mensal de concorrentes",liga:"Posicionamento",status:"red",linkedProjId:2},
-  {n:7,titulo:"Lançamento Blend Coquetelaria",kpi:"Marca + identidade pronta até Jun/26",liga:"Nova receita",status:"yellow",linkedProjId:4}
+  {n:6,titulo:"Lançamento Blend Coquetelaria",kpi:"Marca + identidade pronta até Jun/26",liga:"Nova receita",status:"yellow",linkedProjId:4}
 ];
 
 // ===== EDITABLE SYSTEM =====
@@ -1122,11 +1150,14 @@ function editTask(pid,tIdx){
   const statOpts=['NÃO INICIADO','EM ANDAMENTO','EM ATRASO','STAND BY','CONCLUÍDO']
     .map(s=>`<option value="${s}"${t.status===s?' selected':''}>${s}</option>`).join('');
   const projOpts=PROJECTS.map(proj=>`<option value="${proj.id}"${proj.id===pid?' selected':''}>${proj.nome}</option>`).join('');
+  const p=PROJECTS.find(x=>x.id===pid);
+  const faseOpts=`<option value="">Sem fase</option>`+(p.fases||[]).map(f=>`<option value="${f}"${t.fase===f?' selected':''}>${f}</option>`).join('');
   row.outerHTML=`<div class="task-row" id="trow-${pid}-${tIdx}" style="flex-wrap:wrap;gap:6px;background:#F4F8FF;border-radius:8px;padding:10px;border:1px solid #C2D8F0">
     <input value="${t.nome}" id="et-nome-${pid}-${tIdx}" style="flex:1;min-width:160px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
     <input value="${t.resp}" id="et-resp-${pid}-${tIdx}" placeholder="Responsável" list="team-list" style="width:110px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
     <input value="${/^\d{4}-\d{2}-\d{2}$/.test(t.prazo)?t.prazo:''}" id="et-prazo-${pid}-${tIdx}" type="date" style="width:110px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
     <select id="et-status-${pid}-${tIdx}" style="padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">${statOpts}</select>
+    <select id="et-fase-${pid}-${tIdx}" style="padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;max-width:130px">${faseOpts}</select>
     <select id="et-proj-${pid}-${tIdx}" title="Mover para projeto" style="padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;max-width:180px">${projOpts}</select>
     <input value="${t.link||''}" id="et-link-${pid}-${tIdx}" placeholder="Link ClickUp" style="width:150px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
     <button class="btn btnp btns" onclick="saveEditTask(${pid},${tIdx})">Salvar</button>
@@ -1141,6 +1172,7 @@ function saveEditTask(pid,tIdx){
   t.prazo=document.getElementById(`et-prazo-${pid}-${tIdx}`).value.trim()||t.prazo;
   t.status=document.getElementById(`et-status-${pid}-${tIdx}`).value;
   t.link=document.getElementById(`et-link-${pid}-${tIdx}`).value.trim();
+  t.fase = document.getElementById(`et-fase-${pid}-${tIdx}`)?.value || '';
   const newPid=parseInt(document.getElementById(`et-proj-${pid}-${tIdx}`).value);
   if(newPid!==pid){
     const newProj=PROJECTS.find(p=>p.id===newPid);
@@ -1331,6 +1363,73 @@ function checkTask(pid,tIdx,checked){
   document.getElementById(`chv-${pid}`)?.classList.add('open');
 }
 
+// ===== PCT MANUAL =====
+function loadProjPct(){
+  const d=JSON.parse(localStorage.getItem('atm_proj_pct')||'{}');
+  PROJECTS.forEach(p=>{if(d[p.id]!==undefined)p.manualPct=parseInt(d[p.id]);});
+}
+function saveProjPct(pid,val){
+  const d=JSON.parse(localStorage.getItem('atm_proj_pct')||'{}');
+  d[pid]=val;localStorage.setItem('atm_proj_pct',JSON.stringify(d));
+  const bar=document.getElementById(`mpb-proj-${pid}`);
+  if(bar){bar.style.width=val+'%';bar.className='pb '+(val>=70?'g':val>=40?'y':'r');}
+}
+
+// ===== FASES =====
+function loadProjFases(){
+  const d=JSON.parse(localStorage.getItem('atm_proj_fases')||'{}');
+  PROJECTS.forEach(p=>{if(d[p.id])p.fases=d[p.id];else if(!p.fases)p.fases=[];});
+}
+function saveProjFases(pid){
+  const d=JSON.parse(localStorage.getItem('atm_proj_fases')||'{}');
+  d[pid]=(PROJECTS.find(p=>p.id===pid)||{}).fases||[];
+  localStorage.setItem('atm_proj_fases',JSON.stringify(d));
+}
+function addFase(pid){
+  const inp=document.getElementById(`fase-new-inp-${pid}`);
+  if(!inp)return;
+  const nome=inp.value.trim();
+  if(!nome)return;
+  const p=PROJECTS.find(x=>x.id===pid);
+  if(!p.fases)p.fases=[];
+  if(p.fases.includes(nome)){toast('Fase já existe');return;}
+  p.fases.push(nome);
+  saveProjFases(pid);
+  renderProjects();
+  document.getElementById(`pb-${pid}`)?.classList.add('open');
+  document.getElementById(`chv-${pid}`)?.classList.add('open');
+}
+function renameFase(pid,oldNome){
+  const inp=document.getElementById(`fase-ren-${pid}-${CSS.escape(oldNome)}`);
+  if(!inp)return;
+  const novo=inp.value.trim();
+  if(!novo||novo===oldNome)return;
+  const p=PROJECTS.find(x=>x.id===pid);
+  const idx=p.fases.indexOf(oldNome);
+  if(idx>-1)p.fases[idx]=novo;
+  p.tarefas.forEach(t=>{if(t.fase===oldNome)t.fase=novo;});
+  saveProjFases(pid);saveProjectTasks(pid);
+  renderProjects();
+  document.getElementById(`pb-${pid}`)?.classList.add('open');
+  document.getElementById(`chv-${pid}`)?.classList.add('open');
+}
+function deleteFase(pid,nome){
+  if(!confirm(`Excluir fase "${nome}"? As tarefas ficam sem fase.`))return;
+  const p=PROJECTS.find(x=>x.id===pid);
+  p.fases=p.fases.filter(f=>f!==nome);
+  p.tarefas.forEach(t=>{if(t.fase===nome)t.fase='';});
+  saveProjFases(pid);saveProjectTasks(pid);
+  renderProjects();
+  document.getElementById(`pb-${pid}`)?.classList.add('open');
+  document.getElementById(`chv-${pid}`)?.classList.add('open');
+}
+function startRenameFase(pid,nome){
+  const span=document.getElementById(`fase-lbl-${pid}-${nome}`);
+  if(!span)return;
+  const safeId=`fase-ren-${pid}-${CSS.escape(nome)}`;
+  span.outerHTML=`<input id="${safeId}" value="${nome}" style="font-size:12px;font-weight:600;padding:2px 6px;border:1px solid #C2D8F0;border-radius:5px;font-family:'DM Sans',sans-serif" onkeydown="if(event.key==='Enter')renameFase(${pid},'${nome.replace(/'/g,"\\'")}')">`;
+}
+
 // ===== RENDER PROJECTS =====
 function renderProjects(){
   if(viewMode==='lista'){renderProjectsFlat();renderExtProj(4);renderExtProj(6);return;}
@@ -1352,8 +1451,33 @@ function renderProjects(){
     if(filters.query&&activeFiltered.length===0&&archiveFiltered.length===0)return;
     const showActive=hasArchivedFilter?allFiltered:activeFiltered;
     const showArchived=hasArchivedFilter?[]:archiveFiltered;
+    // Agrupa ativos por fase
     let rows='';
-    showActive.forEach(t=>{rows+=taskRowHTML(p,t,p.tarefas.indexOf(t));});
+    const fases=p.fases||[];
+    if(fases.length>0){
+      fases.forEach(fase=>{
+        const faseTasks=showActive.filter(t=>t.fase===fase);
+        const faseRows=faseTasks.map(t=>taskRowHTML(p,t,p.tarefas.indexOf(t))).join('');
+        rows+=`<div style="margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #F0F0F0;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#555;background:#F4F4F4;padding:2px 8px;border-radius:20px" id="fase-lbl-${p.id}-${fase}">${fase}</span>
+            <button class="bico" onclick="startRenameFase(${p.id},'${fase.replace(/'/g,"\\'")}');" style="font-size:10px;padding:1px 4px" title="Renomear">✎</button>
+            <button class="bico bico-del" onclick="deleteFase(${p.id},'${fase.replace(/'/g,"\\'")}');" style="font-size:10px;padding:1px 4px" title="Excluir fase">✕</button>
+            <span style="font-size:11px;color:#999;margin-left:4px">${faseTasks.length} tarefa${faseTasks.length!==1?'s':''}</span>
+          </div>
+          ${faseRows||'<div style="padding:6px 0;color:#CCC;font-size:12px">Nenhuma tarefa nesta fase</div>'}
+        </div>`;
+      });
+      const semFase=showActive.filter(t=>!t.fase||!fases.includes(t.fase));
+      if(semFase.length>0){
+        rows+=`<div style="margin-bottom:6px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#BBB;padding:6px 0;border-bottom:1px solid #F0F0F0;margin-bottom:4px">Sem fase</div>
+          ${semFase.map(t=>taskRowHTML(p,t,p.tarefas.indexOf(t))).join('')}
+        </div>`;
+      }
+    }else{
+      showActive.forEach(t=>{rows+=taskRowHTML(p,t,p.tarefas.indexOf(t));});
+    }
     let archRows='';
     showArchived.forEach(t=>{archRows+=taskRowHTML(p,t,p.tarefas.indexOf(t));});
     const noRes=showActive.length===0&&showArchived.length===0?`<div style="padding:16px 0;color:#999;font-size:13px;text-align:center">Nenhuma tarefa com os filtros ativos</div>`:'';
@@ -1376,9 +1500,17 @@ function renderProjects(){
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end">
             <span class="badge bg" style="font-size:10px">${done} concluídas</span>
             ${atr?`<span class="badge br" style="font-size:10px">${atr} atrasadas</span>`:''}
-            <div style="text-align:right;min-width:72px">
-              <div style="font-size:12px;font-weight:700">${pct}%</div>
-              <div class="pw" style="width:72px"><div class="pb ${pct>=70?'g':pct>=40?'y':''}" style="width:${pct}%"></div></div>
+            <div style="text-align:right;min-width:120px" onclick="event.stopPropagation()">
+              <div style="display:flex;align-items:center;gap:4px;justify-content:flex-end">
+                <span style="font-size:11px;color:#999">Auto:</span>
+                <span style="font-size:12px;font-weight:700">${pct}%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
+                <span style="font-size:11px;color:#999">Real:</span>
+                <input type="number" min="0" max="100" value="${p.manualPct!==undefined?p.manualPct:pct}" onchange="saveProjPct(${p.id},this.value)" style="width:46px;padding:2px 4px;border:1px solid #DDD;border-radius:5px;font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif;text-align:center">
+                <span style="font-size:11px;color:#999">%</span>
+              </div>
+              <div class="pw" style="width:90px;margin-top:3px"><div class="pb ${pct>=70?'g':pct>=40?'y':''}" id="mpb-proj-${p.id}" style="width:${p.manualPct!==undefined?p.manualPct:pct}%"></div></div>
             </div>
             <span class="chv" id="chv-${p.id}">▾</span>
           </div>
@@ -1390,6 +1522,15 @@ function renderProjects(){
               <strong style="color:#555">Meta:</strong>
               <span id="pm-tag-${p.id}" style="color:#666">${p.metaTag||'—'}</span>
               <button class="bico bico-edit" onclick="event.stopPropagation();editProjMeta(${p.id})" title="Editar meta relacionada" style="font-size:11px;padding:1px 5px">✎</button>
+            </div>
+          </div>
+          <div style="margin:8px 0 12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#F8F8F8;border-radius:8px">
+            <span style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.05em">Fases:</span>
+            ${(p.fases||[]).length===0?`<span style="font-size:11px;color:#CCC">Nenhuma fase</span>`:''}
+            ${(p.fases||[]).map(f=>`<span style="font-size:11px;background:#fff;border:1px solid #DDD;padding:2px 8px;border-radius:20px;color:#555">${f}</span>`).join('')}
+            <div style="display:flex;align-items:center;gap:4px;margin-left:4px">
+              <input id="fase-new-inp-${p.id}" placeholder="Nova fase..." style="padding:3px 7px;border:1px solid #DDD;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;width:110px" onkeydown="if(event.key==='Enter')addFase(${p.id})">
+              <button class="btn btnp btns" style="font-size:11px;padding:3px 10px" onclick="addFase(${p.id})">+ Fase</button>
             </div>
           </div>
           <div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0">
@@ -1404,6 +1545,10 @@ function renderProjects(){
               <option value="NÃO INICIADO">Não iniciado</option>
               <option value="EM ANDAMENTO">Em andamento</option>
               <option value="CONCLUÍDO">Concluído</option>
+            </select>
+            <select id="nt-fase-${p.id}" style="max-width:130px;padding:6px 8px;border:1px solid #DDD;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px">
+              <option value="">Sem fase</option>
+              ${(p.fases||[]).map(f=>`<option value="${f}">${f}</option>`).join('')}
             </select>
             <input class="md" type="text" placeholder="Link ClickUp (opcional)" id="nt-link-${p.id}">
             <button class="btn btnp btns" onclick="addTask(${p.id})">+ Adicionar</button>
@@ -1459,7 +1604,8 @@ function addTask(pid){
   const prazo=document.getElementById(`nt-prazo-${pid}`).value||'—';
   const status=document.getElementById(`nt-status-${pid}`).value;
   const link=document.getElementById(`nt-link-${pid}`).value.trim();
-  const t={nome,resp,status,prazo,link};
+  const fase = document.getElementById(`nt-fase-${pid}`)?.value || '';
+  const t={nome,resp,status,prazo,link,fase};
   PROJECTS.find(p=>p.id===pid).tarefas.push(t);
   saveProjectTasks(pid);
   renderProjects();
@@ -2382,9 +2528,53 @@ function loadNotes(){
   [4,6].forEach(pid=>{const el=document.getElementById(`note-${pid}`);if(el&&d[`note_${pid}`])el.value=d[`note_${pid}`];});
 }
 
+// ===== NOVO PROJETO =====
+function loadCustomProjects(){
+  const custom=JSON.parse(localStorage.getItem('atm_custom_projs')||'[]');
+  custom.forEach(p=>{if(!PROJECTS.find(x=>x.id===p.id))PROJECTS.push(p);});
+}
+function openNovoProjModal(){
+  document.getElementById('novo-proj-modal').classList.add('open');
+  document.getElementById('np-nome').value='';
+  document.getElementById('np-resp').value='';
+  document.getElementById('np-kpis').value='';
+  document.getElementById('np-meta').value='';
+  document.getElementById('np-fases').value='Planejamento, Produção, Execução, Pós-evento';
+}
+function closeNovoProjModal(e){
+  if(e&&e.target!==document.getElementById('novo-proj-modal'))return;
+  document.getElementById('novo-proj-modal').classList.remove('open');
+}
+function saveNovoProj(){
+  const nome=document.getElementById('np-nome').value.trim();
+  if(!nome){toast('Digite o nome do projeto');return;}
+  const resp=document.getElementById('np-resp').value.trim()||'—';
+  const kpis=document.getElementById('np-kpis').value.trim()||'A definir';
+  const metaTag=document.getElementById('np-meta').value.trim()||'';
+  const fasesRaw=document.getElementById('np-fases').value.trim();
+  const fases=fasesRaw?fasesRaw.split(',').map(f=>f.trim()).filter(Boolean):[];
+  const newId=Math.max(...PROJECTS.map(p=>p.id))+1;
+  const p={id:newId,nome,resp,kpis,metaTag,linkedMeta:'',tarefas:[],fases};
+  PROJECTS.push(p);
+  // persist
+  const custom=JSON.parse(localStorage.getItem('atm_custom_projs')||'[]');
+  custom.push(p);
+  localStorage.setItem('atm_custom_projs',JSON.stringify(custom));
+  closeNovoProjModal();
+  renderProjects();renderOverview();renderAlertBanner();
+  toast(`Projeto "${nome}" criado!`);
+  setTimeout(()=>{
+    document.getElementById(`pb-${newId}`)?.classList.add('open');
+    document.getElementById(`chv-${newId}`)?.classList.add('open');
+  },100);
+}
+
 // ===== INIT =====
+loadCustomProjects();
 loadExtraTasks();
 loadProjMetas();
+loadProjFases();
+loadProjPct();
 renderOverview();
 renderProjects();
 renderAlertBanner();
