@@ -175,7 +175,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 .task-chip.tc-and{background:#E6F1FB;color:#185FA5}
 .task-chip.tc-sb{background:#FAEEDA;color:#854F0B}
 .task-chip.tc-co{background:#E6F4EC;color:#1A7A3F}
-.post-chip{font-size:10px;padding:2px 5px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;display:block}
+.post-chip{font-size:10px;padding:5px 7px;min-height:24px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;display:block;line-height:1.4}
 .notes-area{width:100%;min-height:120px;border:1px solid #DDD;border-radius:8px;padding:12px;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;background:#FAFAFA;box-sizing:border-box}
 .notes-area:focus{outline:none;border-color:#0A0A0A;background:#fff}
 /* TOAST */
@@ -216,6 +216,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   <button onclick="showTab('herrera',this)">Herrera Gastronomia</button>
   <button onclick="showTab('formoday',this)">Formô Day</button>
   <button onclick="showTab('corrida',this)">Corrida Bar em Bar</button>
+  <button onclick="showTab('reunioes',this)">Reuniões Comerciais</button>
 </nav>
 
 <div class="main">
@@ -247,8 +248,9 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
     <div class="card kpib">
       <div id="kpi-tasks-num" class="kpinum">—</div>
       <div class="kpilbl">Tarefas Concluídas</div>
-      <div id="kpi-tasks-sub" class="kpisub">de 151 total</div>
+      <div id="kpi-tasks-sub" class="kpisub">de — total</div>
       <div class="pw"><div id="kpi-tasks-bar" class="pb" style="width:0%"></div></div>
+      <div id="kpi-tasks-mes" class="kpisub" style="color:#185FA5;margin-top:4px">— tarefas no mês</div>
     </div>
   </div>
 
@@ -278,10 +280,10 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
         Atual: <span class="ev" contenteditable data-key="ov_posts_atual" onblur="updatePostsBar()">0</span> posts
       </div>
     </div>
-    <div class="card kpib">
+    <div class="card kpib" style="cursor:pointer" onclick="showBriefingsModal()">
       <div id="ov-briefings-num" class="kpinum">—</div>
       <div class="kpilbl">Briefings Ativos</div>
-      <div class="kpisub">turmas com conteúdo em produção</div>
+      <div class="kpisub">turmas com conteúdo em produção · clique para ver</div>
     </div>
   </div>
 
@@ -300,7 +302,10 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   <!-- LINHA 4: entregas + NPS -->
   <div class="grid g2" style="margin-bottom:14px">
     <div class="card">
-      <div class="lbl" style="margin-bottom:12px">Próximas Entregas</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="lbl" style="margin-bottom:0">Próximas Entregas</div>
+        <button class="btn btno btns" onclick="openEntregaModal()">+ Adicionar</button>
+      </div>
       <div id="ov-entregas"></div>
     </div>
     <div class="card">
@@ -359,7 +364,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 <!-- PROJETOS -->
 <div id="tab-projetos" class="tab-content">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-    <div class="section-title" style="margin-bottom:0">Projetos · 8 projetos · 151 tarefas</div>
+    <div class="section-title" style="margin-bottom:0">Projetos · <span id="proj-count-lbl">— projetos · — tarefas</span></div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <div class="vtog">
         <button id="vtog-proj" class="active" onclick="setView('projeto',this)">Por Projeto</button>
@@ -680,6 +685,16 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
       <button class="btn btno btns" onclick="saveNote(6)">Salvar</button>
     </div>
     <textarea class="notes-area" id="note-6" placeholder="Anotações do projeto Herrera..."></textarea>
+    <div style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:600;color:#555">Anexos</div>
+        <label class="btn btno btns" style="cursor:pointer;margin-bottom:0">
+          + Anexar arquivo
+          <input type="file" multiple style="display:none" onchange="attachHerreraFiles(event)">
+        </label>
+      </div>
+      <div id="herrera-attachments"></div>
+    </div>
   </div>
 </div>
 
@@ -757,6 +772,38 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
       <button class="btn btno btns" onclick="saveNote(11)">Salvar</button>
     </div>
     <textarea class="notes-area" id="note-11" placeholder="Anotações do projeto Corrida Bar em Bar..."></textarea>
+  </div>
+</div>
+
+<!-- REUNIÕES COMERCIAIS -->
+<div id="tab-reunioes" class="tab-content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+    <div class="section-title" style="margin-bottom:0">Reuniões Comerciais</div>
+    <button class="btn btnp" onclick="openReuniaoModal()">+ Nova Reunião</button>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+      <div style="font-size:12px;color:#999">Filtrar:</div>
+      <select id="reun-f-resp" style="padding:5px 10px;border:1px solid #DDD;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif" onchange="renderReunioes()">
+        <option value="">Todos responsáveis</option>
+        <option>Carol</option><option>Nana</option><option>Felipe</option><option>Ana</option><option>Paloma</option>
+      </select>
+      <select id="reun-f-status" style="padding:5px 10px;border:1px solid #DDD;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif" onchange="renderReunioes()">
+        <option value="">Todos status</option>
+        <option>Realizada</option><option>Pendente</option><option>Cancelada</option>
+      </select>
+    </div>
+    <div id="reunioes-table-wrap">
+      <table id="reunioes-table">
+        <thead>
+          <tr>
+            <th>Data</th><th>Cliente / Turma</th><th>Assunto</th><th>Responsável</th><th>Status</th><th>Próximos Passos</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="reunioes-tbody"></tbody>
+      </table>
+      <div id="reunioes-empty" style="display:none;text-align:center;padding:40px;color:#999;font-size:13px">Nenhuma reunião cadastrada. Clique em "Nova Reunião" para começar.</div>
+    </div>
   </div>
 </div>
 
@@ -855,6 +902,80 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   </div>
 </div>
 
+<!-- REUNIÃO MODAL -->
+<div class="modal-overlay" id="reuniao-modal" onclick="closeReuniaoModal(event)">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-head">
+      <div id="reuniao-modal-title" style="font-size:16px;font-weight:700">Nova Reunião</div>
+      <button class="modal-close" onclick="document.getElementById('reuniao-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+      <input type="hidden" id="reun-edit-id" value="">
+      <div class="grid g2" style="gap:12px;margin-bottom:12px">
+        <div class="fg"><label>Data</label><input type="date" id="reun-data"></div>
+        <div class="fg"><label>Responsável</label>
+          <select id="reun-resp" style="padding:7px 10px;border:1px solid #DDD;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%">
+            <option>Carol</option><option>Nana</option><option>Felipe</option><option>Ana</option><option>Paloma</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:12px"><label>Cliente / Turma</label><input type="text" id="reun-cliente" placeholder="Ex: Turma Medicina PUCPR 2026.1"></div>
+      <div class="fg" style="margin-bottom:12px"><label>Assunto / Pauta</label><input type="text" id="reun-assunto" placeholder="Ex: Alinhamento de conteúdo, Revisão de briefing"></div>
+      <div class="fg" style="margin-bottom:12px"><label>Status</label>
+        <select id="reun-status" style="padding:7px 10px;border:1px solid #DDD;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%">
+          <option>Realizada</option><option>Pendente</option><option>Cancelada</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:12px"><label>Próximos Passos</label><textarea id="reun-proximos" style="width:100%;min-height:80px;padding:8px 10px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box" placeholder="O que ficou combinado..."></textarea></div>
+      <div class="fg" style="margin-bottom:16px"><label>Observações</label><textarea id="reun-obs" style="width:100%;min-height:60px;padding:8px 10px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:13px;resize:vertical;box-sizing:border-box" placeholder="Anotações adicionais..."></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btno" onclick="document.getElementById('reuniao-modal').classList.remove('open')">Cancelar</button>
+        <button class="btn btnp" onclick="saveReuniao()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRIEFINGS MODAL -->
+<div class="modal-overlay" id="briefings-modal" onclick="closeBriefingsModal(event)">
+  <div class="modal-box" style="max-width:600px">
+    <div class="modal-head">
+      <div style="font-size:16px;font-weight:700">Briefings Ativos</div>
+      <button class="modal-close" onclick="document.getElementById('briefings-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+      <div id="briefings-modal-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ENTREGA MODAL -->
+<div class="modal-overlay" id="entrega-modal" onclick="closeEntregaModal(event)">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-head">
+      <div id="entrega-modal-title" style="font-size:16px;font-weight:700">Nova Entrega</div>
+      <button class="modal-close" onclick="document.getElementById('entrega-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="entrega-edit-id" value="">
+      <div class="fg" style="margin-bottom:12px"><label>Nome / Descrição</label><input type="text" id="entrega-nome" placeholder="Ex: Entrega de artes Formatura X"></div>
+      <div class="grid g2" style="gap:12px;margin-bottom:12px">
+        <div class="fg"><label>Prazo</label><input type="date" id="entrega-prazo"></div>
+        <div class="fg"><label>Responsável</label><input type="text" id="entrega-resp" list="team-list" placeholder="Ex: Carol"></div>
+      </div>
+      <div class="fg" style="margin-bottom:16px"><label>Status</label>
+        <select id="entrega-status" style="padding:7px 10px;border:1px solid #DDD;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%">
+          <option>NÃO INICIADO</option><option>EM ANDAMENTO</option><option>EM ATRASO</option><option>CONCLUÍDO</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btno" onclick="document.getElementById('entrega-modal').classList.remove('open')">Cancelar</button>
+        <button class="btn btnp" onclick="saveEntrega()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -888,7 +1009,9 @@ const dbStore = {
     const LS_KEYS = [
       'atm_all_tasks','atm_editable','atm_posts','atm_proj_fases',
       'atm_proj_pct','atm_custom_projs','atm_proj_meta',
+      'atm_proj_resp','atm_proj_kpis',
       'atm_hist','atm_camp','atm_corr',
+      'atm_reunioes','atm_entregas','atm_herrera_files',
       'note_4','note_6','note_10','note_11'
     ];
     const data = {};
@@ -1520,16 +1643,21 @@ function renderCalView(){
 }
 
 // ===== ALERT BANNER =====
+const _MN_ABBR=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const _MN_FULL=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 function renderAlertBanner(){
   const all=PROJECTS.flatMap(p=>p.tarefas);
   const atrasadas=all.filter(t=>t.status==="EM ATRASO");
-  const mesAtual=all.filter(t=>t.prazo==="Abr"&&t.status!=="CONCLUÍDO"&&t.status!=="FINALIZADO");
+  const _nowMonth=new Date().getMonth();
+  const _mesAbrev=_MN_ABBR[_nowMonth];
+  const _mesNome=_MN_FULL[_nowMonth];
+  const mesAtual=all.filter(t=>t.prazo===_mesAbrev&&t.status!=="CONCLUÍDO"&&t.status!=="FINALIZADO");
   const el=document.getElementById('alert-banner');
   if(!atrasadas.length&&!mesAtual.length){el.style.display='none';return;}
   el.style.display='flex';
   el.innerHTML=`<span style="font-size:12px;font-weight:600;color:#666">Alertas:</span>
     ${atrasadas.length?`<span class="alert-item al-red" onclick="setFilter('EM ATRASO')">🔴 ${atrasadas.length} tarefa${atrasadas.length>1?'s':''} em atraso — clique para filtrar</span>`:''}
-    ${mesAtual.length?`<span class="alert-item al-yellow" onclick="setFilter('mes-abr')">🟡 ${mesAtual.length} tarefa${mesAtual.length>1?'s':''} com prazo em Abril — clique para filtrar</span>`:''}`;
+    ${mesAtual.length?`<span class="alert-item al-yellow" onclick="setFilter('mes-abr')">🟡 ${mesAtual.length} tarefa${mesAtual.length>1?'s':''} com prazo em ${_mesNome} — clique para filtrar</span>`:''}`;
 }
 function setFilter(v){
   // reset all checkboxes
@@ -1660,6 +1788,9 @@ function startRenameFase(pid,nome){
 
 // ===== RENDER PROJECTS =====
 function renderProjects(){
+  // Update proj count label
+  const pcEl=document.getElementById('proj-count-lbl');
+  if(pcEl){const tot=PROJECTS.flatMap(p=>p.tarefas).length;pcEl.textContent=`${PROJECTS.length} projetos · ${tot} tarefas`;}
   if(viewMode==='lista'){renderProjectsFlat();renderExtProj(4);renderExtProj(6);renderExtProj(10);renderExtProj(11);return;}
   const container=document.getElementById('projetos-list');
   container.innerHTML='';
@@ -1849,17 +1980,61 @@ function addTask(pid){
 function openProjModal(id){
   const p=PROJECTS.find(x=>x.id===id);
   document.getElementById('modal-title').textContent=p.nome;
-  document.getElementById('modal-sub').textContent=`${p.resp} · ${p.tarefas.length} tarefas · ${p.metaTag}`;
+  document.getElementById('modal-sub').textContent=`${p.tarefas.length} tarefas · ${p.metaTag}`;
   let rows=p.tarefas.map(t=>{
     const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:6px">↗</a>`:'';
     return `<div class="task-row"><span class="task-name">${t.nome}${lnk}</span><span class="task-resp">${t.resp}</span><span class="task-prazo">${t.prazo}</span>${statusBadge(t.status)}</div>`;
   }).join('');
   document.getElementById('modal-body').innerHTML=`
-    <div class="proj-kpis" style="margin-bottom:14px"><strong>KPIs:</strong> ${p.kpis}</div>
+    <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:180px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:4px">Gestor</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="modal-resp-val" style="font-size:14px;font-weight:600;padding:5px 9px;border:1px solid #DDD;border-radius:6px;min-width:100px;cursor:text;outline:none" contenteditable="true">${p.resp}</span>
+          <button class="btn btnp btns" onclick="saveModalResp(${id})" style="font-size:11px">Salvar</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#999;margin-bottom:4px">KPIs &amp; Metas</div>
+      <div style="display:flex;align-items:flex-start;gap:6px">
+        <span id="modal-kpis-val" style="flex:1;font-size:13px;padding:5px 9px;border:1px solid #DDD;border-radius:6px;min-height:36px;cursor:text;outline:none;line-height:1.5" contenteditable="true">${p.kpis}</span>
+        <button class="btn btnp btns" onclick="saveModalKpis(${id})" style="font-size:11px;margin-top:2px">Salvar</button>
+      </div>
+    </div>
     <div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0">
       <span style="flex:1">Tarefa</span><span style="min-width:90px">Responsável</span><span style="min-width:36px">Prazo</span><span style="min-width:100px">Status</span>
     </div>${rows}`;
   document.getElementById('modal').classList.add('open');
+}
+function saveModalResp(id){
+  const el=document.getElementById('modal-resp-val');
+  if(!el)return;
+  const val=el.textContent.trim();
+  const p=PROJECTS.find(x=>x.id===id);
+  p.resp=val;
+  const d=JSON.parse(dbStore.getItem('atm_proj_resp')||'{}');
+  d[id]=val;dbStore.setItem('atm_proj_resp',JSON.stringify(d));
+  document.getElementById('modal-sub').textContent=`${p.tarefas.length} tarefas · ${p.metaTag}`;
+  toast('Gestor atualizado!');renderProjects();
+}
+function saveModalKpis(id){
+  const el=document.getElementById('modal-kpis-val');
+  if(!el)return;
+  const val=el.textContent.trim();
+  const p=PROJECTS.find(x=>x.id===id);
+  p.kpis=val;
+  const d=JSON.parse(dbStore.getItem('atm_proj_kpis')||'{}');
+  d[id]=val;dbStore.setItem('atm_proj_kpis',JSON.stringify(d));
+  toast('KPIs atualizados!');
+}
+function loadProjResp(){
+  const d=JSON.parse(dbStore.getItem('atm_proj_resp')||'{}');
+  PROJECTS.forEach(p=>{if(d[p.id]!==undefined)p.resp=d[p.id];});
+}
+function loadProjKpis(){
+  const d=JSON.parse(dbStore.getItem('atm_proj_kpis')||'{}');
+  PROJECTS.forEach(p=>{if(d[p.id]!==undefined)p.kpis=d[p.id];});
 }
 function closeModal(e){if(e.target===document.getElementById('modal'))document.getElementById('modal').classList.remove('open');}
 
@@ -2206,28 +2381,30 @@ function renderOverview(){
   document.getElementById('kpi-tasks-num').textContent=doneT;
   document.getElementById('kpi-tasks-sub').textContent=`de ${allT.length} total`;
   document.getElementById('kpi-tasks-bar').style.width=pctT+'%';
+  // Tarefas no mês atual
+  const _nowMn=_MN_ABBR[new Date().getMonth()];
+  const _nowY=new Date().getFullYear();
+  const tMes=allT.filter(t=>{
+    if(!t.prazo)return false;
+    if(t.prazo===_nowMn)return true;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(t.prazo)){
+      const [y,m]=t.prazo.split('-');
+      return parseInt(y)===_nowY&&(parseInt(m)-1)===new Date().getMonth();
+    }
+    return false;
+  }).length;
+  const mesEl=document.getElementById('kpi-tasks-mes');
+  if(mesEl)mesEl.textContent=`${tMes} tarefas no mês`;
   // Briefings ativos
-  const briefCount=allT.filter(t=>t.nome.toLowerCase().includes('briefing')&&t.status==='EM ANDAMENTO').length;
+  const briefTasks=allT.filter(t=>t.nome.toLowerCase().includes('briefing')&&t.status==='EM ANDAMENTO');
+  const briefCount=briefTasks.length;
   const bEl=document.getElementById('ov-briefings-num');
   if(bEl)bEl.textContent=briefCount||'0';
+  window._briefTasks=briefTasks;
   // Posts publicados
   updatePostsBar();
-  // Próximas Entregas (Projeto id=5)
-  const projE=PROJECTS.find(p=>p.id===5);
-  const eDiv=document.getElementById('ov-entregas');
-  if(projE&&eDiv){
-    const upcoming=projE.tarefas.filter(t=>t.status!=='CONCLUÍDO'&&t.status!=='FINALIZADO').slice(0,5);
-    eDiv.innerHTML=upcoming.length?upcoming.map(t=>{
-      const cls=t.status==='EM ATRASO'?'br':t.status==='EM ANDAMENTO'?'bb':'bgr';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F8F8F8">
-        <span style="font-size:13px;flex:1">${t.nome}</span>
-        <div style="display:flex;gap:6px;align-items:center">
-          ${t.prazo?`<span style="font-size:11px;color:#999">${t.prazo}</span>`:''}
-          <span class="badge ${cls}" style="font-size:10px">${t.status}</span>
-        </div>
-      </div>`;
-    }).join(''):'<div style="color:#999;font-size:13px;padding:8px 0">Nenhuma entrega pendente.</div>';
-  }
+  // Próximas Entregas — mix de tarefas próximas + entregas customizadas
+  renderEntregas();
   // NPS Recente
   const nDiv=document.getElementById('ov-nps');
   if(nDiv){
@@ -3045,6 +3222,262 @@ function syncHerreraDefaults(){
   }
 }
 
+// ===== BRIEFINGS MODAL =====
+function showBriefingsModal(){
+  const tasks=window._briefTasks||[];
+  const el=document.getElementById('briefings-modal-body');
+  if(el){
+    if(!tasks.length){el.innerHTML='<div style="text-align:center;padding:30px;color:#999">Nenhum briefing ativo no momento.</div>';
+    }else{
+      el.innerHTML=tasks.map(t=>{
+        const proj=PROJECTS.find(p=>p.tarefas.includes(t));
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F4F4F4">
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${t.nome}</div>
+            <div style="font-size:11px;color:#999;margin-top:2px">${proj?proj.nome:''} · ${t.resp}</div>
+          </div>
+          ${t.prazo?`<span style="font-size:11px;color:#666">${t.prazo}</span>`:''}
+          <span class="badge bb" style="font-size:10px">EM ANDAMENTO</span>
+          ${t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:12px;text-decoration:none">↗</a>`:''}
+        </div>`;
+      }).join('');
+    }
+  }
+  document.getElementById('briefings-modal').classList.add('open');
+}
+function closeBriefingsModal(e){if(e.target===document.getElementById('briefings-modal'))document.getElementById('briefings-modal').classList.remove('open');}
+
+// ===== ENTREGAS CUSTOMIZADAS =====
+let _entregas=[];
+function loadEntregas(){_entregas=JSON.parse(dbStore.getItem('atm_entregas')||'[]');}
+function saveEntregasStore(){dbStore.setItem('atm_entregas',JSON.stringify(_entregas));}
+function renderEntregas(){
+  const eDiv=document.getElementById('ov-entregas');
+  if(!eDiv)return;
+  // Tasks de projetos com prazo próximo (próximos 45 dias) não concluídas
+  const today=new Date();today.setHours(0,0,0,0);
+  const limit=new Date(today);limit.setDate(limit.getDate()+45);
+  const projTasks=PROJECTS.flatMap(p=>p.tarefas.map(t=>({...t,_src:'proj'}))).filter(t=>{
+    if(t.status==='CONCLUÍDO'||t.status==='FINALIZADO')return false;
+    if(!t.prazo)return false;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(t.prazo)){
+      const d=new Date(t.prazo+'T00:00:00');
+      return d<=limit;
+    }
+    return false;
+  });
+  projTasks.sort((a,b)=>a.prazo.localeCompare(b.prazo));
+  const combined=[
+    ..._entregas.map(e=>({...e,_src:'custom'})),
+    ...projTasks.slice(0,6)
+  ];
+  if(!combined.length){
+    eDiv.innerHTML='<div style="color:#999;font-size:13px;padding:8px 0">Nenhuma entrega pendente.</div>';
+    return;
+  }
+  eDiv.innerHTML=combined.map(t=>{
+    const cls=t.status==='EM ATRASO'?'br':t.status==='EM ANDAMENTO'?'bb':t.status==='CONCLUÍDO'?'bg':'bgr';
+    const delBtn=t._src==='custom'?`<button onclick="deleteEntrega(${t.id})" style="background:none;border:none;color:#CCC;cursor:pointer;font-size:11px;padding:0 3px" title="Excluir">✕</button>`:'';
+    const editBtn=t._src==='custom'?`<button onclick="editEntrega(${t.id})" style="background:none;border:none;color:#999;cursor:pointer;font-size:11px;padding:0 3px" title="Editar">✎</button>`:'';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F8F8F8">
+      <span style="font-size:13px;flex:1">${t.nome}</span>
+      <div style="display:flex;gap:4px;align-items:center">
+        ${t.prazo?`<span style="font-size:11px;color:#999">${fmtDate(t.prazo)}</span>`:''}
+        <span class="badge ${cls}" style="font-size:10px">${t.status}</span>
+        ${editBtn}${delBtn}
+      </div>
+    </div>`;
+  }).join('');
+}
+function openEntregaModal(id){
+  document.getElementById('entrega-modal-title').textContent=id?'Editar Entrega':'Nova Entrega';
+  document.getElementById('entrega-edit-id').value=id||'';
+  if(id){
+    const e=_entregas.find(x=>x.id===id);
+    if(e){
+      document.getElementById('entrega-nome').value=e.nome||'';
+      document.getElementById('entrega-prazo').value=e.prazo||'';
+      document.getElementById('entrega-resp').value=e.resp||'';
+      document.getElementById('entrega-status').value=e.status||'NÃO INICIADO';
+    }
+  }else{
+    document.getElementById('entrega-nome').value='';
+    document.getElementById('entrega-prazo').value='';
+    document.getElementById('entrega-resp').value='';
+    document.getElementById('entrega-status').value='NÃO INICIADO';
+  }
+  document.getElementById('entrega-modal').classList.add('open');
+}
+function closeEntregaModal(e){if(e.target===document.getElementById('entrega-modal'))document.getElementById('entrega-modal').classList.remove('open');}
+function saveEntrega(){
+  const nome=document.getElementById('entrega-nome').value.trim();
+  if(!nome){toast('Digite o nome da entrega');return;}
+  const prazo=document.getElementById('entrega-prazo').value;
+  const resp=document.getElementById('entrega-resp').value.trim();
+  const status=document.getElementById('entrega-status').value;
+  const editId=document.getElementById('entrega-edit-id').value;
+  if(editId){
+    const idx=_entregas.findIndex(x=>String(x.id)===editId);
+    if(idx>-1)_entregas[idx]={..._entregas[idx],nome,prazo,resp,status};
+  }else{
+    const newId=Date.now();
+    _entregas.push({id:newId,nome,prazo,resp,status});
+  }
+  saveEntregasStore();
+  document.getElementById('entrega-modal').classList.remove('open');
+  renderEntregas();
+  toast('Entrega salva!');
+}
+function editEntrega(id){openEntregaModal(id);}
+function deleteEntrega(id){
+  if(!confirm('Excluir esta entrega?'))return;
+  _entregas=_entregas.filter(e=>e.id!==id);
+  saveEntregasStore();
+  renderEntregas();
+  toast('Entrega excluída.');
+}
+
+// ===== REUNIÕES COMERCIAIS =====
+let _reunioes=[];
+function loadReunioes(){_reunioes=JSON.parse(dbStore.getItem('atm_reunioes')||'[]');}
+function saveReuniaoStore(){dbStore.setItem('atm_reunioes',JSON.stringify(_reunioes));}
+function renderReunioes(){
+  const tbody=document.getElementById('reunioes-tbody');
+  const emptyEl=document.getElementById('reunioes-empty');
+  if(!tbody)return;
+  const fResp=document.getElementById('reun-f-resp')?.value||'';
+  const fStatus=document.getElementById('reun-f-status')?.value||'';
+  let list=[..._reunioes].sort((a,b)=>b.data.localeCompare(a.data));
+  if(fResp)list=list.filter(r=>r.resp===fResp);
+  if(fStatus)list=list.filter(r=>r.status===fStatus);
+  if(!list.length){
+    tbody.innerHTML='';
+    if(emptyEl)emptyEl.style.display='block';
+    return;
+  }
+  if(emptyEl)emptyEl.style.display='none';
+  const stCls={Realizada:'bg',Pendente:'by',Cancelada:'br'};
+  tbody.innerHTML=list.map(r=>{
+    const [y,m,d]=r.data.split('-');
+    const mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const fmtD=r.data?`${parseInt(d)} ${mn[parseInt(m)-1]}/${y.slice(2)}`:'—';
+    return `<tr>
+      <td style="font-size:12px;white-space:nowrap">${fmtD}</td>
+      <td style="font-size:13px;font-weight:600">${r.cliente||'—'}</td>
+      <td style="font-size:12px">${r.assunto||'—'}</td>
+      <td><span style="background:#F0F0F0;color:#0A0A0A;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px">${r.resp||'—'}</span></td>
+      <td><span class="badge ${stCls[r.status]||'bgr'}" style="font-size:10px">${r.status}</span></td>
+      <td style="font-size:12px;color:#666;max-width:200px">${r.proximos||'—'}</td>
+      <td style="white-space:nowrap">
+        <button class="bico bico-edit" onclick="editReuniao(${r.id})" title="Editar">✎</button>
+        <button class="bico bico-del" onclick="deleteReuniao(${r.id})" title="Excluir">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function openReuniaoModal(id){
+  document.getElementById('reuniao-modal-title').textContent=id?'Editar Reunião':'Nova Reunião';
+  document.getElementById('reun-edit-id').value=id||'';
+  if(id){
+    const r=_reunioes.find(x=>x.id===id);
+    if(r){
+      document.getElementById('reun-data').value=r.data||'';
+      document.getElementById('reun-resp').value=r.resp||'Carol';
+      document.getElementById('reun-cliente').value=r.cliente||'';
+      document.getElementById('reun-assunto').value=r.assunto||'';
+      document.getElementById('reun-status').value=r.status||'Realizada';
+      document.getElementById('reun-proximos').value=r.proximos||'';
+      document.getElementById('reun-obs').value=r.obs||'';
+    }
+  }else{
+    const today=new Date();
+    document.getElementById('reun-data').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    document.getElementById('reun-resp').value='Nana';
+    document.getElementById('reun-cliente').value='';
+    document.getElementById('reun-assunto').value='';
+    document.getElementById('reun-status').value='Realizada';
+    document.getElementById('reun-proximos').value='';
+    document.getElementById('reun-obs').value='';
+  }
+  document.getElementById('reuniao-modal').classList.add('open');
+}
+function closeReuniaoModal(e){if(e.target===document.getElementById('reuniao-modal'))document.getElementById('reuniao-modal').classList.remove('open');}
+function saveReuniao(){
+  const data=document.getElementById('reun-data').value;
+  const resp=document.getElementById('reun-resp').value;
+  const cliente=document.getElementById('reun-cliente').value.trim();
+  const assunto=document.getElementById('reun-assunto').value.trim();
+  const status=document.getElementById('reun-status').value;
+  const proximos=document.getElementById('reun-proximos').value.trim();
+  const obs=document.getElementById('reun-obs').value.trim();
+  if(!cliente&&!assunto){toast('Preencha ao menos o cliente ou assunto');return;}
+  const editId=document.getElementById('reun-edit-id').value;
+  if(editId){
+    const idx=_reunioes.findIndex(x=>String(x.id)===editId);
+    if(idx>-1)_reunioes[idx]={..._reunioes[idx],data,resp,cliente,assunto,status,proximos,obs};
+  }else{
+    _reunioes.push({id:Date.now(),data,resp,cliente,assunto,status,proximos,obs});
+  }
+  saveReuniaoStore();
+  document.getElementById('reuniao-modal').classList.remove('open');
+  renderReunioes();
+  toast('Reunião salva!');
+}
+function editReuniao(id){openReuniaoModal(id);}
+function deleteReuniao(id){
+  if(!confirm('Excluir esta reunião?'))return;
+  _reunioes=_reunioes.filter(r=>r.id!==id);
+  saveReuniaoStore();
+  renderReunioes();
+  toast('Reunião excluída.');
+}
+
+// ===== ANEXOS HERRERA =====
+function loadHerreraAttachments(){
+  const files=JSON.parse(dbStore.getItem('atm_herrera_files')||'[]');
+  renderHerreraAttachments(files);
+}
+function renderHerreraAttachments(files){
+  const el=document.getElementById('herrera-attachments');
+  if(!el)return;
+  if(!files||!files.length){el.innerHTML='<div style="font-size:12px;color:#CCC;padding:6px 0">Nenhum anexo</div>';return;}
+  el.innerHTML=files.map((f,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F4F4F4">
+      <span style="font-size:12px;flex:1;color:#333">${f.name}</span>
+      <span style="font-size:11px;color:#999">${(f.size/1024).toFixed(1)} KB</span>
+      <a href="${f.data}" download="${f.name}" style="color:#185FA5;font-size:11px;text-decoration:none">⬇ Baixar</a>
+      <button onclick="deleteHerreraFile(${i})" style="background:none;border:none;color:#CCC;cursor:pointer;font-size:11px;padding:0 3px" title="Excluir">✕</button>
+    </div>`).join('');
+}
+function attachHerreraFiles(event){
+  const files=Array.from(event.target.files);
+  if(!files.length)return;
+  const existing=JSON.parse(dbStore.getItem('atm_herrera_files')||'[]');
+  let pending=files.length;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=function(e){
+      existing.push({name:file.name,size:file.size,data:e.target.result,addedAt:new Date().toISOString()});
+      pending--;
+      if(pending===0){
+        dbStore.setItem('atm_herrera_files',JSON.stringify(existing));
+        renderHerreraAttachments(existing);
+        toast(`${files.length} arquivo${files.length>1?'s':''} anexado${files.length>1?'s':''}!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value='';
+}
+function deleteHerreraFile(idx){
+  if(!confirm('Remover este anexo?'))return;
+  const files=JSON.parse(dbStore.getItem('atm_herrera_files')||'[]');
+  files.splice(idx,1);
+  dbStore.setItem('atm_herrera_files',JSON.stringify(files));
+  renderHerreraAttachments(files);
+  toast('Anexo removido.');
+}
+
 // ===== INIT =====
 async function initApp(){
   // 1. Conectar ao SQLite (ou cair no localStorage se servidor não estiver rodando)
@@ -3062,8 +3495,12 @@ async function initApp(){
   loadProjMetas();
   loadProjFases();
   loadProjPct();
+  loadProjResp();
+  loadProjKpis();
   syncHerreraDefaults();
   loadFunilFromDB();
+  loadEntregas();
+  loadReunioes();
 
   // 4. Renderizar tudo
   renderOverview();
@@ -3084,6 +3521,11 @@ async function initApp(){
   renderExtPosts(11);
   loadNotes();
   renderPosts();
+  loadHerreraAttachments();
+  renderReunioes();
+
+  // 5. Auto-refresh a cada 60 segundos
+  setInterval(()=>{renderOverview();renderAlertBanner();},60000);
 }
 initApp();
 </script>
