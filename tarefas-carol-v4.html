@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minhas Tarefas — Carol</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F2F2F0;--surface:#fff;--ink:#0A0A0A;--ink-2:#404040;--ink-3:#909090;
+  --border:rgba(0,0,0,0.08);--border-md:rgba(0,0,0,0.14);
+  --q1-bg:#FFF0F0;--q1-bd:#FFB3B3;--q1-tx:#CC0000;--q1-dot:#FF3B3B;
+  --q2-bg:#FFF8E6;--q2-bd:#FFD980;--q2-tx:#8B5C00;--q2-dot:#F5A623;
+  --q3-bg:#E8F4FF;--q3-bd:#99CCFF;--q3-tx:#004C99;--q3-dot:#2D7DD2;
+  --q4-bg:#F0F0F0;--q4-bd:#CCC;--q4-tx:#555;--q4-dot:#999;
+  --r:10px;--r-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── HEADER ── */
+.hd{background:var(--ink);padding:1.25rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;position:relative;overflow:hidden;}
+.hd::after{content:'GTD';position:absolute;right:1rem;bottom:-18px;font-size:96px;font-weight:700;color:rgba(255,255,255,0.03);letter-spacing:-4px;pointer-events:none;}
+.hd-l{}
+.hd-eye{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:4px;}
+.hd-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px;}
+.hd-date{font-size:11px;color:rgba(255,255,255,0.38);margin-top:2px;font-family:'DM Mono',monospace;}
+.hd-stats{display:flex;gap:1.5rem;}
+.hs{text-align:right;}
+.hs-v{font-size:26px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;}
+.hs-l{font-size:9px;color:rgba(255,255,255,0.35);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+
+/* ── TOOLBAR ── */
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border-md);padding:0.75rem 2rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* Grupos de botões */
+.btn-group{display:flex;gap:4px;align-items:center;}
+.sep{width:1px;height:22px;background:var(--border-md);margin:0 4px;}
+
+.tb-btn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 12px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:none;color:var(--ink-2);cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:5px;}
+.tb-btn:hover{background:var(--bg);color:var(--ink);}
+.tb-btn.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.tb-btn.add{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600;}
+.tb-btn.add:hover{opacity:0.85;}
+
+.filter-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em;margin-right:2px;}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;min-height:calc(100vh - 100px);}
+
+/* SIDEBAR */
+.sidebar{width:200px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border-md);padding:0.875rem;overflow-y:auto;}
+.sb-title{font-size:10px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-3);margin-bottom:8px;padding:0 2px;}
+.cal-year{font-size:12px;font-weight:700;margin-bottom:6px;padding:0 2px;}
+.cal-month{margin-bottom:6px;}
+.cal-mn{font-size:10px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-3);padding:4px 4px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;border-radius:4px;transition:all 0.12s;}
+.cal-mn:hover{background:var(--bg);color:var(--ink);}
+.cal-mn.has-open{color:var(--ink);}
+.m-badge{font-size:9px;background:var(--bg);border-radius:99px;padding:1px 6px;color:var(--ink-3);font-weight:400;}
+.m-badge.hot{background:var(--q1-dot);color:#fff;}
+.cal-days{display:none;}
+.cal-days.open{display:block;}
+.cal-day{display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:4px;cursor:pointer;font-size:11px;transition:background 0.1s;margin-bottom:1px;}
+.cal-day:hover{background:var(--bg);}
+.cal-day.sel{background:var(--ink);color:#fff;}
+.cal-day.sel .cwd{color:rgba(255,255,255,0.5);}
+.cal-day.sel .dc{background:rgba(255,255,255,0.18);color:#fff;}
+.cal-day.tod .cdn{font-weight:700;}
+.cdn{font-family:'DM Mono',monospace;font-size:10px;min-width:18px;}
+.cwd{font-size:10px;color:var(--ink-3);flex:1;}
+.dc{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;background:var(--bg);border-radius:99px;padding:1px 5px;min-width:16px;text-align:center;}
+.dc.q1c{background:var(--q1-bg);color:var(--q1-tx);}
+.dc.venc{background:var(--q1-dot);color:#fff;}
+
+/* ── MAIN ── */
+.main{flex:1;padding:1.25rem 1.75rem;overflow-y:auto;}
+
+/* VIEWS */
+.view{display:none;}
+.view.active{display:block;}
+
+/* ── LISTA ── */
+/* Grupo por data */
+.dg{margin-bottom:1.25rem;}
+.dg-label{font-size:10px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-3);display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.dg-label.v-lbl{color:var(--q1-tx);}
+.dg-label.h-lbl{color:var(--q2-tx);}
+.dg-bar{flex:1;height:1px;background:var(--border-md);}
+
+/* Grupo por quadrante */
+.qg{margin-bottom:1.25rem;}
+.qg-hd{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.qg-dot{width:8px;height:8px;border-radius:50%;}
+.qg-title{font-size:13px;font-weight:700;}
+.qg-badge{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:3px 8px;border-radius:3px;}
+.qg-count{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink-3);margin-left:auto;}
+.qg-div{border:none;border-top:1px solid var(--border-md);margin-bottom:6px;}
+
+/* Task card */
+.tlist{display:flex;flex-direction:column;gap:4px;}
+.tc{background:var(--surface);border:1px solid var(--border-md);border-radius:var(--r);padding:10px 12px;display:grid;grid-template-columns:20px 1fr auto auto;align-items:center;gap:10px;position:relative;overflow:hidden;transition:box-shadow 0.15s;}
+.tc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.tc.q1::before{background:var(--q1-dot);}
+.tc.q2::before{background:var(--q2-dot);}
+.tc.q3::before{background:var(--q3-dot);}
+.tc.q4::before{background:var(--q4-dot);}
+.tc:hover{box-shadow:0 2px 10px rgba(0,0,0,0.07);}
+.tck{width:18px;height:18px;border-radius:50%;border:2px solid var(--border-md);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:none;}
+.tck:hover{border-color:var(--ink);}
+.tck.ck{background:var(--ink);border-color:var(--ink);}
+.tck.ck::after{content:'✓';font-size:9px;color:#fff;font-weight:700;}
+.tnome{font-size:13px;font-weight:500;line-height:1.3;margin-bottom:2px;}
+.tmeta{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.tcat{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:2px 5px;border-radius:3px;background:var(--bg);color:var(--ink-3);border:1px solid var(--border-md);}
+.tpra{font-size:10px;font-family:'DM Mono',monospace;color:var(--ink-3);}
+.tpra.venc{color:var(--q1-tx);font-weight:700;}
+.tpra.hoje{color:var(--q2-tx);font-weight:700;}
+.tpra.prox{color:var(--q3-tx);}
+.tbadge{font-size:9px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;padding:3px 8px;border-radius:3px;white-space:nowrap;flex-shrink:0;}
+.bq1{background:var(--q1-bg);color:var(--q1-tx);border:1px solid var(--q1-bd);}
+.bq2{background:var(--q2-bg);color:var(--q2-tx);border:1px solid var(--q2-bd);}
+.bq3{background:var(--q3-bg);color:var(--q3-tx);border:1px solid var(--q3-bd);}
+.bq4{background:var(--q4-bg);color:var(--q4-tx);border:1px solid var(--q4-bd);}
+.tacts{display:flex;gap:3px;}
+.tbtn{width:26px;height:26px;border-radius:4px;border:1px solid var(--border);background:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;color:var(--ink-3);}
+.tbtn:hover{background:var(--bg);color:var(--ink);border-color:var(--border-md);}
+.tbtn.del:hover{background:var(--q1-bg);color:var(--q1-tx);border-color:var(--q1-bd);}
+
+/* ── CONCLUÍDOS ── */
+.concl-toggle{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r);border:1px dashed var(--border-md);cursor:pointer;margin-top:1.5rem;font-size:12px;color:var(--ink-3);transition:all 0.12s;}
+.concl-toggle:hover{background:var(--surface);color:var(--ink);}
+.concl-section{display:none;margin-top:8px;}
+.concl-section.open{display:block;}
+.concl-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;display:grid;grid-template-columns:20px 1fr auto;align-items:center;gap:10px;opacity:0.45;margin-bottom:4px;}
+.concl-ck{width:18px;height:18px;border-radius:50%;background:var(--ink);border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.concl-ck::after{content:'✓';font-size:9px;color:#fff;font-weight:700;}
+.concl-nome{font-size:12px;text-decoration:line-through;color:var(--ink-3);}
+
+/* ── CALENDÁRIO VIEW ── */
+.cal-view-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;}
+.cal-view-title{font-size:16px;font-weight:700;letter-spacing:-0.3px;}
+.cal-nav{font-size:13px;padding:5px 10px;border-radius:var(--r-sm);border:1px solid var(--border-md);background:none;cursor:pointer;color:var(--ink-2);transition:all 0.12s;}
+.cal-nav:hover{background:var(--bg);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border-md);border-radius:var(--r);overflow:hidden;}
+.cal-grid-hd{background:var(--bg);padding:6px;text-align:center;font-size:10px;font-family:'DM Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-3);}
+.cal-cell{background:var(--surface);padding:6px;min-height:80px;cursor:pointer;transition:background 0.1s;}
+.cal-cell:hover{background:#FAFAF8;}
+.cal-cell.other-month{background:#F8F8F6;}
+.cal-cell.is-today{background:#FFFBE6;}
+.cal-cell.is-today .cal-cell-day{background:var(--ink);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+.cal-cell-day{font-size:12px;font-family:'DM Mono',monospace;font-weight:500;margin-bottom:4px;width:22px;text-align:center;}
+.cal-cell-tasks{display:flex;flex-direction:column;gap:2px;}
+.cal-task-pill{font-size:10px;padding:2px 6px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;}
+.ctp-q1{background:var(--q1-bg);color:var(--q1-tx);}
+.ctp-q2{background:var(--q2-bg);color:var(--q2-tx);}
+.ctp-q3{background:var(--q3-bg);color:var(--q3-tx);}
+.ctp-q4{background:var(--q4-bg);color:var(--q4-tx);}
+.cal-more{font-size:10px;color:var(--ink-3);padding:1px 4px;}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:2rem;color:var(--ink-3);font-size:13px;}
+
+/* ── MODAL ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.mo.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--r);padding:1.5rem;width:100%;max-width:460px;border:1px solid var(--border-md);animation:su 0.18s ease;}
+@keyframes su{from{transform:translateY(8px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-t{font-size:16px;font-weight:700;margin-bottom:1rem;letter-spacing:-0.3px;}
+.fi{margin-bottom:11px;}
+.fi label{display:block;font-size:9px;font-weight:700;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-3);margin-bottom:4px;}
+.fi input,.fi select,.fi textarea{width:100%;padding:8px 10px;border:1px solid var(--border-md);border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink);background:var(--surface);outline:none;transition:border-color 0.15s;}
+.fi input:focus,.fi select:focus{border-color:var(--ink);}
+.fi textarea{height:52px;resize:vertical;}
+.fi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.qguide{margin-top:7px;padding:9px 11px;border-radius:var(--r-sm);font-size:12px;line-height:1.6;display:none;}
+.qguide.show{display:block;}
+.qguide.q1{background:var(--q1-bg);color:var(--q1-tx);border:1px solid var(--q1-bd);}
+.qguide.q2{background:var(--q2-bg);color:var(--q2-tx);border:1px solid var(--q2-bd);}
+.qguide.q3{background:var(--q3-bg);color:var(--q3-tx);border:1px solid var(--q3-bd);}
+.qguide.q4{background:var(--q4-bg);color:var(--q4-tx);border:1px solid var(--q4-bd);}
+.mbtns{display:flex;gap:7px;justify-content:flex-end;margin-top:1rem;}
+.mb{padding:8px 16px;border-radius:var(--r-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+.mb-save{border:none;background:var(--ink);color:#fff;}
+.mb-cancel{border:1px solid var(--border-md);background:none;color:var(--ink);}
+.mb-del{border:1px solid var(--q1-bd);background:none;color:var(--q1-tx);margin-right:auto;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;background:var(--ink);color:#fff;padding:9px 16px;border-radius:5px;font-size:11px;font-family:'DM Mono',monospace;display:none;z-index:300;animation:su 0.2s ease;}
+
+@media(max-width:680px){.sidebar{display:none;}.hd{padding:1rem;}.main{padding:1rem;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hd">
+  <div class="hd-l">
+    <div class="hd-eye">Gestão pessoal · Carol</div>
+    <div class="hd-title">Minhas Tarefas</div>
+    <div class="hd-date" id="hd-date"></div>
+  </div>
+  <div class="hd-stats">
+    <div class="hs"><div class="hs-v" id="st-ab">0</div><div class="hs-l">Em aberto</div></div>
+    <div class="hs"><div class="hs-v" id="st-urg" style="color:#FF3B3B">0</div><div class="hs-l">Urgentes hoje</div></div>
+    <div class="hs"><div class="hs-v" id="st-dn" style="color:rgba(255,255,255,0.3)">0</div><div class="hs-l">Concluídas</div></div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <button class="tb-btn add" onclick="abrirModal()">+ Nova tarefa</button>
+  <div class="sep"></div>
+
+  <!-- VISUALIZAÇÃO -->
+  <span class="filter-label">Ver</span>
+  <div class="btn-group">
+    <button class="tb-btn active" id="vb-lista" onclick="setView('lista',this)">☰ Lista</button>
+    <button class="tb-btn" id="vb-cal" onclick="setView('cal',this)">📅 Calendário</button>
+  </div>
+  <div class="sep"></div>
+
+  <!-- AGRUPAR (só na lista) -->
+  <span class="filter-label" id="group-label">Agrupar</span>
+  <div class="btn-group" id="group-btns">
+    <button class="tb-btn active" id="gb-data" onclick="setGroup('data',this)">Por data</button>
+    <button class="tb-btn" id="gb-eis" onclick="setGroup('eis',this)">Eisenhower</button>
+    <button class="tb-btn" id="gb-status" onclick="setGroup('status',this)">Status</button>
+  </div>
+  <div class="sep" id="filter-sep"></div>
+
+  <!-- FILTRO STATUS -->
+  <span class="filter-label">Filtro</span>
+  <div class="btn-group">
+    <button class="tb-btn active" id="fb-all" onclick="setFilter('all',this)">Todas</button>
+    <button class="tb-btn" id="fb-q1" onclick="setFilter('q1',this)">🔴 Fazer já</button>
+    <button class="tb-btn" id="fb-q2" onclick="setFilter('q2',this)">🟡 Agendar</button>
+    <button class="tb-btn" id="fb-q3" onclick="setFilter('q3',this)">🔵 Delegar</button>
+    <button class="tb-btn" id="fb-q4" onclick="setFilter('q4',this)">⚫ Avaliar</button>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR CALENDÁRIO -->
+  <div class="sidebar">
+    <div class="sb-title">Calendário 2026</div>
+    <div class="cal-year">2026</div>
+    <div id="mini-cal"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- VIEW: LISTA -->
+    <div class="view active" id="view-lista">
+      <div id="lista-content"></div>
+      <!-- CONCLUÍDOS -->
+      <div class="concl-toggle" onclick="toggleConcluidos()" id="concl-toggle">
+        <span id="concl-icon">▶</span>
+        <span id="concl-label">Ver concluídas (0)</span>
+      </div>
+      <div class="concl-section" id="concl-section"></div>
+    </div>
+
+    <!-- VIEW: CALENDÁRIO -->
+    <div class="view" id="view-cal">
+      <div class="cal-view-header">
+        <button class="cal-nav" onclick="navCal(-1)">←</button>
+        <div class="cal-view-title" id="cal-view-title"></div>
+        <button class="cal-nav" onclick="navCal(1)">→</button>
+        <button class="cal-nav" onclick="irHoje()" style="margin-left:auto">Hoje</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mo" id="modal">
+  <div class="modal">
+    <div class="modal-t" id="modal-t">Nova tarefa</div>
+    <input type="hidden" id="eid">
+    <div class="fi"><label>Tarefa</label><input type="text" id="f-nome" placeholder="O que precisa ser feito?"></div>
+    <div class="fi-row">
+      <div class="fi"><label>Categoria</label>
+        <select id="f-cat">
+          <option>Formô</option><option>Marketing</option><option>Herrera</option>
+          <option>Financeiro</option><option>Equipe</option><option>Pessoal</option>
+          <option>Parceiros</option><option>Blend</option><option>Outros</option>
+        </select>
+      </div>
+      <div class="fi"><label>Data / Prazo</label><input type="date" id="f-prazo"></div>
+    </div>
+    <div class="fi-row">
+      <div class="fi"><label>É urgente?</label>
+        <select id="f-urg" onchange="calcQ()">
+          <option value="">Selecione...</option>
+          <option value="sim">Sim — precisa resolver logo</option>
+          <option value="nao">Não — pode esperar</option>
+        </select>
+      </div>
+      <div class="fi"><label>É importante?</label>
+        <select id="f-imp" onchange="calcQ()">
+          <option value="">Selecione...</option>
+          <option value="sim">Sim — impacta suas metas</option>
+          <option value="nao">Não — pouco impacto real</option>
+        </select>
+      </div>
+    </div>
+    <div class="qguide" id="qguide"></div>
+    <div class="fi"><label>Observação (opcional)</label><textarea id="f-obs" placeholder="Contexto, detalhes..."></textarea></div>
+    <div class="mbtns">
+      <button class="mb mb-del" id="btn-del" onclick="deletar()" style="display:none">Excluir</button>
+      <button class="mb mb-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="mb mb-save" onclick="salvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════
+// CONSTANTES
+// ═══════════════════════════════════
+const KEY = 'carol-tasks-v4';
+const MESES_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+const QD = {
+  q1:{label:'Fazer já',   dot:'var(--q1-dot)',badge:'bq1',guide:'🔴 <strong>Fazer já:</strong> Urgente e importante. Resolva você mesma agora.'},
+  q2:{label:'Agendar',    dot:'var(--q2-dot)',badge:'bq2',guide:'🟡 <strong>Agendar:</strong> Importante mas sem urgência. Proteja um horário.'},
+  q3:{label:'Delegar',    dot:'var(--q3-dot)',badge:'bq3',guide:'🔵 <strong>Delegar:</strong> Urgente mas pouco importante para você. Passe para a equipe.'},
+  q4:{label:'Avaliar',    dot:'var(--q4-dot)',badge:'bq4',guide:'⚫ <strong>Avaliar:</strong> Nem urgente nem importante. Considere remover.'},
+};
+
+// ═══════════════════════════════════
+// DADOS INICIAIS — 79 TAREFAS
+// ═══════════════════════════════════
+const INIT = [
+  {id:1, nome:'Verificar ClickUp e delegar aos responsáveis',      cat:'Equipe',     prazo:'2026-04-02', urg:'sim', imp:'sim', obs:'Delegar tudo dentro do setor'},
+  {id:2, nome:'Responder conversas relevantes do dia (WhatsApp)',   cat:'Formô',      prazo:'2026-04-02', urg:'sim', imp:'sim', obs:''},
+  {id:3, nome:'Subir cardápio Angel — verificar e delegar',         cat:'Parceiros',  prazo:'2026-04-02', urg:'sim', imp:'sim', obs:''},
+  {id:4, nome:'Refazer logo Herrera e enviar doc de próximos passos',cat:'Herrera',   prazo:'2026-04-02', urg:'sim', imp:'sim', obs:''},
+  {id:5, nome:'Subir número de celular Meta — pedir nova verificação',cat:'Marketing',prazo:'2026-04-02', urg:'sim', imp:'sim', obs:'Proposta de custo para sócios'},
+  {id:6, nome:'Contrato Maycon',                                     cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'sim', obs:'Em andamento'},
+  {id:7, nome:'Finalizar proposta Gabriel Herrera',                  cat:'Herrera',   prazo:'2026-04-07', urg:'sim', imp:'sim', obs:'Uniforme, timbrado, vídeo apresentação, proposta, divisórias'},
+  {id:8, nome:'Montar próximos passos Gabriel',                      cat:'Herrera',   prazo:'2026-04-07', urg:'sim', imp:'sim', obs:''},
+  {id:9, nome:'Refazer modelo Formo Day com orçamento',              cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'sim', obs:''},
+  {id:10,nome:'Fazer ingresso Formo Day',                            cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'sim', obs:''},
+  {id:11,nome:'App Formô — Benefícios (fazer a página)',             cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'sim', obs:''},
+  {id:12,nome:'Fazer página home Formo Day',                         cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'sim', obs:''},
+  {id:13,nome:'Post Formo Day',                                      cat:'Marketing', prazo:'2026-04-07', urg:'sim', imp:'sim', obs:''},
+  {id:14,nome:'Falar com Abner sobre pagamento IA',                  cat:'Financeiro',prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:15,nome:'Enviar vídeo Gabriel',                                cat:'Herrera',   prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:16,nome:'PDF Torriton — pedir',                                cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:17,nome:'Pedir vídeo 4 — Herrera',                            cat:'Herrera',   prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:18,nome:'Marcar de ir no Gabe',                                cat:'Herrera',   prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:19,nome:'Pagar Papi',                                          cat:'Financeiro',prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:20,nome:'Enviar TVs Torriton',                                 cat:'Formô',     prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:21,nome:'Projeto Tubarão',                                     cat:'Formô',     prazo:'2026-04-07', urg:'nao', imp:'sim', obs:''},
+  {id:22,nome:'Site YZ',                                             cat:'Marketing', prazo:'2026-04-07', urg:'nao', imp:'sim', obs:''},
+  {id:23,nome:'Lista de turmas Miguel → DELEGAR',                    cat:'Equipe',    prazo:'2026-04-07', urg:'sim', imp:'nao', obs:'Já identificado para delegar'},
+  {id:24,nome:'Ver valor violino (6) Dia das Mães Torriton → DELEGAR',cat:'Formô',   prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:25,nome:'KV Delegado',                                         cat:'Equipe',    prazo:'2026-04-07', urg:'sim', imp:'nao', obs:''},
+  {id:26,nome:'Alinhar eventos com Vini',                            cat:'Formô',     prazo:'2026-04-08', urg:'sim', imp:'sim', obs:''},
+  {id:27,nome:'Tirar dinheiro Wise',                                 cat:'Financeiro',prazo:'2026-04-08', urg:'sim', imp:'nao', obs:''},
+  {id:28,nome:'Ver vídeo Torriton Redes',                            cat:'Marketing', prazo:'2026-04-08', urg:'sim', imp:'nao', obs:''},
+  {id:29,nome:'Home Tag Play',                                       cat:'Marketing', prazo:'2026-04-08', urg:'nao', imp:'sim', obs:''},
+  {id:30,nome:'Cursos — avaliar e decidir',                          cat:'Pessoal',   prazo:'2026-04-08', urg:'nao', imp:'sim', obs:''},
+  {id:31,nome:'Ver meu budget — plano de conta',                     cat:'Financeiro',prazo:'2026-04-09', urg:'sim', imp:'sim', obs:''},
+  {id:32,nome:'Multas — ver com Leocádio pagamentos',                cat:'Financeiro',prazo:'2026-04-09', urg:'sim', imp:'sim', obs:''},
+  {id:33,nome:'Fazer vídeo Torriton Formo Day + QRcode',             cat:'Marketing', prazo:'2026-04-09', urg:'sim', imp:'sim', obs:''},
+  {id:34,nome:'Fazer modelo de conteúdo meu',                        cat:'Marketing', prazo:'2026-04-09', urg:'nao', imp:'sim', obs:''},
+  {id:35,nome:'Pagamento Matheus',                                   cat:'Financeiro',prazo:'2026-04-09', urg:'sim', imp:'nao', obs:''},
+  {id:36,nome:'Subir nota Fernanda Cabral',                          cat:'Financeiro',prazo:'2026-04-09', urg:'sim', imp:'nao', obs:''},
+  {id:37,nome:'Sacolas Vini e Gabi',                                 cat:'Formô',     prazo:'2026-04-09', urg:'sim', imp:'nao', obs:''},
+  {id:38,nome:'Passar vídeos Digo',                                  cat:'Marketing', prazo:'2026-04-09', urg:'sim', imp:'nao', obs:''},
+  {id:39,nome:'Ana: cobrar planilha de cachês',                      cat:'Equipe',    prazo:'2026-04-10', urg:'sim', imp:'sim', obs:''},
+  {id:40,nome:'Ver coisas do Gabriel Herrera',                       cat:'Herrera',   prazo:'2026-04-10', urg:'sim', imp:'sim', obs:''},
+  {id:41,nome:'Passo a passo Formo Day',                             cat:'Formô',     prazo:'2026-04-10', urg:'sim', imp:'sim', obs:''},
+  {id:42,nome:'Moodboard de foto — marca',                           cat:'Marketing', prazo:'2026-04-10', urg:'nao', imp:'sim', obs:''},
+  {id:43,nome:'Dash app + 5 parcerias',                              cat:'Formô',     prazo:'2026-04-10', urg:'nao', imp:'sim', obs:''},
+  {id:44,nome:'Ver BO votral do Quinta',                             cat:'Formô',     prazo:'2026-04-13', urg:'sim', imp:'sim', obs:''},
+  {id:45,nome:'Imposto de renda',                                    cat:'Financeiro',prazo:'2026-04-13', urg:'sim', imp:'sim', obs:''},
+  {id:46,nome:'Acessar paredes Gabriel',                             cat:'Herrera',   prazo:'2026-04-13', urg:'sim', imp:'sim', obs:''},
+  {id:47,nome:'Comida — descrever kit (frigos, água, tops, bandeira)',cat:'Formô',    prazo:'2026-04-13', urg:'sim', imp:'sim', obs:''},
+  {id:48,nome:'Costureira',                                          cat:'Pessoal',   prazo:'2026-04-13', urg:'sim', imp:'nao', obs:''},
+  {id:49,nome:'Enviar mãe — camisas Pacífico',                       cat:'Pessoal',   prazo:'2026-04-13', urg:'sim', imp:'nao', obs:''},
+  {id:50,nome:'Pagar Digo',                                          cat:'Financeiro',prazo:'2026-04-13', urg:'sim', imp:'nao', obs:''},
+  {id:51,nome:'Marcar próxima data Digo',                            cat:'Marketing', prazo:'2026-04-13', urg:'sim', imp:'nao', obs:''},
+  {id:52,nome:'Pagar mãe bebys pal',                                 cat:'Financeiro',prazo:'2026-04-13', urg:'sim', imp:'nao', obs:''},
+  {id:53,nome:'Doc para líderes com metas',                          cat:'Equipe',    prazo:'2026-04-14', urg:'sim', imp:'sim', obs:''},
+  {id:54,nome:'Órbita — avisos design',                              cat:'Formô',     prazo:'2026-04-14', urg:'sim', imp:'nao', obs:''},
+  {id:55,nome:'Apresentação Renault',                                cat:'Parceiros', prazo:'2026-04-15', urg:'sim', imp:'sim', obs:''},
+  {id:56,nome:'Porta — Angel orçamento',                             cat:'Parceiros', prazo:'2026-04-15', urg:'sim', imp:'sim', obs:''},
+  {id:57,nome:'Selo Reclame Aqui',                                   cat:'Marketing', prazo:'2026-04-15', urg:'sim', imp:'sim', obs:''},
+  {id:58,nome:'Dashboard de marketing',                              cat:'Marketing', prazo:'2026-04-15', urg:'sim', imp:'sim', obs:''},
+  {id:59,nome:'Indicadores de projeto',                              cat:'Formô',     prazo:'2026-04-15', urg:'sim', imp:'sim', obs:''},
+  {id:60,nome:'Coisas Gabriel — pendências',                         cat:'Herrera',   prazo:'2026-04-15', urg:'sim', imp:'sim', obs:''},
+  {id:61,nome:'Agentes de IA — estudar',                             cat:'Pessoal',   prazo:'2026-04-15', urg:'nao', imp:'sim', obs:''},
+  {id:62,nome:'Curso — decidir e inscrever',                         cat:'Pessoal',   prazo:'2026-04-15', urg:'nao', imp:'sim', obs:''},
+  {id:63,nome:'Reembolso cartão de crédito',                         cat:'Financeiro',prazo:'2026-04-15', urg:'sim', imp:'nao', obs:''},
+  {id:64,nome:'Passar arquivos Digo para postagem',                  cat:'Marketing', prazo:'2026-04-15', urg:'sim', imp:'nao', obs:''},
+  {id:65,nome:'Definir sobre a Wella',                               cat:'Parceiros', prazo:'2026-04-15', urg:'sim', imp:'nao', obs:''},
+  {id:66,nome:'Organizar coisas para viajar',                        cat:'Pessoal',   prazo:'2026-04-15', urg:'sim', imp:'nao', obs:''},
+  {id:67,nome:'Meu pagamento Gabriel',                               cat:'Financeiro',prazo:'2026-04-17', urg:'sim', imp:'sim', obs:''},
+  {id:68,nome:'Minha comissão',                                      cat:'Financeiro',prazo:'2026-04-17', urg:'sim', imp:'sim', obs:''},
+  {id:69,nome:'Visualizar report financeiro do HD',                  cat:'Financeiro',prazo:'2026-04-17', urg:'sim', imp:'sim', obs:''},
+  {id:70,nome:'Finalizar Sue',                                       cat:'Formô',     prazo:'2026-04-17', urg:'sim', imp:'sim', obs:''},
+  {id:71,nome:'Planejamento de MKT — Decoração',                    cat:'Marketing', prazo:'2026-04-17', urg:'nao', imp:'sim', obs:''},
+  {id:72,nome:'Marcar 1:1 — Marines e Val',                         cat:'Equipe',    prazo:'2026-04-17', urg:'nao', imp:'sim', obs:''},
+  {id:73,nome:'Letrero de LED recepção',                             cat:'Formô',     prazo:'2026-04-17', urg:'nao', imp:'sim', obs:''},
+  {id:74,nome:'Pedir pagamento Leocádio',                            cat:'Financeiro',prazo:'2026-04-17', urg:'sim', imp:'nao', obs:''},
+  {id:75,nome:'Comprar lampadrio',                                   cat:'Pessoal',   prazo:'2026-04-17', urg:'nao', imp:'nao', obs:''},
+  {id:76,nome:'Pensar em parcerias para Formô Clube',                cat:'Formô',     prazo:'2026-04-30', urg:'nao', imp:'sim', obs:''},
+  {id:77,nome:'Organizar pendências Gabriel',                        cat:'Herrera',   prazo:'2026-04-30', urg:'nao', imp:'sim', obs:''},
+  {id:78,nome:'Parcerias para o grupo → DELEGAR para Felipe',       cat:'Formô',     prazo:'2026-04-30', urg:'sim', imp:'nao', obs:''},
+  {id:79,nome:'Organizar para viajar — versão final',               cat:'Pessoal',   prazo:'2026-04-30', urg:'nao', imp:'nao', obs:''},
+];
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let tarefas = [];
+let viewAtiva = 'lista';   // 'lista' | 'cal'
+let groupBy   = 'data';    // 'data' | 'eis' | 'status'
+let filterBy  = 'all';     // 'all' | 'q1' | 'q2' | 'q3' | 'q4'
+let calMes    = new Date().getMonth();
+let calAno    = new Date().getFullYear();
+let conclOpen = false;
+let editandoId = null;
+let diaFiltro = null;
+
+function getQ(u,i){
+  if(u==='sim'&&i==='sim')return'q1';
+  if(u==='nao'&&i==='sim')return'q2';
+  if(u==='sim'&&i==='nao')return'q3';
+  return'q4';
+}
+
+// ═══════════════════════════════════
+// LOAD / SAVE
+// ═══════════════════════════════════
+function load(){
+  try{ const s=localStorage.getItem(KEY); tarefas=s?JSON.parse(s):null; } catch(e){tarefas=null;}
+  if(!tarefas||tarefas.length===0){ tarefas=JSON.parse(JSON.stringify(INIT)); save(false); }
+}
+function save(t=true){ localStorage.setItem(KEY,JSON.stringify(tarefas)); if(t) showToast('✓ Salvo'); }
+
+// ═══════════════════════════════════
+// RENDER
+// ═══════════════════════════════════
+function render(){
+  // Stats
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const ab = tarefas.filter(t=>!t.done);
+  const urgHoje = tarefas.filter(t=>!t.done && getQ(t.urg,t.imp)==='q1' && t.prazo && new Date(t.prazo+'T00:00:00')<=hoje);
+  const dn = tarefas.filter(t=>t.done);
+  document.getElementById('st-ab').textContent=ab.length;
+  document.getElementById('st-urg').textContent=urgHoje.length;
+  document.getElementById('st-dn').textContent=dn.length;
+  document.getElementById('hd-date').textContent=hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  renderMiniCal();
+  if(viewAtiva==='lista') renderLista();
+  else renderCalView();
+}
+
+// ── LISTA ──
+function renderLista(){
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  let lista = tarefas.filter(t=>!t.done);
+
+  // filtro Eisenhower
+  if(filterBy!=='all') lista=lista.filter(t=>getQ(t.urg,t.imp)===filterBy);
+
+  // filtro por dia selecionado no mini-cal
+  if(diaFiltro) lista=lista.filter(t=>t.prazo===diaFiltro);
+
+  const el = document.getElementById('lista-content');
+  el.innerHTML='';
+
+  if(lista.length===0){ el.innerHTML='<div class="empty">Nenhuma tarefa para mostrar 🎉</div>'; }
+  else if(groupBy==='data'){
+    // agrupar por data
+    const grp={};
+    lista.forEach(t=>{ const k=t.prazo||'s'; if(!grp[k])grp[k]=[]; grp[k].push(t); });
+    Object.keys(grp).sort().forEach(data=>{
+      const d=document.createElement('div'); d.className='dg';
+      const lbl=fmtDataLabel(data,hoje);
+      d.innerHTML=`<div class="dg-label ${lbl.cls}"><span class="dg-bar"></span>${lbl.txt}<span class="dg-bar"></span></div><div class="tlist" id="dg-${data.replace(/-/g,'')}"></div>`;
+      el.appendChild(d);
+      grp[data].forEach(t=>document.getElementById(`dg-${data.replace(/-/g,'')}`).appendChild(mkCard(t)));
+    });
+  } else if(groupBy==='eis'){
+    ['q1','q2','q3','q4'].forEach(q=>{
+      const ts=lista.filter(t=>getQ(t.urg,t.imp)===q);
+      if(!ts.length)return;
+      const qd=QD[q]; const d=document.createElement('div'); d.className='qg';
+      d.innerHTML=`<div class="qg-hd"><div class="qg-dot" style="background:${qd.dot}"></div><div class="qg-title">${qd.label}</div><span class="qg-badge ${qd.badge}" style="margin-left:6px">${qd.label.toUpperCase()}</span><span class="qg-count">${ts.length} tarefa${ts.length!==1?'s':''}</span></div><hr class="qg-div"><div class="tlist" id="qg-${q}"></div>`;
+      el.appendChild(d);
+      ts.sort((a,b)=>(a.prazo||'9999')>(b.prazo||'9999')?1:-1).forEach(t=>document.getElementById(`qg-${q}`).appendChild(mkCard(t)));
+    });
+  } else { // status
+    const grupos={'Em atraso':[],'Hoje':[],'Próximos 7 dias':[],'Futuro':[],'Sem data':[]};
+    lista.forEach(t=>{
+      if(!t.prazo){grupos['Sem data'].push(t);return;}
+      const d=new Date(t.prazo+'T00:00:00');
+      const diff=Math.round((d-hoje)/86400000);
+      if(diff<0) grupos['Em atraso'].push(t);
+      else if(diff===0) grupos['Hoje'].push(t);
+      else if(diff<=7) grupos['Próximos 7 dias'].push(t);
+      else grupos['Futuro'].push(t);
+    });
+    Object.entries(grupos).forEach(([nome,ts])=>{
+      if(!ts.length)return;
+      const d=document.createElement('div'); d.className='dg';
+      const cls=nome==='Em atraso'?'v-lbl':nome==='Hoje'?'h-lbl':'';
+      d.innerHTML=`<div class="dg-label ${cls}"><span class="dg-bar"></span>${nome} (${ts.length})<span class="dg-bar"></span></div><div class="tlist" id="st-${nome.replace(/ /g,'')}"></div>`;
+      el.appendChild(d);
+      ts.sort((a,b)=>(a.prazo||'9999')>(b.prazo||'9999')?1:-1).forEach(t=>document.getElementById(`st-${nome.replace(/ /g,'')}`).appendChild(mkCard(t)));
+    });
+  }
+
+  // Concluídos
+  const dn=tarefas.filter(t=>t.done);
+  document.getElementById('concl-label').textContent=`Ver concluídas (${dn.length})`;
+  const sec=document.getElementById('concl-section');
+  sec.innerHTML=dn.map(t=>`
+    <div class="concl-card">
+      <div class="concl-ck"></div>
+      <div class="concl-nome">${t.nome}</div>
+      <button class="tbtn" onclick="desfazer(${t.id})" title="Desfazer">↩</button>
+    </div>`).join('');
+}
+
+function mkCard(t){
+  const q=getQ(t.urg,t.imp); const qd=QD[q];
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  let prazoHtml='';
+  if(t.prazo){
+    const d=new Date(t.prazo+'T00:00:00');
+    const diff=Math.round((d-hoje)/86400000);
+    let cls='tpra',txt='';
+    if(diff<0){cls+=' venc';txt=`⚠ ${Math.abs(diff)}d atrás`;}
+    else if(diff===0){cls+=' hoje';txt='📅 Hoje';}
+    else if(diff===1){cls+=' prox';txt='Amanhã';}
+    else txt=d.toLocaleDateString('pt-BR',{day:'numeric',month:'short'});
+    prazoHtml=`<span class="${cls}">${txt}</span>`;
+  }
+  const el=document.createElement('div');
+  el.className=`tc ${q}`;
+  el.innerHTML=`
+    <button class="tck" onclick="toggleDone(${t.id})"></button>
+    <div>
+      <div class="tnome">${t.nome}</div>
+      <div class="tmeta"><span class="tcat">${t.cat}</span>${prazoHtml}${t.obs?`<span style="font-size:10px;color:var(--ink-3)" title="${t.obs}">💬</span>`:''}</div>
+    </div>
+    <span class="tbadge ${qd.badge}">${qd.label}</span>
+    <div class="tacts">
+      <button class="tbtn" onclick="abrirEditar(${t.id})">✏️</button>
+      <button class="tbtn del" onclick="deletarDireto(${t.id})">🗑</button>
+    </div>`;
+  return el;
+}
+
+function fmtDataLabel(data,hoje){
+  if(data==='s') return{txt:'Sem data',cls:''};
+  const d=new Date(data+'T00:00:00');
+  const diff=Math.round((d-hoje)/86400000);
+  if(diff<0) return{txt:`⚠ Venceu ${Math.abs(diff)} dia${Math.abs(diff)!==1?'s':''} atrás`,cls:'v-lbl'};
+  if(diff===0) return{txt:'Hoje',cls:'h-lbl'};
+  if(diff===1) return{txt:'Amanhã',cls:''};
+  return{txt:d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'}),cls:''};
+}
+
+// ── CALENDÁRIO VIEW ──
+function renderCalView(){
+  const dias=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  document.getElementById('cal-view-title').textContent=`${MESES_FULL[calMes]} ${calAno}`;
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML=dias.map(d=>`<div class="cal-grid-hd">${d}</div>`).join('');
+
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const primeiroDia=new Date(calAno,calMes,1).getDay();
+  const diasNoMes=new Date(calAno,calMes+1,0).getDate();
+
+  // Índice de tarefas por data
+  const porData={};
+  tarefas.filter(t=>!t.done&&t.prazo).forEach(t=>{
+    if(!porData[t.prazo])porData[t.prazo]=[];
+    porData[t.prazo].push(t);
+  });
+
+  // Dias do mês anterior
+  const diasMesAnt=new Date(calAno,calMes,0).getDate();
+  for(let i=primeiroDia-1;i>=0;i--){
+    const d=diasMesAnt-i;
+    grid.innerHTML+=`<div class="cal-cell other-month"><div class="cal-cell-day" style="color:var(--ink-3)">${d}</div></div>`;
+  }
+
+  for(let d=1;d<=diasNoMes;d++){
+    const dataStr=`${calAno}-${String(calMes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dt=new Date(calAno,calMes,d);
+    const isHoje=dt.getTime()===hoje.getTime();
+    const ts=porData[dataStr]||[];
+    const cell=document.createElement('div');
+    cell.className=`cal-cell ${isHoje?'is-today':''}`;
+    cell.onclick=()=>{ diaFiltro=dataStr; setView('lista',document.getElementById('vb-lista')); };
+    const pills=ts.slice(0,3).map(t=>{
+      const q=getQ(t.urg,t.imp);
+      return`<div class="cal-task-pill ctp-${q}" title="${t.nome}">${t.nome}</div>`;
+    }).join('');
+    const mais=ts.length>3?`<div class="cal-more">+${ts.length-3} mais</div>`:'';
+    cell.innerHTML=`<div class="cal-cell-day">${d}</div><div class="cal-cell-tasks">${pills}${mais}</div>`;
+    grid.appendChild(cell);
+  }
+
+  // Completar últimas semanas
+  const total=primeiroDia+diasNoMes;
+  const resto=total%7===0?0:7-(total%7);
+  for(let d=1;d<=resto;d++){
+    grid.innerHTML+=`<div class="cal-cell other-month"><div class="cal-cell-day" style="color:var(--ink-3)">${d}</div></div>`;
+  }
+}
+
+// ── MINI CALENDÁRIO SIDEBAR ──
+function renderMiniCal(){
+  const root=document.getElementById('mini-cal');
+  root.innerHTML='';
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const mesAtual=hoje.getMonth();
+
+  const porData={};
+  tarefas.filter(t=>!t.done&&t.prazo).forEach(t=>{
+    if(!porData[t.prazo])porData[t.prazo]=[];
+    porData[t.prazo].push(t);
+  });
+
+  for(let m=0;m<12;m++){
+    const div=document.createElement('div'); div.className='cal-month';
+    const pref=`2026-${String(m+1).padStart(2,'0')}`;
+    const n=Object.keys(porData).filter(d=>d.startsWith(pref)).reduce((s,d)=>s+porData[d].length,0);
+    const mn=document.createElement('div');
+    mn.className=`cal-mn ${n>0?'has-open':''}`;
+    mn.innerHTML=`${MESES_FULL[m]}<span class="m-badge ${n>0&&m<=mesAtual?'hot':''}">${n}</span>`;
+    mn.onclick=()=>{ const days=div.querySelector('.cal-days'); days.classList.toggle('open'); };
+    div.appendChild(mn);
+
+    const days=document.createElement('div');
+    days.className=`cal-days ${m===mesAtual?'open':''}`;
+    const diasNoMes=new Date(2026,m+1,0).getDate();
+    for(let d=1;d<=diasNoMes;d++){
+      const ds=`2026-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dt=new Date(2026,m,d);
+      const nT=(porData[ds]||[]).length;
+      const isHoje=dt.getTime()===hoje.getTime();
+      const isSel=diaFiltro===ds;
+      const diff=Math.round((dt-hoje)/86400000);
+      const el=document.createElement('div');
+      el.className=`cal-day ${isHoje?'tod':''} ${isSel?'sel':''}`;
+      el.innerHTML=`<span class="cdn">${d}</span><span class="cwd">${DIAS_SEMANA[dt.getDay()]}</span>${nT>0?`<span class="dc ${diff<0?'venc':'q1c'}">${nT}</span>`:''}`;
+      if(nT>0||isHoje){
+        el.onclick=()=>{
+          diaFiltro=isSel?null:ds;
+          if(!isSel){ setView('lista',document.getElementById('vb-lista')); }
+          else render();
+        };
+      }
+      days.appendChild(el);
+    }
+    div.appendChild(days);
+    root.appendChild(div);
+  }
+}
+
+// ═══════════════════════════════════
+// CONTROLES
+// ═══════════════════════════════════
+function setView(v,btn){
+  viewAtiva=v;
+  document.querySelectorAll('#vb-lista,#vb-cal').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('view-lista').classList.toggle('active',v==='lista');
+  document.getElementById('view-cal').classList.toggle('active',v==='cal');
+  document.getElementById('group-btns').style.display=v==='lista'?'flex':'none';
+  document.getElementById('group-label').style.display=v==='lista'?'inline':'none';
+  render();
+}
+
+function setGroup(g,btn){
+  groupBy=g; diaFiltro=null;
+  document.querySelectorAll('#gb-data,#gb-eis,#gb-status').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function setFilter(f,btn){
+  filterBy=f;
+  document.querySelectorAll('#fb-all,#fb-q1,#fb-q2,#fb-q3,#fb-q4').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function navCal(dir){ calMes+=dir; if(calMes>11){calMes=0;calAno++;} if(calMes<0){calMes=11;calAno--;} renderCalView(); }
+function irHoje(){ calMes=new Date().getMonth(); calAno=new Date().getFullYear(); renderCalView(); }
+
+function toggleConcluidos(){
+  conclOpen=!conclOpen;
+  document.getElementById('concl-section').classList.toggle('open',conclOpen);
+  document.getElementById('concl-icon').textContent=conclOpen?'▼':'▶';
+}
+
+function toggleDone(id){
+  const t=tarefas.find(x=>x.id===id); if(!t)return;
+  t.done=true; save(); render();
+}
+function desfazer(id){
+  const t=tarefas.find(x=>x.id===id); if(!t)return;
+  t.done=false; save(); render();
+}
+
+// ═══════════════════════════════════
+// MODAL
+// ═══════════════════════════════════
+function calcQ(){
+  const u=document.getElementById('f-urg').value;
+  const i=document.getElementById('f-imp').value;
+  const g=document.getElementById('qguide');
+  const q=getQ(u,i);
+  if(u&&i){ g.innerHTML=QD[q].guide; g.className=`qguide show ${q}`; }
+  else g.className='qguide';
+}
+
+function abrirModal(){
+  editandoId=null;
+  document.getElementById('modal-t').textContent='Nova tarefa';
+  document.getElementById('f-nome').value='';
+  document.getElementById('f-cat').value='Formô';
+  document.getElementById('f-prazo').value=diaFiltro||new Date().toISOString().split('T')[0];
+  document.getElementById('f-urg').value='';
+  document.getElementById('f-imp').value='';
+  document.getElementById('f-obs').value='';
+  document.getElementById('qguide').className='qguide';
+  document.getElementById('btn-del').style.display='none';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('f-nome').focus(),80);
+}
+
+function abrirEditar(id){
+  const t=tarefas.find(x=>x.id===id); if(!t)return;
+  editandoId=id;
+  document.getElementById('modal-t').textContent='Editar tarefa';
+  document.getElementById('f-nome').value=t.nome;
+  document.getElementById('f-cat').value=t.cat;
+  document.getElementById('f-prazo').value=t.prazo||'';
+  document.getElementById('f-urg').value=t.urg||'';
+  document.getElementById('f-imp').value=t.imp||'';
+  document.getElementById('f-obs').value=t.obs||'';
+  document.getElementById('btn-del').style.display='inline-block';
+  calcQ();
+  document.getElementById('modal').classList.add('open');
+}
+
+function salvar(){
+  const nome=document.getElementById('f-nome').value.trim();
+  if(!nome){alert('Digite o nome da tarefa');return;}
+  const d={nome,cat:document.getElementById('f-cat').value,prazo:document.getElementById('f-prazo').value,urg:document.getElementById('f-urg').value,imp:document.getElementById('f-imp').value,obs:document.getElementById('f-obs').value.trim()};
+  if(editandoId){ const i=tarefas.findIndex(x=>x.id===editandoId); if(i>-1) tarefas[i]={...tarefas[i],...d}; }
+  else tarefas.push({id:Date.now(),done:false,...d});
+  fecharModal(); save(); render();
+}
+
+function deletar(){
+  if(!editandoId||!confirm('Excluir esta tarefa?'))return;
+  tarefas=tarefas.filter(x=>x.id!==editandoId);
+  fecharModal(); save(); render();
+}
+function deletarDireto(id){
+  if(!confirm('Excluir esta tarefa?'))return;
+  tarefas=tarefas.filter(x=>x.id!==id); save(); render();
+}
+function fecharModal(){ document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click',e=>{ if(e.target.id==='modal') fecharModal(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') fecharModal(); });
+
+function showToast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; clearTimeout(window._tt); window._tt=setTimeout(()=>t.style.display='none',2000); }
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+load();
+render();
+</script>
+</body>
+</html>

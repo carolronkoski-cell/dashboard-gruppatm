@@ -184,6 +184,12 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 /* RESPONSIVE */
 @media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(2,1fr)}.main{padding:16px}}
 @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}.header{padding:12px 16px}.nav{padding:0 12px}}
+/* GANTT */
+.gantt-bar{height:10px;border-radius:3px}
+.gantt-wrap{overflow-x:auto;background:#fff;border-radius:0 0 8px 8px;border:1px solid #EBEBEB;border-top:none}
+.gantt-group-hd{padding:10px 16px;font-size:13px;font-weight:700;color:#fff;display:flex;justify-content:space-between;align-items:center;border-radius:8px 8px 0 0}
+.gantt-week-col{background:#F8F8F8;border:1px solid #E8E8E8;border-radius:10px;padding:12px;min-height:200px}
+.gantt-card{background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
 </style>
 </head>
 <body>
@@ -208,6 +214,8 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   <button onclick="showTab('comunicacao',this)">Comunicação</button>
   <button onclick="showTab('blend',this)">Blend</button>
   <button onclick="showTab('herrera',this)">Herrera Gastronomia</button>
+  <button onclick="showTab('formoday',this)">Formô Day</button>
+  <button onclick="showTab('corrida',this)">Corrida Bar em Bar</button>
 </nav>
 
 <div class="main">
@@ -357,6 +365,7 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
         <button id="vtog-proj" class="active" onclick="setView('projeto',this)">Por Projeto</button>
         <button id="vtog-lista" onclick="setView('lista',this)">Lista Geral</button>
         <button id="vtog-cal" onclick="setView('calendario',this)">Calendário</button>
+        <button id="vtog-gantt" onclick="setView('gantt',this)">Gantt</button>
       </div>
       <button class="btn btno btns" onclick="expandAll()" id="btn-expand-all">Expandir todos</button>
       <button class="btn btnp btns" onclick="openNovoProjModal()">+ Novo Projeto</button>
@@ -421,7 +430,8 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
       <select id="posts-f-marca" onchange="renderPosts()" style="padding:6px 10px;border:1px solid #DDD;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px">
         <option value="">Todas as marcas</option>
         <option>Formô Brasil PR</option><option>Revelô</option><option>Atmosfera</option>
-        <option>Blend</option><option>Herrera Gastronomia</option>
+        <option>Blend</option><option>Herrera Gastronomia</option><option>Formô Day</option>
+        <option>Corrida Bar em Bar</option>
       </select>
       <select id="posts-f-plat" onchange="renderPosts()" style="padding:6px 10px;border:1px solid #DDD;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px">
         <option value="">Todas as plataformas</option>
@@ -673,6 +683,83 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
   </div>
 </div>
 
+<div id="tab-formoday" class="tab-content">
+  <div class="ext-header">
+    <div class="ext-title">Formô Day</div>
+    <div class="ext-sub">Evento · Projeto do Grupo ATM · Responsável: Carol</div>
+  </div>
+  <div class="grid g3" style="margin-bottom:18px">
+    <div class="card kpib" id="ext-kpi-10"></div>
+    <div class="card kpib"><div class="kpinum">Carol</div><div class="kpilbl">Responsável</div><div class="kpisub">Gestão do Evento</div></div>
+    <div class="card kpib"><div class="kpinum">A definir</div><div class="kpilbl">Data do Evento</div><div class="kpisub">Planejamento em andamento</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="lbl" style="margin-bottom:10px">KPIs</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <span class="badge bg">Evento realizado</span>
+      <span class="badge bb">NPS ≥ 4,5</span>
+      <span class="badge bb">Cobertura completa</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl" style="margin-bottom:12px">Tarefas</div>
+    <div id="ext-proj-10"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="lbl">Posts Formô Day</div>
+      <button class="btn btno btns" onclick="openPostModal('','Formô Day')">+ Novo Post</button>
+    </div>
+    <div id="ext-posts-10"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="lbl">Anotações</div>
+      <button class="btn btno btns" onclick="saveNote(10)">Salvar</button>
+    </div>
+    <textarea class="notes-area" id="note-10" placeholder="Anotações do projeto Formô Day..."></textarea>
+  </div>
+</div>
+
+<!-- CORRIDA BAR EM BAR -->
+<div id="tab-corrida" class="tab-content">
+  <div class="ext-header">
+    <div class="ext-title">Corrida Bar em Bar</div>
+    <div class="ext-sub">Projeto de ativação e evento · Responsável: Carol</div>
+  </div>
+  <div class="grid g3" style="margin-bottom:18px">
+    <div class="card kpib" id="ext-kpi-11"></div>
+    <div class="card kpib"><div class="kpinum">Carol</div><div class="kpilbl">Responsável</div><div class="kpisub">Gestão do projeto</div></div>
+    <div class="card kpib"><div class="kpinum">A definir</div><div class="kpilbl">Data do Evento</div><div class="kpisub">Planejamento em andamento</div></div>
+  </div>
+  <div class="card" style="margin-bottom:18px">
+    <div class="lbl" style="margin-bottom:10px">KPIs</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      <span class="badge bg">Evento realizado</span>
+      <span class="badge bb">Participação alcançada</span>
+      <span class="badge bgr">Engajamento registrado</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="lbl" style="margin-bottom:12px">Tarefas</div>
+    <div id="ext-proj-11"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="lbl">Posts Corrida Bar em Bar</div>
+      <button class="btn btno btns" onclick="openPostModal('','Corrida Bar em Bar')">+ Novo Post</button>
+    </div>
+    <div id="ext-posts-11"></div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="lbl">Anotações</div>
+      <button class="btn btno btns" onclick="saveNote(11)">Salvar</button>
+    </div>
+    <textarea class="notes-area" id="note-11" placeholder="Anotações do projeto Corrida Bar em Bar..."></textarea>
+  </div>
+</div>
+
 </div><!-- end .main -->
 
 <!-- NOVO PROJETO MODAL -->
@@ -717,7 +804,8 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
         <div class="fg"><label>Marca</label>
           <select id="pm-marca"><option value="">Selecione...</option>
             <option>Formô Brasil PR</option><option>Revelô</option><option>Atmosfera</option>
-            <option>Blend</option><option>Herrera Gastronomia</option>
+            <option>Blend</option><option>Herrera Gastronomia</option><option>Formô Day</option>
+            <option>Corrida Bar em Bar</option>
           </select></div>
         <div class="fg"><label>Formato / Canal</label>
           <select id="pm-formato"><option value="">Selecione...</option>
@@ -770,6 +858,91 @@ input[type="date"]{padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== DB STORE (SQLite via Express, fallback a localStorage) =====
+const _DB_BASE = 'http://localhost:3333/api';
+const dbStore = {
+  _cache: null,   // null = não inicializado; {} = carregado do servidor
+  _online: false,
+
+  async init() {
+    try {
+      const res = await fetch(`${_DB_BASE}/storage`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) {
+        this._cache = await res.json();
+        this._online = true;
+        console.log('[dbStore] Conectado ao servidor SQLite ✓');
+        // Auto-migração: se DB vazio e localStorage tem dados, migra
+        if (Object.keys(this._cache).length === 0) {
+          await this._migrate();
+          const res2 = await fetch(`${_DB_BASE}/storage`);
+          if (res2.ok) this._cache = await res2.json();
+        }
+      }
+    } catch(e) {
+      console.warn('[dbStore] Servidor não disponível, usando localStorage:', e.message);
+      this._online = false;
+    }
+  },
+
+  async _migrate() {
+    const LS_KEYS = [
+      'atm_all_tasks','atm_editable','atm_posts','atm_proj_fases',
+      'atm_proj_pct','atm_custom_projs','atm_proj_meta',
+      'atm_hist','atm_camp','atm_corr',
+      'note_4','note_6','note_10','note_11'
+    ];
+    const data = {};
+    for (const k of LS_KEYS) {
+      const v = window.localStorage.getItem(k);
+      if (v !== null) data[k] = v;
+    }
+    if (Object.keys(data).length === 0) return;
+    try {
+      const r = await fetch(`${_DB_BASE}/migrate`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ data })
+      });
+      const json = await r.json();
+      console.log(`[dbStore] Migração: ${json.migrated} chaves importadas`, json.skipped ? '(pulado: já havia dados)' : '');
+    } catch(e) {
+      console.warn('[dbStore] Migração falhou:', e.message);
+    }
+  },
+
+  getItem(key) {
+    if (this._online && this._cache !== null) {
+      const val = this._cache[key];
+      return val !== undefined ? JSON.stringify(val) : null;
+    }
+    return window.localStorage.getItem(key);
+  },
+
+  setItem(key, value) {
+    // Sempre salva no localStorage como backup local
+    window.localStorage.setItem(key, value);
+    if (this._online && this._cache !== null) {
+      let parsed;
+      try { parsed = JSON.parse(value); } catch { parsed = value; }
+      this._cache[key] = parsed;
+      fetch(`${_DB_BASE}/storage/${encodeURIComponent(key)}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ value: parsed })
+      }).catch(e => console.warn('[dbStore] setItem falhou:', e.message));
+    }
+  },
+
+  removeItem(key) {
+    window.localStorage.removeItem(key);
+    if (this._online && this._cache !== null) {
+      delete this._cache[key];
+      fetch(`${_DB_BASE}/storage/${encodeURIComponent(key)}`, { method: 'DELETE' })
+        .catch(e => console.warn('[dbStore] removeItem falhou:', e.message));
+    }
+  }
+};
+
 // ===== DATA =====
 const PROJECTS = [
   {id:1,nome:"Formô Brasil PR",resp:"Felipe, Abner, Carol",
@@ -906,15 +1079,67 @@ const PROJECTS = [
     {nome:"Odonto Unibrasil 146 06.03",resp:"Nana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hkggn8"},
     {nome:"Psico PUCPR 07.03",resp:"Nana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hm12vy"}
   ]},
+  {id:10,nome:"Formô Day",resp:"Carol",
+   kpis:"Evento realizado · NPS ≥ 4,5 · Cobertura completa",
+   metaTag:"Evento",linkedMeta:"",
+   fases:[],
+   tarefas:[]},
+  {id:11,nome:"Corrida Bar em Bar",resp:"Carol",
+   kpis:"Evento realizado · Participação alcançada · Engajamento registrado",
+   metaTag:"Novo projeto",linkedMeta:"",
+   fases:[],
+   tarefas:[
+    {nome:"Finalizar Planilha de Custos",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Comprar Frutas",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Fechar Parceria Nutrilatina",resp:"Carol",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Fechar Parceria Tops",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Enviar Tops para Silk",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Produzir Bandeira",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Produzir Garrafinhas",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Produzir QRCODES",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Alinhar Foto e Vídeo (Horários)",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Briefing de Captação",resp:"Paloma",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Separação de Águas + Cooler",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""},
+    {nome:"Mesa para frutas",resp:"Nana",status:"NÃO INICIADO",prazo:"—",link:""}
+  ]},
   {id:6,nome:"Herrera Gastronomia",resp:"Ana",
    kpis:"4 vídeos série entregues · Marca lançada · Canal Instagram ativo",
    metaTag:"Projeto Externo",linkedMeta:"",
+   fases:["Preparação do Perfil","Semana 01","Semana 02","Semana 03+ · Eventos","Semana 03+ · Espaço"],
    tarefas:[
-    {nome:"Edição vídeo 1 Gabriel",resp:"Ana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hxamfz"},
-    {nome:"Edição vídeo 2 Arquiteta",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868j2xmx2"},
-    {nome:"Edição vídeo 3 Mãos à obra",resp:"Ana",status:"NÃO INICIADO",prazo:"Abr",link:"https://app.clickup.com/t/868j2xnp2"},
-    {nome:"Edição vídeo 4 Marca",resp:"Ana",status:"NÃO INICIADO",prazo:"Abr",link:""},
-    {nome:"Plano de mídia Gabriel Herrera",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hxju57"}
+    {nome:"Edição vídeo 1 Gabriel",resp:"Ana",status:"CONCLUÍDO",prazo:"Mar",link:"https://app.clickup.com/t/868hxamfz",fase:"Semana 01"},
+    {nome:"Edição vídeo 2 Arquiteta",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868j2xmx2",fase:"Semana 01"},
+    {nome:"Edição vídeo 3 Mãos à obra",resp:"Ana",status:"NÃO INICIADO",prazo:"Abr",link:"https://app.clickup.com/t/868j2xnp2",fase:"Semana 01"},
+    {nome:"Edição vídeo 4 Marca",resp:"Ana",status:"NÃO INICIADO",prazo:"Abr",link:"",fase:"Semana 01"},
+    {nome:"Plano de mídia Gabriel Herrera",resp:"Ana",status:"CONCLUÍDO",prazo:"Abr",link:"https://app.clickup.com/t/868hxju57",fase:"Semana 01"},
+    {nome:"Edição vídeo 5 – O Novo Espaço (tour + moodboard)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 01"},
+    {nome:"Trocar foto de perfil com identidade visual oficial",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Preparação do Perfil"},
+    {nome:"Reescrever a bio do Instagram (@herreragastronomia)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Preparação do Perfil"},
+    {nome:"Avaliar mudança de @ para @herreragastronomia",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Preparação do Perfil"},
+    {nome:"Criar capas dos destaques (Night Bordeaux + Golden Chamomile)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Preparação do Perfil"},
+    {nome:"Arquivar posts antigos fora do novo posicionamento",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Preparação do Perfil"},
+    {nome:"Configurar link na bio (WhatsApp + portfólio + contato)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Preparação do Perfil"},
+    {nome:"Carrossel Sem.02 – O evento que mudou tudo",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 02"},
+    {nome:"Reels Sem.02 – A Identidade (Gabriel explica nova fase)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 02"},
+    {nome:"Carrossel Sem.02 – Nova marca com explicação de conceito",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 02"},
+    {nome:"Stories Sem.02 – Anúncio da mudança de @",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 02"},
+    {nome:"Reels Sem.02 – O Resultado Final (revelação do espaço)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 02"},
+    {nome:"Reels – Cenas da gastronomia ao vivo (evento)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 03+ · Eventos"},
+    {nome:"Reels – Bastidores antes do evento",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 03+ · Eventos"},
+    {nome:"Carrossel – A logística Herrera (do escritório ao evento)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 03+ · Eventos"},
+    {nome:"Reels – A diferença na montagem da mesa",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 03+ · Eventos"},
+    {nome:"Reels – O momento do convidado (reações reais)",resp:"Ana",status:"NÃO INICIADO",prazo:"Mai",link:"",fase:"Semana 03+ · Eventos"},
+    {nome:"Reels – Como se cria um menu para um evento",resp:"Ana",status:"NÃO INICIADO",prazo:"Jun",link:"",fase:"Semana 03+ · Espaço"},
+    {nome:"Reels – Preparação de um prato específico",resp:"Ana",status:"NÃO INICIADO",prazo:"Jun",link:"",fase:"Semana 03+ · Espaço"},
+    {nome:"Reels – Ingrediente em foco",resp:"Ana",status:"NÃO INICIADO",prazo:"Jun",link:"",fase:"Semana 03+ · Espaço"},
+    {nome:"Reels – O espaço Herrera: apresentação do conceito",resp:"Ana",status:"NÃO INICIADO",prazo:"Jun",link:"",fase:"Semana 03+ · Espaço"},
+    {nome:"Carrossel – Autoridade: Um evento em números",resp:"Ana",status:"NÃO INICIADO",prazo:"Jun",link:"",fase:"Semana 03+ · Espaço"},
+    {nome:"Criar Timbrado",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Criar vídeo de Apresentação",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Plotar divisórias",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Criar Caixa convite Gabriel",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Criar Legendas Posts",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""},
+    {nome:"Criar destaques Gabriele",resp:"Carol",status:"NÃO INICIADO",prazo:"Abr",link:""}
   ]},
   {id:7,nome:"Eventos Institucionais",resp:"Carol",
    kpis:"NPS interno ≥ 8 · 100% kits entregues · Registro de todos os eventos",
@@ -965,7 +1190,9 @@ const PROJECTS = [
     {nome:"Quem libera ingressos na entrada",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
     {nome:"Subir necessidade de motions",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
     {nome:"Ver músicas DJ Torriton",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
-    {nome:"Pensar brincadeira fim de ano",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""}
+    {nome:"Pensar brincadeira fim de ano",resp:"Carol",status:"CONCLUÍDO",prazo:"—",link:""},
+    {nome:"Assinaturas de email",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hvz169"},
+    {nome:"Uniforme Marines",resp:"Nana",status:"EM ANDAMENTO",prazo:"Abr",link:"https://app.clickup.com/t/868hyab7y"}
   ]}
 ];
 
@@ -1078,8 +1305,8 @@ const METAS_MKT=[
 
 // ===== EDITABLE SYSTEM =====
 const ED_KEY='atm_editable';
-function loadED(){return JSON.parse(localStorage.getItem(ED_KEY)||'{}')}
-function saveED(k,v){const d=loadED();d[k]=v;localStorage.setItem(ED_KEY,JSON.stringify(d))}
+function loadED(){return JSON.parse(dbStore.getItem(ED_KEY)||'{}')}
+function saveED(k,v){const d=loadED();d[k]=v;dbStore.setItem(ED_KEY,JSON.stringify(d))}
 function restoreED(){
   const d=loadED();
   document.querySelectorAll('[data-key]').forEach(el=>{
@@ -1090,12 +1317,12 @@ function restoreED(){
 
 // ===== PROJ META PERSISTENCE =====
 function loadProjMetas(){
-  const d=JSON.parse(localStorage.getItem('atm_proj_meta')||'{}');
+  const d=JSON.parse(dbStore.getItem('atm_proj_meta')||'{}');
   PROJECTS.forEach(p=>{if(d[p.id]!==undefined)p.metaTag=d[p.id];});
 }
 function saveProjMetaStore(pid,tag){
-  const d=JSON.parse(localStorage.getItem('atm_proj_meta')||'{}');
-  d[pid]=tag;localStorage.setItem('atm_proj_meta',JSON.stringify(d));
+  const d=JSON.parse(dbStore.getItem('atm_proj_meta')||'{}');
+  d[pid]=tag;dbStore.setItem('atm_proj_meta',JSON.stringify(d));
 }
 function editProjMeta(pid){
   const p=PROJECTS.find(x=>x.id===pid);
@@ -1120,19 +1347,19 @@ function saveProjMetaInline(pid){
 // ===== TASKS PERSISTENCE =====
 function loadExtraTasks(){
   // Novo sistema: array completo por projeto
-  const all=JSON.parse(localStorage.getItem('atm_all_tasks')||'{}');
+  const all=JSON.parse(dbStore.getItem('atm_all_tasks')||'{}');
   PROJECTS.forEach(p=>{
     if(all[p.id]){p.tarefas=all[p.id];p.tarefas.forEach(t=>{if(t.status==="FINALIZADO")t.status="CONCLUÍDO";});return;}
     // Legado: só extras
-    const old=JSON.parse(localStorage.getItem('atm_tasks')||'{}');
+    const old=JSON.parse(dbStore.getItem('atm_tasks')||'{}');
     if(old[p.id])p.tarefas=[...p.tarefas,...old[p.id]];
   });
 }
 function saveProjectTasks(pid){
   const proj=PROJECTS.find(p=>p.id===pid);
-  const d=JSON.parse(localStorage.getItem('atm_all_tasks')||'{}');
+  const d=JSON.parse(dbStore.getItem('atm_all_tasks')||'{}');
   d[pid]=proj.tarefas;
-  localStorage.setItem('atm_all_tasks',JSON.stringify(d));
+  dbStore.setItem('atm_all_tasks',JSON.stringify(d));
 }
 function deleteTask(pid,tIdx){
   if(!confirm('Excluir esta tarefa?'))return;
@@ -1250,6 +1477,7 @@ function setView(mode,btn){
   const expBtn=document.getElementById('btn-expand-all');
   if(expBtn)expBtn.style.display=mode==='projeto'?'':'none';
   if(mode==='calendario'){renderCalView();return;}
+  if(mode==='gantt'){renderGantt();return;}
   renderProjects();
 }
 
@@ -1365,25 +1593,25 @@ function checkTask(pid,tIdx,checked){
 
 // ===== PCT MANUAL =====
 function loadProjPct(){
-  const d=JSON.parse(localStorage.getItem('atm_proj_pct')||'{}');
+  const d=JSON.parse(dbStore.getItem('atm_proj_pct')||'{}');
   PROJECTS.forEach(p=>{if(d[p.id]!==undefined)p.manualPct=parseInt(d[p.id]);});
 }
 function saveProjPct(pid,val){
-  const d=JSON.parse(localStorage.getItem('atm_proj_pct')||'{}');
-  d[pid]=val;localStorage.setItem('atm_proj_pct',JSON.stringify(d));
+  const d=JSON.parse(dbStore.getItem('atm_proj_pct')||'{}');
+  d[pid]=val;dbStore.setItem('atm_proj_pct',JSON.stringify(d));
   const bar=document.getElementById(`mpb-proj-${pid}`);
   if(bar){bar.style.width=val+'%';bar.className='pb '+(val>=70?'g':val>=40?'y':'r');}
 }
 
 // ===== FASES =====
 function loadProjFases(){
-  const d=JSON.parse(localStorage.getItem('atm_proj_fases')||'{}');
+  const d=JSON.parse(dbStore.getItem('atm_proj_fases')||'{}');
   PROJECTS.forEach(p=>{if(d[p.id])p.fases=d[p.id];else if(!p.fases)p.fases=[];});
 }
 function saveProjFases(pid){
-  const d=JSON.parse(localStorage.getItem('atm_proj_fases')||'{}');
+  const d=JSON.parse(dbStore.getItem('atm_proj_fases')||'{}');
   d[pid]=(PROJECTS.find(p=>p.id===pid)||{}).fases||[];
-  localStorage.setItem('atm_proj_fases',JSON.stringify(d));
+  dbStore.setItem('atm_proj_fases',JSON.stringify(d));
 }
 function addFase(pid){
   const inp=document.getElementById(`fase-new-inp-${pid}`);
@@ -1432,7 +1660,7 @@ function startRenameFase(pid,nome){
 
 // ===== RENDER PROJECTS =====
 function renderProjects(){
-  if(viewMode==='lista'){renderProjectsFlat();renderExtProj(4);renderExtProj(6);return;}
+  if(viewMode==='lista'){renderProjectsFlat();renderExtProj(4);renderExtProj(6);renderExtProj(10);renderExtProj(11);return;}
   const container=document.getElementById('projetos-list');
   container.innerHTML='';
   PROJECTS.forEach(p=>{
@@ -1556,9 +1784,11 @@ function renderProjects(){
         </div>
       </div>`);
   });
-  // Sincroniza abas externas Blend e Herrera
+  // Sincroniza abas externas Blend, Herrera, Formô Day e Corrida Bar em Bar
   renderExtProj(4);
   renderExtProj(6);
+  renderExtProj(10);
+  renderExtProj(11);
 }
 function renderProjectsFlat(){
   const container=document.getElementById('projetos-list');
@@ -2045,8 +2275,8 @@ function previewImg(input){
   };
   reader.readAsDataURL(file);
 }
-let historico=JSON.parse(localStorage.getItem('atm_hist')||'[]');
-let campanhas=JSON.parse(localStorage.getItem('atm_camp')||'[]');
+let historico=[];  // carregado em initApp() após dbStore.init()
+let campanhas=[];  // carregado em initApp() após dbStore.init()
 function renderHistorico(){
   const el=document.getElementById('historico-list');
   if(!historico.length){el.innerHTML='<div style="text-align:center;padding:32px 0;color:#999;font-size:13px">Nenhum disparo ainda</div>';return;}
@@ -2102,7 +2332,7 @@ function verDisparo(i){
 function updateStats(i){
   historico[i].enviados=parseInt(document.getElementById('upd-env').value)||0;
   historico[i].abertos=parseInt(document.getElementById('upd-ab').value)||0;
-  localStorage.setItem('atm_hist',JSON.stringify(historico));
+  dbStore.setItem('atm_hist',JSON.stringify(historico));
   document.getElementById('camp-modal').style.display='none';
   renderHistorico();renderCampanhas();
   toast('Estatísticas atualizadas!');
@@ -2115,7 +2345,7 @@ function enviarAgora(){
   const img=document.getElementById('img-thumb').src;
   const imgData=img&&img.startsWith('data:')?img:null;
   historico.push({canal,nome,msg,img:imgData,data:new Date().toLocaleString('pt-BR'),ag:null,enviados:0,abertos:0});
-  localStorage.setItem('atm_hist',JSON.stringify(historico));
+  dbStore.setItem('atm_hist',JSON.stringify(historico));
   renderHistorico();renderCampanhas();
   toast('Registrado! Integre com Evolution API / Resend / FCM.');
   document.getElementById('mensagem').value='';
@@ -2132,7 +2362,7 @@ function agendar(){
   const img=document.getElementById('img-thumb').src;
   const imgData=img&&img.startsWith('data:')?img:null;
   historico.push({canal,nome,msg,img:imgData,data:new Date().toLocaleString('pt-BR'),ag:dt,enviados:0,abertos:0});
-  localStorage.setItem('atm_hist',JSON.stringify(historico));
+  dbStore.setItem('atm_hist',JSON.stringify(historico));
   renderHistorico();renderCampanhas();
   toast(`Agendado para ${dt}`);
 }
@@ -2173,7 +2403,7 @@ function renderCampanhas(){
 }
 
 // ===== CORRELAÇÃO WhatsApp x Posts =====
-let corrData=JSON.parse(localStorage.getItem('atm_corr')||'[]');
+let corrData=[];  // carregado em initApp() após dbStore.init()
 function renderCorrTable(){
   const tb=document.getElementById('corr-tbody');if(!tb)return;
   tb.innerHTML=corrData.map((r,i)=>`
@@ -2191,7 +2421,7 @@ function addCorrRow(){
   if(!d){toast('Informe a data');return;}
   corrData.push({data:d,posts:p,wa:w});
   corrData.sort((a,b)=>a.data.localeCompare(b.data));
-  localStorage.setItem('atm_corr',JSON.stringify(corrData));
+  dbStore.setItem('atm_corr',JSON.stringify(corrData));
   renderCorrTable();renderCorrChart();renderCorrStats();
   document.getElementById('corr-data').value='';
   document.getElementById('corr-posts').value='';
@@ -2199,7 +2429,7 @@ function addCorrRow(){
 }
 function deleteCorrRow(i){
   corrData.splice(i,1);
-  localStorage.setItem('atm_corr',JSON.stringify(corrData));
+  dbStore.setItem('atm_corr',JSON.stringify(corrData));
   renderCorrTable();renderCorrChart();renderCorrStats();
 }
 function renderCorrChart(){
@@ -2297,7 +2527,7 @@ function toast(msg){
 }
 
 // ===== POSTS =====
-let POSTS=JSON.parse(localStorage.getItem('atm_posts')||'[]');
+let POSTS=[];  // carregado em initApp() após dbStore.init()
 const PLAT_ICONS={
   Instagram:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>`,
   TikTok:`<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:3px"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.17 8.17 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>`,
@@ -2337,7 +2567,7 @@ let postMonth=new Date().getMonth();
 let postYear=new Date().getFullYear();
 let editingPostId=null;
 const PLAT_COLORS={Instagram:{bg:'#FCEAEA',c:'#C0392B'},TikTok:{bg:'#F0F0F0',c:'#0A0A0A'},YouTube:{bg:'#FDEAEA',c:'#C0392B'},WhatsApp:{bg:'#E6F4EC',c:'#1A7A3F'},LinkedIn:{bg:'#E6F1FB',c:'#185FA5'},Google:{bg:'#FAEEDA',c:'#854F0B'}};
-function savePosts(){localStorage.setItem('atm_posts',JSON.stringify(POSTS));}
+function savePosts(){dbStore.setItem('atm_posts',JSON.stringify(POSTS));}
 function setPostsView(v,btn){
   postsView=v;
   document.querySelectorAll('#posts-vtog button').forEach(b=>b.classList.remove('active'));
@@ -2482,12 +2712,12 @@ function savePost(){
   };
   if(editingPostId){const idx=POSTS.findIndex(p=>p.id===editingPostId);if(idx>-1)POSTS[idx]=data;}
   else{POSTS.push(data);}
-  savePosts();closePostModal();renderPosts();renderExtPosts(4);renderExtPosts(6);
+  savePosts();closePostModal();renderPosts();renderExtPosts(4);renderExtPosts(6);renderExtPosts(10);renderExtPosts(11);
   toast(editingPostId?'Post atualizado!':'Post adicionado!');
 }
 function deletePost(id){
   if(!confirm('Excluir este post?'))return;
-  POSTS=POSTS.filter(p=>p.id!==id);savePosts();renderPosts();renderExtPosts(4);renderExtPosts(6);
+  POSTS=POSTS.filter(p=>p.id!==id);savePosts();renderPosts();renderExtPosts(4);renderExtPosts(6);renderExtPosts(10);renderExtPosts(11);
   toast('Post excluído!');
 }
 function closePostModal(e){
@@ -2495,7 +2725,7 @@ function closePostModal(e){
   document.getElementById('post-modal').classList.remove('open');
 }
 function renderExtPosts(pid){
-  const marcaMap={4:'Blend',6:'Herrera Gastronomia'};
+  const marcaMap={4:'Blend',6:'Herrera Gastronomia',10:'Formô Day',11:'Corrida Bar em Bar'};
   const marca=marcaMap[pid];
   const container=document.getElementById(`ext-posts-${pid}`);
   if(!container)return;
@@ -2525,12 +2755,195 @@ function saveNote(pid){
 }
 function loadNotes(){
   const d=loadED();
-  [4,6].forEach(pid=>{const el=document.getElementById(`note-${pid}`);if(el&&d[`note_${pid}`])el.value=d[`note_${pid}`];});
+  [4,6,10,11].forEach(pid=>{const el=document.getElementById(`note-${pid}`);if(el&&d[`note_${pid}`])el.value=d[`note_${pid}`];});
+}
+
+// ===== GANTT =====
+window.ganttView='projeto';
+window.ganttShowDone=false;
+const MONTH_IDX_MAP={Jan:0,Fev:1,Mar:2,Abr:3,Mai:4,Jun:5,Jul:6,Ago:7,Set:8,Out:9,Nov:10,Dez:11};
+function prazoToMonthIdx(prazo){
+  if(!prazo||prazo==='—')return -1;
+  if(/^\d{4}-\d{2}-\d{2}$/.test(prazo))return parseInt(prazo.split('-')[1])-1;
+  return MONTH_IDX_MAP[prazo]!==undefined?MONTH_IDX_MAP[prazo]:-1;
+}
+function prazoToDays(prazo){
+  if(!prazo||prazo==='—')return null;
+  const today=new Date();today.setHours(0,0,0,0);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(prazo)){const d=new Date(prazo+'T00:00:00');return Math.round((d-today)/(1000*60*60*24));}
+  const mi=MONTH_IDX_MAP[prazo];
+  if(mi===undefined)return null;
+  const mDate=new Date(new Date().getFullYear(),mi+1,0);
+  return Math.round((mDate-today)/(1000*60*60*24));
+}
+function setGanttView(v){
+  window.ganttView=v;
+  renderGantt();
+}
+function renderGantt(){
+  const container=document.getElementById('projetos-list');
+  container.innerHTML='';
+  const curM=new Date().getMonth();
+  const showDone=window.ganttShowDone;
+  const mths=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const statC={'EM ANDAMENTO':'#185FA5','EM ATRASO':'#C0392B','NÃO INICIADO':'#CCC','STAND BY':'#E6A817','CONCLUÍDO':'#1A7A3F','FINALIZADO':'#1A7A3F'};
+
+  const controls=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;padding:12px 16px;background:#fff;border-radius:10px;border:1px solid #EBEBEB">
+    <span style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.05em">Agrupar por:</span>
+    <div class="vtog">
+      <button onclick="setGanttView('projeto')" style="${window.ganttView==='projeto'?'background:#0A0A0A;color:#fff':''}">Por Projeto</button>
+      <button onclick="setGanttView('pessoa')" style="${window.ganttView==='pessoa'?'background:#0A0A0A;color:#fff':''}">Por Pessoa</button>
+      <button onclick="setGanttView('semana')" style="${window.ganttView==='semana'?'background:#0A0A0A;color:#fff':''}">Por Semana</button>
+    </div>
+    <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:#666;cursor:pointer;margin-left:8px">
+      <input type="checkbox" ${showDone?'checked':''} onchange="window.ganttShowDone=this.checked;renderGantt()"> Mostrar concluídas
+    </label>
+    <div style="display:flex;gap:10px;align-items:center;margin-left:auto;flex-wrap:wrap">
+      ${mths.map((m,i)=>`<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;color:${i===curM?'#185FA5':'#999'};font-weight:${i===curM?'700':'400'}">${i===curM?'▶ ':''} ${m}</span>`).filter((_,i)=>i===curM).join('')}
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;font-size:11px">
+    <span style="font-weight:600;color:#666">Legenda:</span>
+    ${Object.entries({EM_ANDAMENTO:['#185FA5','Em andamento'],EM_ATRASO:['#C0392B','Em atraso'],NAO_INICIADO:['#CCC','Não iniciado'],STAND_BY:['#E6A817','Stand by'],CONCLUIDO:['#1A7A3F','Concluído']}).map(([_,[c,l]])=>`<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:20px;height:8px;border-radius:3px;background:${c}"></span>${l}</span>`).join('')}
+  </div>`;
+
+  if(window.ganttView==='semana'){container.innerHTML=controls+renderGanttSemana();return;}
+
+  const allTasks=PROJECTS.flatMap(p=>p.tarefas
+    .filter(t=>showDone||(t.status!=='CONCLUÍDO'&&t.status!=='FINALIZADO'))
+    .filter(t=>taskVisible(t,p))
+    .map(t=>({...t,projNome:p.nome,projId:p.id}))
+  );
+
+  function mthHeader(showProjCol){
+    const extraCol=showProjCol?`<th style="text-align:left;padding:6px 10px;font-size:10px;font-weight:700;color:#999;min-width:120px">PROJETO</th>`:'';
+    return `<th style="text-align:left;padding:6px 10px;font-size:10px;font-weight:700;color:#999;min-width:200px">TAREFA</th>
+      <th style="text-align:left;padding:6px 10px;font-size:10px;font-weight:700;color:#999;min-width:80px">RESP.</th>
+      ${extraCol}
+      ${mths.map((m,i)=>`<th style="min-width:38px;text-align:center;padding:5px 2px;font-size:9px;font-weight:700;letter-spacing:.04em;color:${i===curM?'#185FA5':'#999'};background:${i===curM?'#EBF3FF':'transparent'}">${m}</th>`).join('')}`;
+  }
+
+  function taskRow(t,showProjCol){
+    const mi=prazoToMonthIdx(t.prazo);
+    const startM=(t.status==='EM ANDAMENTO'||t.status==='EM ATRASO')&&mi>=0?Math.min(curM,mi):mi;
+    const endM=mi>=0?mi:-1;
+    const color=statC[t.status]||'#999';
+    const isDone=t.status==='CONCLUÍDO'||t.status==='FINALIZADO';
+    const cells=mths.map((_,i)=>{
+      const bg=i===curM?'#EBF3FF':'';
+      if(endM<0)return `<td style="padding:3px 1px;background:${bg}"></td>`;
+      const inRange=i>=startM&&i<=endM;
+      if(!inRange)return `<td style="padding:3px 1px;background:${bg}"></td>`;
+      const isS=i===startM;const isE=i===endM;
+      const br=`${isS?'4px':'0'} ${isE?'4px':'0'} ${isE?'4px':'0'} ${isS?'4px':'0'}`;
+      const opa=isDone?.45:.85;
+      return `<td style="padding:3px 1px;background:${bg}"><div title="${t.nome} · ${t.prazo||'—'} · ${t.status}" style="height:10px;background:${color};border-radius:${br};opacity:${opa}"></div></td>`;
+    }).join('');
+    const projCol=showProjCol?`<td style="padding:5px 8px;font-size:11px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px" title="${t.projNome}">${t.projNome.substring(0,18)}</td>`:'';
+    return `<tr style="${isDone?'opacity:.55':''}">
+      <td style="padding:5px 10px;font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${isDone?'text-decoration:line-through;color:#999':''}" title="${t.nome}">${t.nome}</td>
+      <td style="padding:5px 8px;font-size:11px;color:#999;white-space:nowrap">${t.resp||'—'}</td>
+      ${projCol}${cells}
+    </tr>`;
+  }
+
+  let html=controls;
+
+  if(window.ganttView==='projeto'){
+    PROJECTS.forEach(p=>{
+      const tasks=allTasks.filter(t=>t.projId===p.id);
+      if(!tasks.length)return;
+      const ativas=tasks.filter(t=>t.status==='EM ANDAMENTO'||t.status==='EM ATRASO').length;
+      const atr=tasks.filter(t=>t.status==='EM ATRASO').length;
+      html+=`<div style="margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid #EBEBEB">
+        <div class="gantt-group-hd" style="background:#0A0A0A">
+          <span>${p.nome}</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${atr?`<span style="font-size:11px;background:#C0392B;padding:2px 8px;border-radius:20px">${atr} atrasada${atr>1?'s':''}</span>`:''}
+            <span style="font-size:11px;opacity:.65">${ativas} ativas · ${tasks.length} total</span>
+          </div>
+        </div>
+        <div class="gantt-wrap">
+          <table style="width:100%;border-collapse:collapse;min-width:720px">
+            <thead style="background:#F8F8F8"><tr>${mthHeader(false)}</tr></thead>
+            <tbody>${tasks.map(t=>taskRow(t,false)).join('')}</tbody>
+          </table>
+        </div>
+      </div>`;
+    });
+  } else if(window.ganttView==='pessoa'){
+    const pessoas=[...new Set(allTasks.map(t=>t.resp.split(',')[0].trim()))].filter(Boolean).sort();
+    const pessoaColors=['#185FA5','#1A7A3F','#854F0B','#993556','#3C3489','#3B6D11'];
+    pessoas.forEach((pessoa,pi)=>{
+      const tasks=allTasks.filter(t=>t.resp.includes(pessoa));
+      if(!tasks.length)return;
+      const ativas=tasks.filter(t=>t.status==='EM ANDAMENTO'||t.status==='EM ATRASO').length;
+      const atr=tasks.filter(t=>t.status==='EM ATRASO').length;
+      const cor=pessoaColors[pi%pessoaColors.length];
+      html+=`<div style="margin-bottom:14px;border-radius:10px;overflow:hidden;border:1px solid #EBEBEB">
+        <div class="gantt-group-hd" style="background:${cor}">
+          <span>${pessoa}</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            ${atr?`<span style="font-size:11px;background:#C0392B;padding:2px 8px;border-radius:20px">${atr} atrasada${atr>1?'s':''}</span>`:''}
+            <span style="font-size:11px;opacity:.8">${ativas} ativas · ${tasks.length} total</span>
+          </div>
+        </div>
+        <div class="gantt-wrap">
+          <table style="width:100%;border-collapse:collapse;min-width:800px">
+            <thead style="background:#F8F8F8"><tr>${mthHeader(true)}</tr></thead>
+            <tbody>${tasks.map(t=>taskRow(t,true)).join('')}</tbody>
+          </table>
+        </div>
+      </div>`;
+    });
+  }
+
+  if(!html.replace(controls,'').trim()){
+    html+=`<div style="text-align:center;padding:40px;color:#999">Nenhuma tarefa para exibir com os filtros atuais</div>`;
+  }
+  container.innerHTML=html;
+}
+
+function renderGanttSemana(){
+  const showDone=window.ganttShowDone;
+  const allTasks=PROJECTS.flatMap(p=>p.tarefas
+    .filter(t=>showDone||(t.status!=='CONCLUÍDO'&&t.status!=='FINALIZADO'))
+    .filter(t=>taskVisible(t,p))
+    .map(t=>({...t,projNome:p.nome,projId:p.id}))
+  );
+  const statC={'EM ANDAMENTO':'#185FA5','EM ATRASO':'#C0392B','NÃO INICIADO':'#999','STAND BY':'#E6A817','CONCLUÍDO':'#1A7A3F','FINALIZADO':'#1A7A3F'};
+  const buckets=[
+    {label:'⚠ Atrasadas',bg:'#FFF0F0',border:'#FACCCC',color:'#C0392B',tasks:allTasks.filter(t=>{const d=prazoToDays(t.prazo);return d!==null&&d<0;})},
+    {label:'📅 Esta semana',bg:'#EBF3FF',border:'#A8C8F0',color:'#185FA5',tasks:allTasks.filter(t=>{const d=prazoToDays(t.prazo);return d!==null&&d>=0&&d<=7;})},
+    {label:'📌 Próxima semana',bg:'#F8F8F8',border:'#E0E0E0',color:'#555',tasks:allTasks.filter(t=>{const d=prazoToDays(t.prazo);return d!==null&&d>7&&d<=14;})},
+    {label:'🗓 Em breve',bg:'#F4FDF7',border:'#B8DFC8',color:'#1A7A3F',tasks:allTasks.filter(t=>{const d=prazoToDays(t.prazo);return d!==null&&d>14&&d<=45;})},
+    {label:'⏳ Mais tarde',bg:'#F8F8F8',border:'#E8E8E8',color:'#999',tasks:allTasks.filter(t=>{const d=prazoToDays(t.prazo);return d===null||d>45;})},
+  ];
+  let html=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">`;
+  buckets.forEach(b=>{
+    html+=`<div class="gantt-week-col" style="background:${b.bg};border-color:${b.border}">
+      <div style="font-size:12px;font-weight:700;color:${b.color};margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid ${b.border}">
+        ${b.label} <span style="font-size:11px;opacity:.7">(${b.tasks.length})</span>
+      </div>
+      ${b.tasks.length?b.tasks.map(t=>`
+        <div class="gantt-card" style="border-left:3px solid ${statC[t.status]||'#CCC'}">
+          <div style="font-size:12px;font-weight:600;line-height:1.3;margin-bottom:4px">${t.nome}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2px">
+            <span style="font-size:11px;color:#999">${t.resp||'—'}</span>
+            <span style="font-size:10px;color:#666;background:#F0F0F0;padding:1px 6px;border-radius:10px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${t.projNome}">${t.projNome.substring(0,14)}</span>
+          </div>
+          ${t.prazo&&t.prazo!=='—'?`<div style="font-size:10px;color:#999;margin-top:3px">📅 ${fmtDate(t.prazo)}</div>`:''}
+        </div>`).join('')
+      :'<div style="text-align:center;padding:20px 0;color:#CCC;font-size:12px">Sem tarefas</div>'}
+    </div>`;
+  });
+  html+=`</div>`;
+  return `<div style="overflow-x:auto">${html}</div>`;
 }
 
 // ===== NOVO PROJETO =====
 function loadCustomProjects(){
-  const custom=JSON.parse(localStorage.getItem('atm_custom_projs')||'[]');
+  const custom=JSON.parse(dbStore.getItem('atm_custom_projs')||'[]');
   custom.forEach(p=>{if(!PROJECTS.find(x=>x.id===p.id))PROJECTS.push(p);});
 }
 function openNovoProjModal(){
@@ -2557,9 +2970,9 @@ function saveNovoProj(){
   const p={id:newId,nome,resp,kpis,metaTag,linkedMeta:'',tarefas:[],fases};
   PROJECTS.push(p);
   // persist
-  const custom=JSON.parse(localStorage.getItem('atm_custom_projs')||'[]');
+  const custom=JSON.parse(dbStore.getItem('atm_custom_projs')||'[]');
   custom.push(p);
-  localStorage.setItem('atm_custom_projs',JSON.stringify(custom));
+  dbStore.setItem('atm_custom_projs',JSON.stringify(custom));
   closeNovoProjModal();
   renderProjects();renderOverview();renderAlertBanner();
   toast(`Projeto "${nome}" criado!`);
@@ -2569,28 +2982,85 @@ function saveNovoProj(){
   },100);
 }
 
+// ===== SYNC HERRERA DEFAULTS =====
+// Garante que as novas tarefas e fases do Herrera apareçam mesmo que o localStorage já tenha dados anteriores
+function syncHerreraDefaults(){
+  const pid=6;
+  const herreraP=PROJECTS.find(p=>p.id===pid);
+  if(!herreraP)return;
+
+  // --- Sync tarefas ---
+  const allT=JSON.parse(dbStore.getItem('atm_all_tasks')||'{}');
+  if(allT[pid]){
+    const existingNames=new Set(allT[pid].map(t=>t.nome));
+    let tChanged=false;
+    herreraP.tarefas.forEach(t=>{
+      if(!existingNames.has(t.nome)){allT[pid].push(t);tChanged=true;}
+    });
+    if(tChanged){
+      dbStore.setItem('atm_all_tasks',JSON.stringify(allT));
+      herreraP.tarefas=allT[pid];
+    }
+  }
+
+  // --- Sync fases ---
+  const allF=JSON.parse(dbStore.getItem('atm_proj_fases')||'{}');
+  const defaultFases=herreraP.fases||[];
+  if(!allF[pid]){
+    if(defaultFases.length){allF[pid]=defaultFases;dbStore.setItem('atm_proj_fases',JSON.stringify(allF));}
+  } else {
+    const existingFases=new Set(allF[pid]);
+    let fChanged=false;
+    defaultFases.forEach(f=>{if(!existingFases.has(f)){allF[pid].push(f);fChanged=true;}});
+    if(fChanged){
+      dbStore.setItem('atm_proj_fases',JSON.stringify(allF));
+      herreraP.fases=allF[pid];
+    } else {
+      herreraP.fases=allF[pid];
+    }
+  }
+}
+
 // ===== INIT =====
-loadCustomProjects();
-loadExtraTasks();
-loadProjMetas();
-loadProjFases();
-loadProjPct();
-renderOverview();
-renderProjects();
-renderAlertBanner();
-renderFunil();
-renderCanais();
-renderEquipe();
-renderMetasOrg();
-renderMetasMkt();
-renderHistorico();
-renderCampanhas();
-renderCorrTable();
-restoreED();
-renderExtPosts(4);
-renderExtPosts(6);
-loadNotes();
-renderPosts();
+async function initApp(){
+  // 1. Conectar ao SQLite (ou cair no localStorage se servidor não estiver rodando)
+  await dbStore.init();
+
+  // 2. Carregar variáveis que dependem de dados persistidos
+  historico = JSON.parse(dbStore.getItem('atm_hist') || '[]');
+  campanhas = JSON.parse(dbStore.getItem('atm_camp') || '[]');
+  corrData  = JSON.parse(dbStore.getItem('atm_corr') || '[]');
+  POSTS     = JSON.parse(dbStore.getItem('atm_posts') || '[]');
+
+  // 3. Carregar dados dos projetos
+  loadCustomProjects();
+  loadExtraTasks();
+  loadProjMetas();
+  loadProjFases();
+  loadProjPct();
+  syncHerreraDefaults();
+
+  // 4. Renderizar tudo
+  renderOverview();
+  renderProjects();
+  renderAlertBanner();
+  renderFunil();
+  renderCanais();
+  renderEquipe();
+  renderMetasOrg();
+  renderMetasMkt();
+  renderHistorico();
+  renderCampanhas();
+  renderCorrTable();
+  restoreED();
+  renderExtPosts(4);
+  renderExtPosts(6);
+  renderExtPosts(10);
+  renderExtPosts(11);
+  loadNotes();
+  renderPosts();
+}
+initApp();
 </script>
 <datalist id="team-list">
   <option>Carol</option><option>Felipe</option><option>Ana</option>
