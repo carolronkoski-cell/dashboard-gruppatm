@@ -178,12 +178,16 @@ async function syncClickUp() {
       if (!allTasks[k]) allTasks[k] = v;
     }
 
-    // 4. Coletar IDs do ClickUp em tarefas com link
-    const cuIds = {}; // cuId → { key, idx }
+    // 4. Coletar IDs do ClickUp em tarefas com link (suporta duplicatas entre projetos)
+    const cuIds = {}; // cuId → [{ key, idx }, ...]
     for (const [key, tasks] of Object.entries(allTasks)) {
       for (let i = 0; i < tasks.length; i++) {
         const match = tasks[i].link?.match(/clickup\.com\/t\/([a-z0-9]+)/i);
-        if (match) cuIds[match[1]] = { key, idx: i };
+        if (match) {
+          const id = match[1];
+          if (!cuIds[id]) cuIds[id] = [];
+          cuIds[id].push({ key, idx: i });
+        }
       }
     }
 
@@ -193,33 +197,26 @@ async function syncClickUp() {
     // 5. Buscar e atualizar cada tarefa
     let updated = 0;
     for (let i = 0; i < ids.length; i++) {
-      const cuId = ids[i];
-      const { key, idx } = cuIds[cuId];
-      const cuTask = await fetchClickUpTask(cuId);
+      const cuId       = ids[i];
+      const occurrences = cuIds[cuId];
+      const cuTask     = await fetchClickUpTask(cuId);
       if (!cuTask || cuTask.err) continue;
 
-      const task    = allTasks[key][idx];
-      let   changed = false;
-
       const newStatus = mapStatus(cuTask);
-      if (newStatus && task.status !== newStatus) {
-        task.status = newStatus;
-        changed = true;
-      }
+      const newResp   = mapAssignees(cuTask.assignees);
+      const newPrazo  = formatDue(cuTask.due_date);
 
-      const newResp = mapAssignees(cuTask.assignees);
-      if (newResp && task.resp !== newResp) {
-        task.resp = newResp;
-        changed = true;
-      }
+      // Atualiza todas as ocorrências do mesmo link (pode existir em mais de um projeto)
+      for (const { key, idx } of occurrences) {
+        const task    = allTasks[key][idx];
+        let   changed = false;
 
-      const newPrazo = formatDue(cuTask.due_date);
-      if (newPrazo && task.prazo !== newPrazo) {
-        task.prazo = newPrazo;
-        changed = true;
-      }
+        if (newStatus && task.status !== newStatus) { task.status = newStatus; changed = true; }
+        if (newResp   && task.resp   !== newResp)   { task.resp   = newResp;   changed = true; }
+        if (newPrazo  && task.prazo  !== newPrazo)  { task.prazo  = newPrazo;  changed = true; }
 
-      if (changed) updated++;
+        if (changed) updated++;
+      }
 
       // Pausa pequena para não estourar rate limit
       if (i < ids.length - 1) await new Promise(r => setTimeout(r, 120));
