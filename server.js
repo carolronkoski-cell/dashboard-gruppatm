@@ -45,30 +45,35 @@ const stmtCount  = db.prepare('SELECT COUNT(*) as n FROM storage');
 
 // Mapeamento de status ClickUp → Dashboard
 const STATUS_MAP = {
-  'em andamento':  'EM ANDAMENTO',
-  'não iniciado':  'NÃO INICIADO',
-  'nao iniciado':  'NÃO INICIADO',
-  'concluído':     'CONCLUÍDO',
-  'concluido':     'CONCLUÍDO',
-  'complete':      'CONCLUÍDO',
-  'done':          'CONCLUÍDO',
-  'stand by':      'STAND BY',
-  'standby':       'STAND BY',
-  'em aprovação':  'EM ANDAMENTO',
-  'em aprovacao':  'EM ANDAMENTO',
-  'envio final':   'EM ANDAMENTO',
-  'em revisão':    'EM ANDAMENTO',
-  'em revisao':    'EM ANDAMENTO',
-  'blocked':       'STAND BY',
+  'em andamento':      'EM ANDAMENTO',
+  'em desenvolvimento':'EM ANDAMENTO',
+  'em producao':       'EM ANDAMENTO',
+  'em produção':       'EM ANDAMENTO',
+  'em aprovação':      'EM ANDAMENTO',
+  'em aprovacao':      'EM ANDAMENTO',
+  'em revisão':        'EM ANDAMENTO',
+  'em revisao':        'EM ANDAMENTO',
+  'envio final':       'EM ANDAMENTO',
+  'não iniciado':      'NÃO INICIADO',
+  'nao iniciado':      'NÃO INICIADO',
+  'concluído':         'CONCLUÍDO',
+  'concluido':         'CONCLUÍDO',
+  'complete':          'CONCLUÍDO',
+  'done':              'CONCLUÍDO',
+  'stand by':          'STAND BY',
+  'standby':           'STAND BY',
+  'blocked':           'STAND BY',
 };
 
 // Mapeamento de nomes do ClickUp → nomes curtos do dashboard
 const ASSIGNEE_MAP = {
   'nana penkal':                   'Nana',
+  'marines':                       'Marines',
   'maria carolina ronkoski':       'Carol',
   'ana leticia s':                 'Ana',
   'paloma armentano':              'Paloma',
   'abner bergman':                 'Abner',
+  'felipe do amaral tomasoni':     'Felipe',
   'vitor pacifico de moraes neto': 'Vitor',
   'andreone cidactha':             'Andreone',
   'alisson':                       'Alisson',
@@ -76,8 +81,12 @@ const ASSIGNEE_MAP = {
 
 const MONTHS_PT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
+function normalizeStr(s) {
+  return (s || '').toLowerCase().trim().normalize('NFC');
+}
+
 function mapStatus(cuTask) {
-  const raw = (cuTask.status?.status || '').toLowerCase().trim();
+  const raw = normalizeStr(cuTask.status?.status);
   const doneStatuses = ['concluído','concluido','complete','done'];
   if (!doneStatuses.includes(raw) && cuTask.due_date && parseInt(cuTask.due_date) < Date.now()) {
     return 'EM ATRASO';
@@ -88,7 +97,7 @@ function mapStatus(cuTask) {
 function mapAssignees(assignees) {
   if (!assignees || assignees.length === 0) return null;
   const names = assignees.map(a => {
-    const key = (a.username || '').toLowerCase().trim();
+    const key = normalizeStr(a.username);
     return ASSIGNEE_MAP[key] || a.username.split(' ')[0];
   });
   if (names.length === 1) return names[0];
