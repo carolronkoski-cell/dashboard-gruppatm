@@ -129,6 +129,38 @@ tr:hover td{background:#FAFAFA}
 .bico:hover{background:#F0F0F0;color:#0A0A0A;border-color:#CCC}
 .bico-del:hover{background:#FDEAEA;color:#C0392B;border-color:#FACCCC}
 .bico-edit:hover{background:#E6F1FB;color:#185FA5;border-color:#C2D8F0}
+/* STATUS CHECKBOXES */
+.sch-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.sch{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #DDD;border-radius:20px;cursor:pointer;font-size:12px;font-weight:500;transition:all .15s;user-select:none}
+.sch input{display:none}
+.sch.checked-EA{background:#E6F1FB;border-color:#185FA5;color:#185FA5}
+.sch.checked-AT{background:#FDEAEA;border-color:#C0392B;color:#C0392B}
+.sch.checked-NI{background:#F0F0F0;border-color:#999;color:#555}
+.sch.checked-SB{background:#FAEEDA;border-color:#854F0B;color:#854F0B}
+.sch.checked-CO{background:#E6F4EC;border-color:#1A7A3F;color:#1A7A3F}
+.sch.checked-FI{background:#E6F4EC;border-color:#1A7A3F;color:#1A7A3F}
+/* VIEW TOGGLE */
+.vtog{display:flex;border:1px solid #DDD;border-radius:8px;overflow:hidden}
+.vtog button{background:#fff;border:none;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#666;transition:all .15s}
+.vtog button.active{background:#0A0A0A;color:#fff}
+/* DONE SECTION */
+.done-toggle{font-size:12px;color:#999;cursor:pointer;padding:10px 0;display:flex;align-items:center;gap:6px;border-top:1px dashed #E8E8E8;margin-top:8px}
+.done-toggle:hover{color:#0A0A0A}
+/* CHECKBOX TASK */
+.task-cb{width:16px;height:16px;cursor:pointer;accent-color:#1A7A3F;flex-shrink:0;margin-top:1px}
+/* SUB NAV COMUNICAÇÃO */
+.sub-nav{display:flex;gap:0;border-bottom:1px solid #E8E8E8;margin-bottom:20px}
+.sub-nav button{background:none;border:none;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.sub-nav button.active{color:#0A0A0A;border-bottom-color:#0A0A0A}
+/* STAT BAR */
+.stat-bar-wrap{background:#F0F0F0;border-radius:99px;height:8px;flex:1}
+.stat-bar{height:8px;border-radius:99px;transition:width .4s}
+/* AUDIENCE FILTERS */
+.af-wrap{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#F8F8F8;border-radius:8px;margin-bottom:14px}
+.af-wrap select,.af-wrap input{padding:5px 10px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;background:#fff}
+/* CORRELATION CHART */
+.corr-chart{background:#fff;border:1px solid #EBEBEB;border-radius:10px;padding:20px}
+.chart-area{position:relative;height:200px;margin-top:10px}
 /* CHEVRON */
 .chv{font-size:14px;transition:transform .2s;color:#999}
 .chv.open{transform:rotate(180deg)}
@@ -234,47 +266,52 @@ tr:hover td{background:#FAFAFA}
 
 <!-- PROJETOS -->
 <div id="tab-projetos" class="tab-content">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
     <div class="section-title" style="margin-bottom:0">Projetos · 8 projetos · 151 tarefas</div>
-    <button class="btn btno btns" onclick="expandAll()">Expandir todos</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="vtog">
+        <button id="vtog-proj" class="active" onclick="setView('projeto',this)">Por Projeto</button>
+        <button id="vtog-lista" onclick="setView('lista',this)">Lista Geral</button>
+      </div>
+      <button class="btn btno btns" onclick="expandAll()" id="btn-expand-all">Expandir todos</button>
+    </div>
   </div>
 
   <div class="alert-banner" id="alert-banner"></div>
 
   <div class="filter-section">
-    <div class="filter-row">
-      <div class="filter-group">
-        <label>Status</label>
-        <select id="f-status" onchange="applyFilters()">
-          <option value="todos">Todos</option>
-          <option value="EM ANDAMENTO">Em andamento</option>
-          <option value="EM ATRASO">Em atraso</option>
-          <option value="NÃO INICIADO">Não iniciado</option>
-          <option value="STAND BY">Stand by</option>
-          <option value="CONCLUÍDO">Concluído</option>
-          <option value="FINALIZADO">Finalizado</option>
-        </select>
+    <div class="filter-row" style="flex-direction:column;gap:10px;align-items:flex-start">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;width:100%">
+        <div class="filter-group">
+          <label>Responsável</label>
+          <select id="f-resp" onchange="applyFilters()">
+            <option value="todos">Todos</option>
+            <option>Carol</option><option>Felipe</option><option>Ana</option>
+            <option>Paloma</option><option>Nana</option><option>Abner</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Mês</label>
+          <select id="f-mes" onchange="applyFilters()">
+            <option value="todos">Todos</option>
+            <option value="Jan">Janeiro</option><option value="Fev">Fevereiro</option>
+            <option value="Mar">Março</option><option value="Abr">Abril</option>
+            <option value="Mai">Maio</option><option value="Jun">Junho</option>
+            <option value="Jul">Julho</option><option value="Dez">Dezembro</option>
+          </select>
+        </div>
+        <div style="margin-top:18px"><button class="btn btno btns" onclick="clearFilters()">Limpar filtros</button></div>
       </div>
-      <div class="filter-group">
-        <label>Responsável</label>
-        <select id="f-resp" onchange="applyFilters()">
-          <option value="todos">Todos</option>
-          <option>Carol</option><option>Felipe</option><option>Ana</option>
-          <option>Paloma</option><option>Nana</option><option>Abner</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <label>Mês</label>
-        <select id="f-mes" onchange="applyFilters()">
-          <option value="todos">Todos</option>
-          <option value="Jan">Janeiro</option><option value="Fev">Fevereiro</option>
-          <option value="Mar">Março</option><option value="Abr">Abril</option>
-          <option value="Mai">Maio</option><option value="Jun">Junho</option>
-          <option value="Jul">Julho</option><option value="Dez">Dezembro</option>
-        </select>
-      </div>
-      <div style="margin-top:18px">
-        <button class="btn btno btns" onclick="clearFilters()">Limpar filtros</button>
+      <div class="filter-group" style="width:100%">
+        <label>Status (selecione um ou mais)</label>
+        <div class="sch-wrap" id="f-status-checks">
+          <label class="sch" data-cls="checked-EA"><input type="checkbox" value="EM ANDAMENTO" onchange="applyFilters()">Em andamento</label>
+          <label class="sch" data-cls="checked-AT"><input type="checkbox" value="EM ATRASO" onchange="applyFilters()">Em atraso</label>
+          <label class="sch" data-cls="checked-NI"><input type="checkbox" value="NÃO INICIADO" onchange="applyFilters()">Não iniciado</label>
+          <label class="sch" data-cls="checked-SB"><input type="checkbox" value="STAND BY" onchange="applyFilters()">Stand by</label>
+          <label class="sch" data-cls="checked-CO"><input type="checkbox" value="CONCLUÍDO" onchange="applyFilters()">Concluído</label>
+          <label class="sch" data-cls="checked-FI"><input type="checkbox" value="FINALIZADO" onchange="applyFilters()">Finalizado</label>
+        </div>
       </div>
     </div>
   </div>
@@ -300,9 +337,10 @@ tr:hover td{background:#FAFAFA}
       <div style="font-size:11px;color:#999;margin-top:6px">Meta: R$ 35M</div>
     </div>
     <div class="card kpib">
-      <div class="kpinum">R$ 35M</div>
-      <div class="kpilbl">Meta 2026</div>
-      <div class="kpisub">Contratos assinados</div>
+      <div class="kpinum ev" contenteditable data-key="funil_pct_instagram">—%</div>
+      <div class="kpilbl">Leads via Instagram</div>
+      <div class="kpisub" style="color:#666">% do total · clique para editar</div>
+      <div style="font-size:10px;color:#999;margin-top:6px">Fonte: Linktree → WhatsApp</div>
     </div>
     <div class="card kpib">
       <div class="kpinum">6</div>
@@ -331,36 +369,107 @@ tr:hover td{background:#FAFAFA}
 <!-- COMUNICAÇÃO -->
 <div id="tab-comunicacao" class="tab-content">
   <div class="section-title">Comunicação</div>
-  <div class="grid g2">
-    <div class="card">
-      <div class="lbl" style="margin-bottom:14px">Novo Disparo</div>
-      <div class="fg"><label>Canal</label>
-        <select id="canal-select" onchange="toggleFields()">
-          <option value="">Selecione</option>
-          <option value="whatsapp">WhatsApp</option>
-          <option value="email">E-mail</option>
-          <option value="push">Push Notificação</option>
-        </select>
+  <div class="sub-nav">
+    <button class="active" onclick="showComTab('disparo',this)">Novo Disparo</button>
+    <button onclick="showComTab('campanhas',this)">Campanhas</button>
+    <button onclick="showComTab('correlacao',this)">WhatsApp × Posts</button>
+  </div>
+
+  <!-- DISPARO -->
+  <div id="com-disparo">
+    <div class="grid g2">
+      <div class="card">
+        <div class="lbl" style="margin-bottom:14px">Compor mensagem</div>
+        <div class="fg"><label>Nome da campanha</label><input type="text" id="camp-nome" placeholder="Ex: Convite Formatura Med UP 2026"></div>
+        <div class="fg"><label>Canal</label>
+          <select id="canal-select" onchange="toggleFields()">
+            <option value="">Selecione</option>
+            <option value="whatsapp">WhatsApp</option>
+            <option value="email">E-mail</option>
+            <option value="push">Push Notificação</option>
+          </select>
+        </div>
+        <div class="fg" id="assunto-g" style="display:none"><label>Assunto</label><input type="text" id="assunto" placeholder="Assunto do e-mail"></div>
+        <div class="fg"><label>Mensagem</label><textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea></div>
+        <div class="fg">
+          <label>Imagem (opcional)</label>
+          <input type="file" id="img-input" accept="image/*" onchange="previewImg(this)" style="padding:6px">
+          <div id="img-preview" style="margin-top:8px;display:none"><img id="img-thumb" style="max-width:100%;max-height:160px;border-radius:8px;border:1px solid #E8E8E8"></div>
+        </div>
+        <div class="fg"><label>Agendar para (opcional)</label><input type="datetime-local" id="agendamento"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btnp" onclick="enviarAgora()">Enviar agora</button>
+          <button class="btn btno" onclick="agendar()">Agendar</button>
+        </div>
+        <!-- INTEGRAÇÃO: WhatsApp→Evolution API/Twilio | E-mail→Resend/SendGrid | Push→Firebase FCM. NUNCA expor token no frontend. -->
       </div>
-      <div class="fg"><label>Destinatário</label><input type="text" id="destinatario" placeholder="Nome, número, grupo ou lista"></div>
-      <div class="fg" id="assunto-g" style="display:none"><label>Assunto</label><input type="text" id="assunto" placeholder="Assunto do e-mail"></div>
-      <div class="fg"><label>Mensagem</label><textarea id="mensagem" placeholder="Digite sua mensagem..."></textarea></div>
-      <div class="fg"><label>Agendar para (opcional)</label><input type="datetime-local" id="agendamento"></div>
-      <div style="display:flex;gap:10px">
-        <button class="btn btnp" onclick="enviarAgora()">Enviar agora</button>
-        <button class="btn btno" onclick="agendar()">Agendar</button>
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="lbl" style="margin-bottom:12px">Filtrar Audiência</div>
+          <div class="af-wrap">
+            <select id="af-cidade"><option value="">Cidade</option><option>Curitiba</option><option>Cascavel</option><option>Santa Catarina</option></select>
+            <select id="af-turma"><option value="">Turma</option><option>Medicina</option><option>Direito</option><option>Odontologia</option><option>Psicologia</option><option>Engenharia</option></select>
+            <select id="af-comissao"><option value="">Comissão</option><option>Presidente</option><option>Vice</option><option>Tesoureiro</option><option>Secretário</option><option>Membro</option></select>
+            <select id="af-ano"><option value="">Ano formação</option><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option></select>
+            <select id="af-genero"><option value="">Gênero</option><option>Feminino</option><option>Masculino</option></select>
+            <select id="af-ativo"><option value="">Ativo/Inativo</option><option>Ativo</option><option>Inativo</option></select>
+            <select id="af-aderiu"><option value="">Aderiu</option><option>Aderiu</option><option>Não aderiu</option></select>
+            <select id="af-inadim"><option value="">Inadimplência</option><option>Em dia</option><option>Inadimplente</option></select>
+          </div>
+          <div style="font-size:12px;color:#999">
+            Destinatário estimado: <strong id="dest-count">—</strong>
+            <span style="font-size:11px;color:#854F0B;margin-left:8px">⚠ Filtros ativos quando integração com CRM estiver configurada</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="lbl" style="margin-bottom:14px">Histórico de Disparos</div>
+          <div id="historico-list"><div style="text-align:center;padding:32px 0;color:#999;font-size:13px">Nenhum disparo ainda</div></div>
+        </div>
       </div>
-      <!--
-        INTEGRAÇÃO — COMENTÁRIOS PARA O PROGRAMADOR:
-        WhatsApp: Evolution API ou Twilio → POST /message/sendText → { number, text }
-        E-mail: Resend ou SendGrid → POST /emails → { from, to, subject, html }
-        Push: Firebase Cloud Messaging → POST /fcm/send → { to, notification: { title, body } }
-        NUNCA expor tokens no frontend. Usar endpoint backend intermediário (ex: /api/send).
-      -->
     </div>
-    <div class="card">
-      <div class="lbl" style="margin-bottom:14px">Histórico de Disparos</div>
-      <div id="historico-list"><div style="text-align:center;padding:40px 0;color:#999;font-size:13px">Nenhum disparo ainda</div></div>
+  </div>
+
+  <!-- CAMPANHAS -->
+  <div id="com-campanhas" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:700">Campanhas</div>
+      <button class="btn btno btns" onclick="showComTab('disparo',document.querySelector('.sub-nav button'))">+ Nova campanha</button>
+    </div>
+    <div id="campanhas-list"></div>
+    <!-- Modal campanha -->
+    <div id="camp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;padding:20px;align-items:flex-start;justify-content:center">
+      <div style="background:#fff;width:100%;max-width:640px;border-radius:12px;margin-top:40px;overflow:hidden">
+        <div style="padding:18px 22px;border-bottom:1px solid #F0F0F0;display:flex;justify-content:space-between">
+          <div id="cm-title" style="font-size:16px;font-weight:700"></div>
+          <button class="modal-close" onclick="document.getElementById('camp-modal').style.display='none'">✕</button>
+        </div>
+        <div id="cm-body" style="padding:20px 22px;max-height:80vh;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORRELAÇÃO -->
+  <div id="com-correlacao" style="display:none">
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="corr-chart">
+        <div class="lbl">WhatsApp recebidos via Linktree × Postagens do dia</div>
+        <div style="font-size:12px;color:#999;margin-bottom:12px">Insira os dados manualmente — cada linha = 1 dia</div>
+        <table style="margin-bottom:12px">
+          <thead><tr><th>Data</th><th>Posts publicados</th><th>WhatsApp recebidos</th><th></th></tr></thead>
+          <tbody id="corr-tbody"></tbody>
+        </table>
+        <div style="display:flex;gap:6px;margin-bottom:16px">
+          <input type="date" id="corr-data" style="padding:6px 10px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+          <input type="number" id="corr-posts" placeholder="Posts" min="0" style="width:80px;padding:6px 10px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+          <input type="number" id="corr-wa" placeholder="WhatsApps" min="0" style="width:100px;padding:6px 10px;border:1px solid #DDD;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px">
+          <button class="btn btnp btns" onclick="addCorrRow()">+ Adicionar</button>
+        </div>
+        <canvas id="corr-canvas" height="180" style="width:100%;border-radius:8px"></canvas>
+      </div>
+      <div class="corr-chart">
+        <div class="lbl">Correlação geral</div>
+        <div id="corr-stats" style="margin-top:12px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -834,25 +943,43 @@ function statusBadge(s){
 function semCls(s){return{green:"sg",yellow:"sy",red:"sr"}[s]||"sgr"}
 
 // ===== FILTERS =====
-let filters={status:"todos",resp:"todos",mes:"todos"};
+let filters={status:[],resp:"todos",mes:"todos"};
+let viewMode='projeto';
 function applyFilters(){
-  filters.status=document.getElementById('f-status').value;
+  filters.status=Array.from(document.querySelectorAll('#f-status-checks input:checked')).map(i=>i.value);
+  // update visual state of checkboxes
+  document.querySelectorAll('#f-status-checks .sch').forEach(lbl=>{
+    const inp=lbl.querySelector('input');
+    const cls=lbl.dataset.cls;
+    lbl.classList.toggle(cls, inp.checked);
+  });
   filters.resp=document.getElementById('f-resp').value;
   filters.mes=document.getElementById('f-mes').value;
   renderProjects();
 }
 function clearFilters(){
-  filters={status:"todos",resp:"todos",mes:"todos"};
-  document.getElementById('f-status').value="todos";
+  filters={status:[],resp:"todos",mes:"todos"};
+  document.querySelectorAll('#f-status-checks input').forEach(i=>{i.checked=false});
+  document.querySelectorAll('#f-status-checks .sch').forEach(lbl=>{
+    lbl.classList.remove(lbl.dataset.cls);
+  });
   document.getElementById('f-resp').value="todos";
   document.getElementById('f-mes').value="todos";
   renderProjects();
 }
 function taskVisible(t){
-  if(filters.status!=="todos"&&t.status!==filters.status)return false;
+  if(filters.status.length>0&&!filters.status.includes(t.status))return false;
   if(filters.resp!=="todos"&&!t.resp.includes(filters.resp))return false;
   if(filters.mes!=="todos"&&t.prazo!==filters.mes)return false;
   return true;
+}
+function setView(mode,btn){
+  viewMode=mode;
+  document.querySelectorAll('.vtog button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const expBtn=document.getElementById('btn-expand-all');
+  if(expBtn)expBtn.style.display=mode==='projeto'?'':'none';
+  renderProjects();
 }
 
 // ===== ALERT BANNER =====
@@ -868,21 +995,53 @@ function renderAlertBanner(){
     ${mesAtual.length?`<span class="alert-item al-yellow" onclick="setFilter('mes-abr')">🟡 ${mesAtual.length} tarefa${mesAtual.length>1?'s':''} com prazo em Abril — clique para filtrar</span>`:''}`;
 }
 function setFilter(v){
+  // reset all checkboxes
+  document.querySelectorAll('#f-status-checks input').forEach(i=>{i.checked=false;});
+  document.querySelectorAll('#f-status-checks .sch').forEach(l=>l.classList.remove(l.dataset.cls));
   if(v==="mes-abr"){
-    filters.mes="Abr";filters.status="todos";
+    filters.status=[];filters.mes="Abr";
     document.getElementById('f-mes').value="Abr";
-    document.getElementById('f-status').value="todos";
   } else {
-    filters.status=v;filters.mes="todos";
-    document.getElementById('f-status').value=v;
-    document.getElementById('f-mes').value="todos";
+    filters.mes="todos";document.getElementById('f-mes').value="todos";
+    // check the matching checkbox
+    const cb=document.querySelector(`#f-status-checks input[value="${v}"]`);
+    if(cb){cb.checked=true;const lbl=cb.closest('.sch');lbl.classList.add(lbl.dataset.cls);}
+    filters.status=[v];
   }
   filters.resp="todos";document.getElementById('f-resp').value="todos";
   renderProjects();
 }
 
+// ===== TASK ROW HTML =====
+function taskRowHTML(p,t,tIdx){
+  const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:5px;text-decoration:none">↗</a>`:'';
+  const isDone=t.status==="CONCLUÍDO"||t.status==="FINALIZADO";
+  const nameStyle=isDone?'text-decoration:line-through;color:#999':'';
+  return `<div class="task-row" id="trow-${p.id}-${tIdx}">
+    <input type="checkbox" class="task-cb" ${isDone?'checked':''} onchange="checkTask(${p.id},${tIdx},this.checked)" title="Marcar como concluída">
+    <span class="task-name" style="${nameStyle}">${t.nome}${lnk}</span>
+    <span class="task-resp">${t.resp}</span>
+    <span class="task-prazo">${t.prazo}</span>
+    ${statusBadge(t.status)}
+    <span class="meta-tag">${p.metaTag}</span>
+    <div style="display:flex;gap:3px;margin-left:auto;padding-left:6px">
+      <button class="bico bico-edit" onclick="editTask(${p.id},${tIdx})" title="Editar">✎</button>
+      <button class="bico bico-del" onclick="deleteTask(${p.id},${tIdx})" title="Excluir">✕</button>
+    </div>
+  </div>`;
+}
+function checkTask(pid,tIdx,checked){
+  const proj=PROJECTS.find(p=>p.id===pid);
+  proj.tarefas[tIdx].status=checked?"CONCLUÍDO":proj.tarefas[tIdx].status==="CONCLUÍDO"?"NÃO INICIADO":proj.tarefas[tIdx].status;
+  saveProjectTasks(pid);
+  renderProjects();renderAlertBanner();renderOverview();
+  document.getElementById(`pb-${pid}`)?.classList.add('open');
+  document.getElementById(`chv-${pid}`)?.classList.add('open');
+}
+
 // ===== RENDER PROJECTS =====
 function renderProjects(){
+  if(viewMode==='lista'){renderProjectsFlat();return;}
   const container=document.getElementById('projetos-list');
   container.innerHTML='';
   PROJECTS.forEach(p=>{
@@ -890,26 +1049,37 @@ function renderProjects(){
     const done=p.tarefas.filter(t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO").length;
     const atr=p.tarefas.filter(t=>t.status==="EM ATRASO").length;
     const pct=Math.round(done/tot*100);
-    const filtered=p.tarefas.filter(taskVisible);
+    // Split: active vs done/standby
+    const isArchived=t=>t.status==="CONCLUÍDO"||t.status==="FINALIZADO"||t.status==="STAND BY";
+    const activeFiltered=p.tarefas.filter(t=>!isArchived(t)&&taskVisible(t));
+    const archiveFiltered=p.tarefas.filter(t=>isArchived(t)&&taskVisible(t));
+    // If status filter includes archived statuses, show them in active section too
+    const hasArchivedFilter=filters.status.some(s=>["CONCLUÍDO","FINALIZADO","STAND BY"].includes(s));
+    const allFiltered=p.tarefas.filter(taskVisible);
+    const showActive=hasArchivedFilter?allFiltered:activeFiltered;
+    const showArchived=hasArchivedFilter?[]:archiveFiltered;
     let rows='';
-    filtered.forEach(t=>{
-      const tIdx=p.tarefas.indexOf(t);
-      const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:6px;text-decoration:none">↗</a>`:'';
-      rows+=`<div class="task-row" id="trow-${p.id}-${tIdx}"><span class="task-name">${t.nome}${lnk}</span><span class="task-resp">${t.resp}</span><span class="task-prazo">${t.prazo}</span>${statusBadge(t.status)}<span class="meta-tag">${p.metaTag}</span><div style="display:flex;gap:3px;margin-left:auto;padding-left:6px"><button class="bico bico-edit" onclick="editTask(${p.id},${tIdx})" title="Editar">✎</button><button class="bico bico-del" onclick="deleteTask(${p.id},${tIdx})" title="Excluir">✕</button></div></div>`;
-    });
-    const noRes=filtered.length===0?`<div style="padding:16px 0;color:#999;font-size:13px;text-align:center">Nenhuma tarefa com os filtros ativos</div>`:'';
+    showActive.forEach(t=>{rows+=taskRowHTML(p,t,p.tarefas.indexOf(t));});
+    let archRows='';
+    showArchived.forEach(t=>{archRows+=taskRowHTML(p,t,p.tarefas.indexOf(t));});
+    const noRes=showActive.length===0&&showArchived.length===0?`<div style="padding:16px 0;color:#999;font-size:13px;text-align:center">Nenhuma tarefa com os filtros ativos</div>`:'';
+    const archSection=showArchived.length>0?`
+      <div class="done-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.chv').classList.toggle('open')">
+        <span class="chv">▾</span> Concluídas, Finalizadas e Stand By (${showArchived.length})
+      </div>
+      <div style="display:none">${archRows}</div>`:'';
     container.insertAdjacentHTML('beforeend',`
       <div class="proj-item">
         <div class="proj-header" onclick="toggleProj(${p.id})">
           <div>
             <div style="font-size:14px;font-weight:700">${p.nome}</div>
-            <div style="font-size:12px;color:#999;margin-top:3px;display:flex;align-items:center;gap:6px">
+            <div style="font-size:12px;color:#999;margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
               <span style="background:#F0F0F0;color:#0A0A0A;font-weight:700;padding:2px 8px;border-radius:20px;font-size:11px">${p.resp.split(',')[0].trim()}</span>
               ${p.resp.split(',').length>1?`<span>${p.resp.split(',').slice(1).join(',').trim()}</span>`:''}
               <span>· ${tot} tarefas</span>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:14px">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end">
             <span class="badge bg" style="font-size:10px">${done} concluídas</span>
             ${atr?`<span class="badge br" style="font-size:10px">${atr} atrasadas</span>`:''}
             <div style="text-align:right;min-width:72px">
@@ -922,9 +1092,9 @@ function renderProjects(){
         <div class="proj-body" id="pb-${p.id}">
           <div class="proj-kpis"><strong>KPIs:</strong> ${p.kpis}</div>
           <div style="display:flex;gap:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999;padding:0 0 6px;border-bottom:1px solid #F0F0F0">
-            <span style="flex:1">Tarefa</span><span style="min-width:90px">Responsável</span><span style="min-width:36px">Prazo</span><span style="min-width:100px">Status</span><span style="min-width:100px">Meta</span>
+            <span style="width:20px"></span><span style="flex:1">Tarefa</span><span style="min-width:90px">Responsável</span><span style="min-width:36px">Prazo</span><span style="min-width:100px">Status</span><span style="min-width:100px">Meta</span>
           </div>
-          ${rows}${noRes}
+          ${rows}${noRes}${archSection}
           <div class="add-form">
             <input class="lg" type="text" placeholder="Nova tarefa..." id="nt-nome-${p.id}">
             <input class="sm2" type="text" placeholder="Responsável" id="nt-resp-${p.id}">
@@ -940,6 +1110,29 @@ function renderProjects(){
         </div>
       </div>`);
   });
+}
+function renderProjectsFlat(){
+  const container=document.getElementById('projetos-list');
+  container.innerHTML='';
+  const all=PROJECTS.flatMap(p=>p.tarefas.filter(taskVisible).map(t=>({t,p,tIdx:p.tarefas.indexOf(t)})));
+  if(!all.length){container.innerHTML='<div style="text-align:center;padding:40px;color:#999">Nenhuma tarefa com os filtros ativos</div>';return;}
+  let rows=all.map(({t,p,tIdx})=>{
+    const lnk=t.link?`<a href="${t.link}" target="_blank" style="color:#185FA5;font-size:11px;margin-left:5px">↗</a>`:'';
+    const isDone=t.status==="CONCLUÍDO"||t.status==="FINALIZADO";
+    return `<tr>
+      <td><input type="checkbox" class="task-cb" ${isDone?'checked':''} onchange="checkTask(${p.id},${tIdx},this.checked)"></td>
+      <td style="${isDone?'text-decoration:line-through;color:#999':''}">${t.nome}${lnk}</td>
+      <td><span class="meta-tag" style="font-size:11px;padding:2px 8px;background:#E6F1FB;color:#185FA5;border-radius:20px;font-weight:600">${p.nome}</span></td>
+      <td>${t.resp}</td>
+      <td>${t.prazo}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td><button class="bico bico-edit" onclick="editTask(${p.id},${tIdx})">✎</button> <button class="bico bico-del" onclick="deleteTask(${p.id},${tIdx})">✕</button></td>
+    </tr>`;
+  }).join('');
+  container.innerHTML=`<div class="card"><table>
+    <thead><tr><th></th><th>Tarefa</th><th>Projeto</th><th>Responsável</th><th>Prazo</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
 }
 
 function toggleProj(id){
@@ -1205,47 +1398,262 @@ function renderOverview(){
 }
 
 // ===== COMUNICAÇÃO =====
+function showComTab(id,btn){
+  ['disparo','campanhas','correlacao'].forEach(t=>{
+    document.getElementById('com-'+t).style.display=t===id?'':'none';
+  });
+  document.querySelectorAll('.sub-nav button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(id==='campanhas')renderCampanhas();
+  if(id==='correlacao')renderCorrChart();
+}
 function toggleFields(){
   document.getElementById('assunto-g').style.display=
     document.getElementById('canal-select').value==='email'?'block':'none';
 }
+function previewImg(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('img-thumb').src=e.target.result;
+    document.getElementById('img-preview').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
 let historico=JSON.parse(localStorage.getItem('atm_hist')||'[]');
+let campanhas=JSON.parse(localStorage.getItem('atm_camp')||'[]');
 function renderHistorico(){
   const el=document.getElementById('historico-list');
-  if(!historico.length){el.innerHTML='<div style="text-align:center;padding:40px 0;color:#999;font-size:13px">Nenhum disparo ainda</div>';return;}
-  el.innerHTML=historico.slice().reverse().map(h=>`
-    <div style="padding:10px 0;border-bottom:1px solid #F4F4F4">
+  if(!historico.length){el.innerHTML='<div style="text-align:center;padding:32px 0;color:#999;font-size:13px">Nenhum disparo ainda</div>';return;}
+  el.innerHTML=historico.slice().reverse().map((h,ri)=>{
+    const i=historico.length-1-ri;
+    return `<div style="padding:10px 0;border-bottom:1px solid #F4F4F4;cursor:pointer" onclick="verDisparo(${i})">
       <div style="display:flex;justify-content:space-between;margin-bottom:3px">
         <span class="badge ${h.canal==='whatsapp'?'bg':h.canal==='email'?'bb':'bp'}">${h.canal.toUpperCase()}</span>
         <span style="font-size:11px;color:#999">${h.data}</span>
       </div>
-      <div style="font-size:13px;font-weight:500">${h.dest}</div>
-      <div style="font-size:12px;color:#666;margin-top:2px">${h.msg.substring(0,80)}${h.msg.length>80?'...':''}</div>
-      ${h.ag?`<div style="font-size:11px;color:#854F0B;margin-top:3px">⏰ ${h.ag}</div>`:''}
-    </div>`).join('');
+      <div style="font-size:13px;font-weight:500">${h.nome||h.dest}</div>
+      <div style="font-size:12px;color:#666;margin-top:2px">${h.msg.substring(0,60)}${h.msg.length>60?'...':''}</div>
+      ${h.ag?`<div style="font-size:11px;color:#854F0B;margin-top:2px">⏰ ${h.ag}</div>`:''}
+    </div>`;
+  }).join('');
+}
+function verDisparo(i){
+  const h=historico[i];
+  const modal=document.getElementById('camp-modal');
+  document.getElementById('cm-title').textContent=h.nome||'Disparo';
+  document.getElementById('cm-body').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="badge ${h.canal==='whatsapp'?'bg':h.canal==='email'?'bb':'bp'}">${h.canal.toUpperCase()}</span>
+      <span class="badge bgr">${h.data}</span>
+      ${h.ag?`<span class="badge by">⏰ Agendado: ${h.ag}</span>`:''}
+    </div>
+    ${h.img?`<img src="${h.img}" style="max-width:100%;border-radius:8px;margin-bottom:14px">`:''}
+    <div style="font-size:13px;white-space:pre-wrap;background:#F8F8F8;padding:14px;border-radius:8px;margin-bottom:14px">${h.msg}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+      <div style="text-align:center;padding:12px;background:#F8F8F8;border-radius:8px">
+        <div style="font-size:22px;font-weight:700">${h.enviados||'—'}</div>
+        <div style="font-size:11px;color:#999">Enviados</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#F8F8F8;border-radius:8px">
+        <div style="font-size:22px;font-weight:700;color:#1A7A3F">${h.abertos||'—'}</div>
+        <div style="font-size:11px;color:#999">Abertos/Lidos</div>
+      </div>
+      <div style="text-align:center;padding:12px;background:#F8F8F8;border-radius:8px">
+        <div style="font-size:22px;font-weight:700;color:#185FA5">${h.enviados&&h.abertos?Math.round(h.abertos/h.enviados*100)+'%':'—'}</div>
+        <div style="font-size:11px;color:#999">Taxa de abertura</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#854F0B;background:#FAEEDA;padding:10px;border-radius:8px">
+      ⚠ Atualizar enviados/abertos manualmente até integração estar ativa.<br>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input type="number" id="upd-env" placeholder="Enviados" value="${h.enviados||''}" style="width:100px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif">
+        <input type="number" id="upd-ab" placeholder="Abertos" value="${h.abertos||''}" style="width:100px;padding:5px 8px;border:1px solid #DDD;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif">
+        <button class="btn btnp btns" onclick="updateStats(${i})">Salvar</button>
+      </div>
+    </div>`;
+  modal.style.display='flex';
+}
+function updateStats(i){
+  historico[i].enviados=parseInt(document.getElementById('upd-env').value)||0;
+  historico[i].abertos=parseInt(document.getElementById('upd-ab').value)||0;
+  localStorage.setItem('atm_hist',JSON.stringify(historico));
+  document.getElementById('camp-modal').style.display='none';
+  renderHistorico();renderCampanhas();
+  toast('Estatísticas atualizadas!');
 }
 function enviarAgora(){
   const canal=document.getElementById('canal-select').value;
-  const dest=document.getElementById('destinatario').value.trim();
   const msg=document.getElementById('mensagem').value.trim();
-  if(!canal||!dest||!msg){toast('Preencha canal, destinatário e mensagem');return;}
-  historico.push({canal,dest,msg,data:new Date().toLocaleString('pt-BR'),ag:null});
+  const nome=document.getElementById('camp-nome').value.trim()||'Disparo sem nome';
+  if(!canal||!msg){toast('Preencha canal e mensagem');return;}
+  const img=document.getElementById('img-thumb').src;
+  const imgData=img&&img.startsWith('data:')?img:null;
+  historico.push({canal,nome,msg,img:imgData,data:new Date().toLocaleString('pt-BR'),ag:null,enviados:0,abertos:0});
   localStorage.setItem('atm_hist',JSON.stringify(historico));
-  renderHistorico();
+  renderHistorico();renderCampanhas();
   toast('Registrado! Integre com Evolution API / Resend / FCM.');
-  document.getElementById('mensagem').value='';document.getElementById('destinatario').value='';
+  document.getElementById('mensagem').value='';
+  document.getElementById('camp-nome').value='';
+  document.getElementById('img-preview').style.display='none';
 }
 function agendar(){
   const canal=document.getElementById('canal-select').value;
-  const dest=document.getElementById('destinatario').value.trim();
   const msg=document.getElementById('mensagem').value.trim();
   const ag=document.getElementById('agendamento').value;
-  if(!canal||!dest||!msg||!ag){toast('Preencha todos os campos para agendar');return;}
+  const nome=document.getElementById('camp-nome').value.trim()||'Disparo agendado';
+  if(!canal||!msg||!ag){toast('Preencha canal, mensagem e data/hora');return;}
   const dt=new Date(ag).toLocaleString('pt-BR');
-  historico.push({canal,dest,msg,data:new Date().toLocaleString('pt-BR'),ag:dt});
+  const img=document.getElementById('img-thumb').src;
+  const imgData=img&&img.startsWith('data:')?img:null;
+  historico.push({canal,nome,msg,img:imgData,data:new Date().toLocaleString('pt-BR'),ag:dt,enviados:0,abertos:0});
   localStorage.setItem('atm_hist',JSON.stringify(historico));
-  renderHistorico();
+  renderHistorico();renderCampanhas();
   toast(`Agendado para ${dt}`);
+}
+function renderCampanhas(){
+  const el=document.getElementById('campanhas-list');
+  if(!el)return;
+  if(!historico.length){el.innerHTML='<div style="text-align:center;padding:40px;color:#999">Nenhuma campanha ainda</div>';return;}
+  el.innerHTML=historico.slice().reverse().map((h,ri)=>{
+    const i=historico.length-1-ri;
+    const pct=h.enviados&&h.abertos?Math.round(h.abertos/h.enviados*100):0;
+    const barColor=pct>=50?'#1A7A3F':pct>=20?'#E6A817':'#C0392B';
+    return `<div class="card" style="margin-bottom:10px;cursor:pointer" onclick="verDisparo(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700">${h.nome||'Disparo'}</div>
+          <div style="display:flex;gap:6px;margin-top:4px">
+            <span class="badge ${h.canal==='whatsapp'?'bg':h.canal==='email'?'bb':'bp'}" style="font-size:10px">${h.canal.toUpperCase()}</span>
+            <span style="font-size:12px;color:#999">${h.data}</span>
+            ${h.ag?`<span class="badge by" style="font-size:10px">⏰ Agendado</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:${barColor}">${pct}%</div>
+          <div style="font-size:11px;color:#999">abertura</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">
+        <div style="font-size:12px;color:#666">Enviados: <strong>${h.enviados||'—'}</strong></div>
+        <div style="font-size:12px;color:#666">Lidos: <strong style="color:#1A7A3F">${h.abertos||'—'}</strong></div>
+        <div style="font-size:12px;color:#666">Taxa: <strong style="color:${barColor}">${pct}%</strong></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:${pct}%;background:${barColor}"></div></div>
+        <span style="font-size:11px;color:#999;min-width:32px">${pct}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== CORRELAÇÃO WhatsApp x Posts =====
+let corrData=JSON.parse(localStorage.getItem('atm_corr')||'[]');
+function renderCorrTable(){
+  const tb=document.getElementById('corr-tbody');if(!tb)return;
+  tb.innerHTML=corrData.map((r,i)=>`
+    <tr>
+      <td>${r.data}</td>
+      <td style="text-align:center">${r.posts}</td>
+      <td style="text-align:center">${r.wa}</td>
+      <td><button class="bico bico-del" onclick="deleteCorrRow(${i})">✕</button></td>
+    </tr>`).join('');
+}
+function addCorrRow(){
+  const d=document.getElementById('corr-data').value;
+  const p=parseInt(document.getElementById('corr-posts').value)||0;
+  const w=parseInt(document.getElementById('corr-wa').value)||0;
+  if(!d){toast('Informe a data');return;}
+  corrData.push({data:d,posts:p,wa:w});
+  corrData.sort((a,b)=>a.data.localeCompare(b.data));
+  localStorage.setItem('atm_corr',JSON.stringify(corrData));
+  renderCorrTable();renderCorrChart();renderCorrStats();
+  document.getElementById('corr-data').value='';
+  document.getElementById('corr-posts').value='';
+  document.getElementById('corr-wa').value='';
+}
+function deleteCorrRow(i){
+  corrData.splice(i,1);
+  localStorage.setItem('atm_corr',JSON.stringify(corrData));
+  renderCorrTable();renderCorrChart();renderCorrStats();
+}
+function renderCorrChart(){
+  const canvas=document.getElementById('corr-canvas');if(!canvas||!corrData.length)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||600;canvas.width=W;canvas.height=180;
+  ctx.clearRect(0,0,W,180);
+  if(!corrData.length)return;
+  const maxP=Math.max(...corrData.map(r=>r.posts),1);
+  const maxW=Math.max(...corrData.map(r=>r.wa),1);
+  const maxVal=Math.max(maxP,maxW);
+  const pad={l:40,r:20,t:20,b:40};
+  const chartW=W-pad.l-pad.r;const chartH=180-pad.t-pad.b;
+  const n=corrData.length;
+  const step=chartW/(n>1?n-1:1);
+  // Grid
+  ctx.strokeStyle='#F0F0F0';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+chartH*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+chartW,y);ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='right';
+    ctx.fillText(Math.round(maxVal*i/4),pad.l-4,y+3);
+  }
+  // Posts line (blue)
+  ctx.strokeStyle='#185FA5';ctx.lineWidth=2;ctx.beginPath();
+  corrData.forEach((r,i)=>{
+    const x=pad.l+i*step;const y=pad.t+chartH*(1-r.posts/maxVal);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });ctx.stroke();
+  // WA line (green)
+  ctx.strokeStyle='#1A7A3F';ctx.lineWidth=2;ctx.beginPath();
+  corrData.forEach((r,i)=>{
+    const x=pad.l+i*step;const y=pad.t+chartH*(1-r.wa/maxVal);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });ctx.stroke();
+  // Dots
+  corrData.forEach((r,i)=>{
+    const x=pad.l+i*step;
+    ctx.fillStyle='#185FA5';ctx.beginPath();ctx.arc(x,pad.t+chartH*(1-r.posts/maxVal),3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#1A7A3F';ctx.beginPath();ctx.arc(x,pad.t+chartH*(1-r.wa/maxVal),3,0,Math.PI*2);ctx.fill();
+    // labels
+    ctx.fillStyle='#999';ctx.font='9px DM Sans,sans-serif';ctx.textAlign='center';
+    const lbl=r.data.substring(5);ctx.fillText(lbl,x,180-10);
+  });
+  // Legend
+  ctx.fillStyle='#185FA5';ctx.fillRect(pad.l,8,12,4);
+  ctx.fillStyle='#0A0A0A';ctx.font='10px DM Sans,sans-serif';ctx.textAlign='left';ctx.fillText('Posts',pad.l+16,13);
+  ctx.fillStyle='#1A7A3F';ctx.fillRect(pad.l+70,8,12,4);
+  ctx.fillStyle='#0A0A0A';ctx.fillText('WhatsApps',pad.l+86,13);
+}
+function renderCorrStats(){
+  const el=document.getElementById('corr-stats');if(!el||!corrData.length)return;
+  const totalP=corrData.reduce((s,r)=>s+r.posts,0);
+  const totalW=corrData.reduce((s,r)=>s+r.wa,0);
+  const avgP=totalP/corrData.length;const avgW=totalW/corrData.length;
+  const ratio=avgP>0?(avgW/avgP).toFixed(1):0;
+  const best=corrData.slice().sort((a,b)=>b.wa-a.wa)[0];
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="padding:14px;background:#E6F1FB;border-radius:8px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:#185FA5">${totalP}</div>
+        <div style="font-size:11px;color:#666">Posts totais</div>
+      </div>
+      <div style="padding:14px;background:#E6F4EC;border-radius:8px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:#1A7A3F">${totalW}</div>
+        <div style="font-size:11px;color:#666">WhatsApps recebidos</div>
+      </div>
+      <div style="padding:14px;background:#F8F8F8;border-radius:8px;text-align:center">
+        <div style="font-size:22px;font-weight:700">${ratio}x</div>
+        <div style="font-size:11px;color:#666">Média WhatsApp por post</div>
+      </div>
+      <div style="padding:14px;background:#FAEEDA;border-radius:8px;text-align:center">
+        <div style="font-size:16px;font-weight:700;color:#854F0B">${best?best.data.substring(5):'-'}</div>
+        <div style="font-size:11px;color:#666">Melhor dia (${best?best.wa:0} WA)</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#666;background:#F8F8F8;padding:12px;border-radius:8px">
+      A cada <strong>${avgP.toFixed(1)} posts</strong> publicados, são recebidos em média <strong>${avgW.toFixed(1)} WhatsApps</strong> via Linktree. Ratio: <strong>${ratio}x</strong>.
+    </div>`;
 }
 
 // ===== TAB NAVIGATION =====
@@ -1274,6 +1682,8 @@ renderEquipe();
 renderMetasOrg();
 renderMetasMkt();
 renderHistorico();
+renderCampanhas();
+renderCorrTable();
 restoreED();
 </script>
 </body>
