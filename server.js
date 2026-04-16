@@ -341,36 +341,58 @@ async function syncClickUp() {
     const ids = Object.keys(cuIds);
     console.log(`  ${ids.length} tarefas com link ClickUp encontradas`);
 
-    // 5. Buscar e atualizar cada tarefa
-    let updated = 0;
+    // 5. Buscar dados do ClickUp para cada tarefa (sem modificar DB ainda)
+    const clickupUpdates = {}; // cuId → { status, resp, prazo }
     for (let i = 0; i < ids.length; i++) {
-      const cuId       = ids[i];
-      const occurrences = cuIds[cuId];
-      const cuTask     = await fetchClickUpTask(cuId);
+      const cuId   = ids[i];
+      const cuTask = await fetchClickUpTask(cuId);
       if (!cuTask || cuTask.err) continue;
 
-      const newStatus = mapStatus(cuTask);
-      const newResp   = mapAssignees(cuTask.assignees);
-      const newPrazo  = formatDue(cuTask.due_date);
-
-      // Atualiza todas as ocorrências do mesmo link (pode existir em mais de um projeto)
-      for (const { key, idx } of occurrences) {
-        const task    = allTasks[key][idx];
-        let   changed = false;
-
-        if (newStatus && task.status !== newStatus) { task.status = newStatus; changed = true; }
-        if (newResp   && task.resp   !== newResp)   { task.resp   = newResp;   changed = true; }
-        if (newPrazo  && task.prazo  !== newPrazo)  { task.prazo  = newPrazo;  changed = true; }
-
-        if (changed) updated++;
-      }
+      clickupUpdates[cuId] = {
+        status: mapStatus(cuTask),
+        resp:   mapAssignees(cuTask.assignees),
+        prazo:  formatDue(cuTask.due_date),
+      };
 
       // Pausa pequena para não estourar rate limit
       if (i < ids.length - 1) await new Promise(r => setTimeout(r, 120));
     }
 
-    // 6. Salvar tarefas no DB
-    stmtUpsert.run('atm_all_tasks', JSON.stringify(allTasks));
+    // 6. Ler estado MAIS RECENTE do DB (pode ter mudado durante as chamadas acima)
+    //    para não sobrescrever alterações feitas pelo usuário durante o sync
+    const freshRow   = stmtGetOne.get('atm_all_tasks');
+    const freshTasks = freshRow ? JSON.parse(freshRow.value) : dbTasks;
+
+    // Reconstruir allTasks com base no estado fresco
+    const freshAll = {};
+    for (const proj of projects) {
+      const key = String(proj.id);
+      freshAll[key] = freshTasks[key] !== undefined ? freshTasks[key] : (proj.tarefas || []);
+    }
+    for (const [k, v] of Object.entries(freshTasks)) {
+      if (!freshAll[k]) freshAll[k] = v;
+    }
+
+    // Aplicar atualizações do ClickUp sobre o estado fresco
+    let updated = 0;
+    for (const [cuId, updates] of Object.entries(clickupUpdates)) {
+      const occurrences = cuIds[cuId];
+      for (const { key, idx } of occurrences) {
+        // Encontrar tarefa pelo link no estado fresco (índice pode ter mudado)
+        const freshTaskArr = freshAll[key];
+        if (!freshTaskArr) continue;
+        const task = freshTaskArr.find(t => t.link && t.link.includes(cuId));
+        if (!task) continue;
+        let changed = false;
+        if (updates.status && task.status !== updates.status) { task.status = updates.status; changed = true; }
+        if (updates.resp   && task.resp   !== updates.resp)   { task.resp   = updates.resp;   changed = true; }
+        if (updates.prazo  && task.prazo  !== updates.prazo)  { task.prazo  = updates.prazo;  changed = true; }
+        if (changed) updated++;
+      }
+    }
+
+    // 7. Salvar estado fresco + atualizações ClickUp
+    stmtUpsert.run('atm_all_tasks', JSON.stringify(freshAll));
 
     // 7. Sincronizar funil comercial
     await syncFunil();
